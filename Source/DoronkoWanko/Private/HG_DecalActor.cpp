@@ -2,13 +2,19 @@
 
 
 #include "HG_DecalActor.h"
+#include "Components/DecalComponent.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 AHG_DecalActor::AHG_DecalActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	Decal = CreateDefaultSubobject<UDecalComponent>(TEXT("Decal"));
+	SetRootComponent(Decal);
 
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	BoxComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
