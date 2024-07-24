@@ -18,12 +18,14 @@ AHJ_ElectricFan::AHJ_ElectricFan()
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);
+	UE_LOG(LogTemp, Warning, TEXT("E key Presse"));
 }
 
 // Called when the game starts or when spawned
 void AHJ_ElectricFan::BeginPlay()
 {
 	Super::BeginPlay();
+	
 
 	// 특정조건이 만족되면 스폰한다 (다른 객체에서 진행) 
 }
