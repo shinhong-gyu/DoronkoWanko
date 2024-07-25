@@ -16,7 +16,27 @@ AHG_DecalActor::AHG_DecalActor()
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxComp->SetupAttachment(RootComponent);
 
-
+	// 랜덤하게 Decal 패턴 찍어내기
+	UMaterial* SelectedMaterial = nullptr;
+	int32 randInt = FMath::RandRange(0,9);
+	if (randInt == 1) {
+		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("C:/Program Files/Epic Games/UE_5.4/Engine/Plugins/Interchange/Runtime/Content/Materials/DecalMaterial.uasset"));
+		if (tempMaterial.Succeeded())
+		{
+			SelectedMaterial = tempMaterial.Object;
+		}
+	}
+	else{
+		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("C:/Program Files/Epic Games/UE_5.4/Engine/Plugins/Interchange/Runtime/Content/Materials/DecalMaterial.uasset"));
+		if (tempMaterial.Succeeded())
+		{
+			SelectedMaterial = tempMaterial.Object;
+		}
+	}
+	if (SelectedMaterial)
+	{
+		Decal->SetMaterial(0, SelectedMaterial);
+	}
 }
 
 // Called when the game starts or when spawned

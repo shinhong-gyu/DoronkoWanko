@@ -56,7 +56,7 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	{
 		input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionMove);
 		input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionLook);
-		input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionJump);
+		input->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionJump);
 
 	}
 
