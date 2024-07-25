@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HJ_ElectricFan.generated.h"
+#include "HJ_Train.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_ElectricFan : public AActor
+class DORONKOWANKO_API AHJ_Train : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AHJ_ElectricFan();
+	AHJ_Train();
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,16 +24,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
-	class UInputComponent* InputComp;
-
-	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
-
-	UPROPERTY(EditAnywhere)
-	bool IsInRange;
 
 	UFUNCTION(BlueprintCallable)
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -42,14 +36,34 @@ public:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* WingComp;
+	bool IsInRange;
 
+	// 소켓에 부착할 바퀴 클래스 선언 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHJ_TrainWheel> WheelFactory;
+
+	class AHJ_TrainWheel* CurrentWheel;
+
+	void EquipSocket();
+
+	UPROPERTY(EditAnywhere)
+	int PressE = 0;
+
+	// 기차의 몸체(자체) 회전 변수 
+	UPROPERTY(EditAnywhere)
+	float Radius;
+
+	UPROPERTY(EditAnywhere)
+	float AngularSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float CurrentAngle;
+
+	// 기차의 방향 회전 변수 
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
 	UPROPERTY(EditAnywhere)
 	float CurrentRotationAngel;
 
-	UPROPERTY(EditAnywhere)
-	int PressE = 0;
 };

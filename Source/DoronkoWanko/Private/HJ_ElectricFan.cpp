@@ -55,11 +55,11 @@ void AHJ_ElectricFan::Tick(float DeltaTime)
 		if (PlayerController && PlayerController->IsInputKeyDown(EKeys::E))
 		{
 			RotationSpeed = 100.0f;
-			WingRota = WingRota + 1;
+			PressE = PressE + 1;
 		}
 	}
 	
-	if (WingRota % 2 == 1)
+	if (PressE % 2 == 1)
 	{
 		// 선풍기 날개 돌아가게 한다
 		// E키를 한번 누르면 돌아가고 & 두번 누르면 돌아가는게 멈춘다 
