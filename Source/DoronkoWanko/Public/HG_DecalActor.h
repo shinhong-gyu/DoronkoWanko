@@ -28,4 +28,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UDecalComponent* Decal;
+
+	FColor color;
+
+	UDecalComponent* GetDecal() const {
+		return Decal;
+	}
 };

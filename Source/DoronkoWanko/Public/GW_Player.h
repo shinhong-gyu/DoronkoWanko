@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputTriggers.h"
 #include "GW_Player.generated.h"
 
 UCLASS()
@@ -28,6 +29,26 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
+    float TargetArmLength = 300.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
+    float ZoomSpeed = 100.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
+    float MinArmLength = 50.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
+    float MaxArmLength = 1000.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USpringArmComponent* SpringArmComp;
+	
+	UPROPERTY(EditDefaultsOnly)
+	class UCameraComponent* CameraComp;
+
+
+	
 	UPROPERTY(EditDefaultsOnly)
 	class UInputMappingContext* IMC_Player;
 
@@ -46,7 +67,23 @@ public:
 	class UInputAction* IA_Jump;
 
 	void OnMyActionJump(const FInputActionValue& Value);
+	
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Zoom;
+	void OnMyActionZoom(const FInputActionValue& Value);
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Dash;
+	void OnMyActionDashOngoing(const FInputActionValue& Value);
+	void OnMyActionDashCompleted(const FInputActionValue& Value);
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
+    float DashSpeed = 1200.0f;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
+    float WalkSpeed = 600.0f;
+
+
+	AActor* LookAtActor = nullptr;
 
 };

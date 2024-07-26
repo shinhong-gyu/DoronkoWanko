@@ -4,13 +4,32 @@
 #include "GW_Player.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputTriggers.h"
+#include "I_Interaction.h"
+#include <Kismet/GameplayStatics.h>
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	TargetArmLength = 300.0f;
+	ZoomSpeed = 75.0f;
+	MinArmLength = 50.0f;
+	MaxArmLength = 1000.0f;
 
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	SpringArmComp->SetupAttachment(RootComponent);
+	SpringArmComp->TargetArmLength = TargetArmLength;
+
+
+	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
+	CameraComp->SetupAttachment(SpringArmComp);
 }
 
 // Called when the game starts or when spawned
@@ -41,7 +60,36 @@ void AGW_Player::Tick(float DeltaTime)
 	AddMovementInput(Direction, 1);
 	Direction = FVector::ZeroVector;
 
+	FHitResult OutHit;
+	FVector Start = this->GetActorLocation();
+	FVector End = Start + CameraComp->GetForwardVector() + 1000.f;
+	ECollisionChannel TraceChannel = ECC_Visibility;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, TraceChannel, Params);
+	if (bHit) {
+		// 바라본 곳에 뭔가 있다.
+		if (OutHit.GetActor() != LookAtActor) {
+			LookAtActor = OutHit.GetActor();
+			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+			if (Interface) {
+				Interface->LookAt();
+			}
+		}
+		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Red, false, 3);
 
+	}
+	else {
+		if (IsValid(LookAtActor)) {
+			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+			if (Interface) {
+				Interface->FadeAway();
+				LookAtActor = nullptr;
+			}
+		}
+		// 허공
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 3);
+	}
 }
 
 // Called to bind functionality to input
@@ -56,8 +104,10 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	{
 		input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionMove);
 		input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionLook);
-		input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionJump);
-
+		input->BindAction(IA_Jump, ETriggerEvent::Started, this, &AGW_Player::OnMyActionJump);
+		input->BindAction(IA_Zoom, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionZoom);
+		input->BindAction(IA_Dash, ETriggerEvent::Ongoing, this, &AGW_Player::OnMyActionDashOngoing);
+		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
 	}
 
 }
@@ -87,4 +137,39 @@ void AGW_Player::OnMyActionJump(const FInputActionValue& Value)
 {
 	Jump();
 }
+
+void AGW_Player::OnMyActionZoom(const FInputActionValue& Value)
+{
+	const float ZoomAmount = Value.Get<float>() * ZoomSpeed;
+	TargetArmLength = FMath::Clamp(TargetArmLength + ZoomAmount, MinArmLength, MaxArmLength);
+	SpringArmComp->TargetArmLength = TargetArmLength;
+}
+
+// void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value, ETriggerEvent TriggerEvent)
+// {
+// 	if (TriggerEvent == ETriggerEvent::Started)
+// 	{
+// 		// 대시가 시작될 때 실행되는 코드
+// 		GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
+// 	}
+// 	else if (TriggerEvent == ETriggerEvent::Completed)
+// 	{
+// 		// 대시가 완료될 때 실행되는 코드
+// 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+// 	}
+// }
+
+void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value)
+{
+	GetCharacterMovement()->MaxWalkSpeed = 1500.0f;
+}
+
+void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
+{
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+
+}
+
+
+
 
