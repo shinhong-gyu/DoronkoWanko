@@ -41,6 +41,12 @@ public:
 
 	float Speed = 300; 
 
+	float Check = 0;
+	float MoveCheck = 0;
+
+	void Rotate();
+
+	FTimerHandle TimerHandle;
 	/*UFUNCTION(BlueprintCallable)
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);*/
 
