@@ -5,6 +5,8 @@
 #include "Components/BoxComponent.h"
 #include "HJ_TrainWheel.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/ArrowComponent.h"
+#include "GW_Player.h"
 
 // Sets default values
 AHJ_Train::AHJ_Train()
@@ -19,6 +21,22 @@ AHJ_Train::AHJ_Train()
 	// 메쉬 생성
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(BoxComp);
+
+	// 바퀴 메쉬 생성 
+	Wheel1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel1"));
+	Wheel2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel2"));
+	Wheel3 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel3"));
+	Wheel4 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel4"));
+
+	Wheel1->SetupAttachment(BoxComp);
+	Wheel2->SetupAttachment(BoxComp);
+	Wheel3->SetupAttachment(BoxComp);
+	Wheel4->SetupAttachment(BoxComp);
+
+	// 바퀴 메쉬 처음엔 안보이게 설정 
+	Wheel2->SetVisibility(false);
+	Wheel3->SetVisibility(false);
+	Wheel4->SetVisibility(false);
 
 	// 충돌체 처리 
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
@@ -47,17 +65,28 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*if (IsInRange)
-	{*/
+	if (IsInRange)
+	{
 		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-		if (PlayerController && PlayerController->IsInputKeyDown(EKeys::E))
+		if (PlayerController && PlayerController->WasInputKeyJustPressed(EKeys::E))
 		{
-			EquipSocket();
-			/*PressE = PressE + 1;*/
+			PressE = PressE + 1;
 		}
-
+	}
 
 	// 기차 회전 로직 -> Socket 구현되면 조건부 재생 
+	if (PressE == 1)
+	{
+		Wheel2->SetVisibility(true);
+	}
+	else if (PressE == 2)
+	{
+		Wheel3->SetVisibility(true);
+	}
+	else if (PressE >= 3)
+	{
+		Wheel4->SetVisibility(true);
+
 		CurrentAngle += AngularSpeed * DeltaTime;
 		float X = Radius * FMath::Cos(CurrentAngle);
 		float Y = Radius * FMath::Sin(CurrentAngle);
@@ -72,15 +101,17 @@ void AHJ_Train::Tick(float DeltaTime)
 		}
 		FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
 		BoxComp->SetRelativeRotation(TrainRotation);
-
+	}
+	else 
+	{ }
 }
 
 void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// 바퀴와 충돌 인식 
-	auto* Wheel = Cast<AHJ_TrainWheel>(OtherActor);
+	// 플레이어와 충돌 인식 
+	auto* Player = Cast<AGW_Player>(OtherActor);
 
-	if (Wheel)
+	if (Player)
 	{
 		IsInRange = true;
 		UE_LOG(LogTemp, Warning, TEXT("WheelHit"));
@@ -89,34 +120,14 @@ void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 
 void AHJ_Train::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	// 바퀴와 충돌 종료 인식 
-	auto* Wheel = Cast<AHJ_TrainWheel>(OtherActor);
+	// 플레이어와 충돌 종료 인식 
+	auto* Player = Cast<AHJ_TrainWheel>(OtherActor);
 
-	if (Wheel)
+	if (Player)
 	{
 		IsInRange = false;
 		UE_LOG(LogTemp, Warning, TEXT("WheelOut"));
 	}
-}
-
-void AHJ_Train::EquipSocket()
-{
-	// 기차 바퀴를 소켓에 붙인다 
-	// 다만 현재 바퀴도& 기차도 모두 Static Mesh 상태로 열차에 붙질 않는다 
-	FName WheelSocket(TEXT("WheelSocket"));
-
-	if (CurrentWheel == nullptr)
-	{
-		CurrentWheel = GetWorld()->SpawnActor<AHJ_TrainWheel>(WheelFactory, GetActorLocation(), FRotator::ZeroRotator);
-
-		if (CurrentWheel)
-		{ 
-			CurrentWheel->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, WheelSocket);
-		}	
-	}
-	
-	// 대안1. Scene 컴포넌트 만들어서 해당 위치에 바퀴가 생성되게 한다. 
-	// 대안2. 바퀴를 hidden 설정 -> 인터렉션 할 때 마다 show // 이때 열차의 Rotation 정상으로 돌아오게 
 }
 
 
