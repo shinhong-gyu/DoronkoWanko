@@ -23,6 +23,8 @@ ARoboticVacuum::ARoboticVacuum()
 	RotationSpeed = 20.0f;
 	CurrentRotationAngle = 0.0f;
 
+	Check = 0;
+
 }
 
 // Called when the game starts or when spawned
@@ -38,49 +40,47 @@ void ARoboticVacuum::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*CheckAngle = CurrentRotationAngle - ActorAngle;*/
-	// 각도차이 - 절대값으로 계산해야함 
-	
-	// 추가되는 회전값은 45도, 90도, 135도 3가지 중 랜덤값으로 나간다 
-	if (CurrentRotationAngle <= 45.0f) // R값에 랜덤값으로 들어가야 함 
-	{
-		/*CurrentRotationAngle = RobotRotation.Yaw; */// 엑터의 현 위치에서 회전해야 함 
-		// 이전 회전 각도 - 변경된 회전 각도 -> 새로운 변수에 담기 // 해당 변수의 값이 45보다 작을 때 동작 
-		CurrentRotationAngle += RotationSpeed * DeltaTime;
-	}
-	else
-	{
-		Speed = 300;
-		SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
-		RotationSpeed = 0;
-		
-	}
-	FRotator VacuumRotation = CheckAngle + FRotator(0.0f, CurrentRotationAngle, 0.0f);
+	FRotator VacuumRotation = FRotator(0.0f, CurrentRotationAngle, 0.0f);
 	SphereComp->SetRelativeRotation(VacuumRotation);
 
+	if (MoveCheck >= 20)
+	{
+		SetActorLocation(GetActorLocation() + GetActorForwardVector()*Speed*DeltaTime);
+	}
 }
 
 void ARoboticVacuum::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor)
 	{
-		CurrentRotationAngle = 0;
-		Speed = 0;
-		CheckAngle = GetActorRotation();
-		SetActorLocation(GetActorLocation() + GetActorForwardVector()*(-10.0f));
-		UE_LOG(LogTemp, Warning, TEXT("VacuumOUT"));
+		MoveCheck = 0;
+		if (Check < 20)
+		{
+			if (!GetWorld()->GetTimerManager().IsTimerActive(TimerHandle))
+			{
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ARoboticVacuum::Rotate, 0.05f, true);
+			}
+		}
+
+		else
+		{
+			GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+		}
+
 	}
 }
 
+void ARoboticVacuum::Rotate()
+{
+	CurrentRotationAngle += RotationSpeed * 1;
+	Check += 1;
+	MoveCheck += 1;
 
+	if (Check >= 20)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+		Check = 0; 
+	}
+}
 
-//void ARoboticVacuum::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	if (OtherActor)
-//	{
-//	CurrentRotationAngel = 0;
-//	Speed = 0;
-//	UE_LOG(LogTemp, Warning, TEXT("VacuumOUT"));
-//	}
-//}
 
