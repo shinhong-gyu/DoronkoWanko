@@ -43,7 +43,6 @@ AHG_DecalActor::AHG_DecalActor()
 void AHG_DecalActor::BeginPlay()
 {
 	Super::BeginPlay();
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AHG_DecalActor::OnMyMudOverlap);
 }
 
 // Called every frame
@@ -52,10 +51,3 @@ void AHG_DecalActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-void AHG_DecalActor::OnMyMudOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	
-}
-
-

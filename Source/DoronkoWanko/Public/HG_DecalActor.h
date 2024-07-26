@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UDecalComponent* Decal;
 
-	UFUNCTION()
-	void OnMyMudOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,bool bFromSweep, const FHitResult& SweepResult);
+	FColor color;
+
+	UDecalComponent* GetDecal() const {
+		return Decal;
+	}
 };

@@ -22,7 +22,21 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere)
+	class USphereComponent* SphereComp;
 	
 	UPROPERTY(EditAnywhere)
-	class UStaticMesh* MeshComp;
+	class UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(EditAnywhere)
+    TSubclassOf<class AHG_DecalActor> DecalClass;
+
+	UPROPERTY(EditAnywhere)
+	class UProjectileMovementComponent* ProjectileMovementComponent;
+
+	void SpawnDecalAtLocation(const FVector& Location, const FRotator& Rotation);
+
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };
