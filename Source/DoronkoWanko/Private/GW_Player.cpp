@@ -4,12 +4,32 @@
 #include "GW_Player.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputTriggers.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	TargetArmLength = 300.0f;
+	ZoomSpeed = 75.0f;
+	MinArmLength = 50.0f;
+	MaxArmLength = 1000.0f;
+
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	SpringArmComp->SetupAttachment(RootComponent);
+	SpringArmComp->TargetArmLength = TargetArmLength;
+
+
+	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
+	CameraComp->SetupAttachment(SpringArmComp);
+
+
+
 
 }
 
@@ -56,7 +76,12 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	{
 		input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionMove);
 		input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionLook);
-		input->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionJump);
+		input->BindAction(IA_Jump, ETriggerEvent::Started, this, &AGW_Player::OnMyActionJump);
+		input->BindAction(IA_Zoom, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionZoom);
+		input->BindAction(IA_Dash, ETriggerEvent::Ongoing, this, &AGW_Player::OnMyActionDashOngoing);
+		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
+
+
 
 	}
 
@@ -87,4 +112,39 @@ void AGW_Player::OnMyActionJump(const FInputActionValue& Value)
 {
 	Jump();
 }
+
+void AGW_Player::OnMyActionZoom(const FInputActionValue& Value)
+{
+	const float ZoomAmount = Value.Get<float>() * ZoomSpeed;
+	TargetArmLength = FMath::Clamp(TargetArmLength + ZoomAmount, MinArmLength, MaxArmLength);
+	SpringArmComp->TargetArmLength = TargetArmLength;
+}
+
+// void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value, ETriggerEvent TriggerEvent)
+// {
+// 	if (TriggerEvent == ETriggerEvent::Started)
+// 	{
+// 		// 대시가 시작될 때 실행되는 코드
+// 		GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
+// 	}
+// 	else if (TriggerEvent == ETriggerEvent::Completed)
+// 	{
+// 		// 대시가 완료될 때 실행되는 코드
+// 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+// 	}
+// }
+
+void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value)
+{
+	GetCharacterMovement()->MaxWalkSpeed = 1500.0f;
+}
+
+void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
+{
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+
+}
+
+
+
 
