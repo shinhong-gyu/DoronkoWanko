@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HG_DecalActor.generated.h"
+#include "MasterInteraction.h"
+#include "MasterMapObject.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHG_DecalActor : public AActor
+class DORONKOWANKO_API AMasterMapObject : public AMasterInteraction
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AHG_DecalActor();
+	AMasterMapObject();
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,15 +24,4 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComp;
-
-	UPROPERTY(EditAnywhere)
-	class UDecalComponent* Decal;
-
-	FColor color;
-
-	UDecalComponent* GetDecal() const {
-		return Decal;
-	}
 };

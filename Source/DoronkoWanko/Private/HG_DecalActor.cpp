@@ -15,13 +15,34 @@ AHG_DecalActor::AHG_DecalActor()
 
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxComp->SetupAttachment(RootComponent);
+
+	// ·£´ýÇÏ°Ô Decal ÆÐÅÏ Âï¾î³»±â
+	UMaterial* SelectedMaterial = nullptr;
+	int32 randInt = FMath::RandRange(0,9);
+	if (randInt == 1) {
+		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT(""));
+		if (tempMaterial.Succeeded())
+		{
+			SelectedMaterial = tempMaterial.Object;
+		}
+	}
+	else{
+		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT(""));
+		if (tempMaterial.Succeeded())
+		{
+			SelectedMaterial = tempMaterial.Object;
+		}
+	}
+	if (SelectedMaterial)
+	{
+		Decal->SetMaterial(0, SelectedMaterial);
+	}
 }
 
 // Called when the game starts or when spawned
 void AHG_DecalActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -30,4 +51,3 @@ void AHG_DecalActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-

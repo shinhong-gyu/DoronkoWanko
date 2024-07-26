@@ -84,6 +84,6 @@ public:
     float WalkSpeed = 600.0f;
 
 
-
+	AActor* LookAtActor = nullptr;
 
 };

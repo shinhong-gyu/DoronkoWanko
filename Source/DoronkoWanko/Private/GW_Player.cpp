@@ -9,6 +9,9 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputTriggers.h"
+#include "I_Interaction.h"
+#include <Kismet/GameplayStatics.h>
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -27,10 +30,6 @@ AGW_Player::AGW_Player()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
-
-
-
-
 }
 
 // Called when the game starts or when spawned
@@ -61,7 +60,36 @@ void AGW_Player::Tick(float DeltaTime)
 	AddMovementInput(Direction, 1);
 	Direction = FVector::ZeroVector;
 
+	FHitResult OutHit;
+	FVector Start = this->GetActorLocation();
+	FVector End = Start + CameraComp->GetForwardVector() + 1000.f;
+	ECollisionChannel TraceChannel = ECC_Visibility;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, TraceChannel, Params);
+	if (bHit) {
+		// 바라본 곳에 뭔가 있다.
+		if (OutHit.GetActor() != LookAtActor) {
+			LookAtActor = OutHit.GetActor();
+			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+			if (Interface) {
+				Interface->LookAt();
+			}
+		}
+		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Red, false, 3);
 
+	}
+	else {
+		if (IsValid(LookAtActor)) {
+			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+			if (Interface) {
+				Interface->FadeAway();
+				LookAtActor = nullptr;
+			}
+		}
+		// 허공
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 3);
+	}
 }
 
 // Called to bind functionality to input
@@ -80,9 +108,6 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Zoom, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionZoom);
 		input->BindAction(IA_Dash, ETriggerEvent::Ongoing, this, &AGW_Player::OnMyActionDashOngoing);
 		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
-
-
-
 	}
 
 }
