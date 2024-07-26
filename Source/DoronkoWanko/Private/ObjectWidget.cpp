@@ -5,5 +5,5 @@
 
 void UObjectWidget::SetText(FText s)
 {
-	InteractionText->SetText(s);
+	InteractionTextBox->SetText(s);
 }

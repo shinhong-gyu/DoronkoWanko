@@ -38,16 +38,19 @@ void AMasterInteraction::Tick(float DeltaTime)
 void AMasterInteraction::LookAt()
 {
 	// 아이템 속성에 따라 Interaction 문구를 Widget 의 TextBox 에 바인드하고
-	Widget->SetText(InteractionText);
 	// 위젯을 생성하여 화면에 표시하고 싶다.
 	if (bIsDropped) // 아이템이 떨어져 있고
 	{
 		if (Widget == nullptr)  // Widget 이 아직 생성되지 않았다면
-		{
+		{	
 			// Widget 을 생성하고
 			Widget = CreateWidget<UObjectWidget>(GetWorld(), ObjectWidgetClass);
-			// 화면에 Widget 을 출력
-			Widget->AddToViewport();
+			if (Widget != nullptr) {
+				printf("1");
+				Widget->SetText(InteractionText);
+				// 화면에 Widget 을 출력
+				Widget->AddToViewport();
+			}
 		}
 		else // Widget 이 이미 있다면 
 		{

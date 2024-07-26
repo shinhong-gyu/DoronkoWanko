@@ -19,7 +19,7 @@ class DORONKOWANKO_API UObjectWidget : public UUserWidget
 public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UTextBlock* InteractionText;
+	UTextBlock* InteractionTextBox;
 
 	UFUNCTION()
 	void SetText(FText s);
