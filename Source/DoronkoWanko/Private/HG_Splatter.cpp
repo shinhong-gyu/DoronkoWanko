@@ -23,13 +23,14 @@ AHG_Splatter::AHG_Splatter()
 	ProjectileMovementComponent->Activate();
 	ProjectileMovementComponent->Velocity = FVector(0,0,-1)*500.0f;
 	ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
+
 }
 
 // Called when the game starts or when spawned
 void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AHG_Splatter::OnMyBeginOverlap);
 }
 
 // Called every frame
@@ -54,10 +55,9 @@ void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator&
 	}
 }
 
-void AHG_Splatter::NotifyActorBeginOverlap(AActor* OtherActor)
+void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::NotifyActorBeginOverlap(OtherActor);
-
+	UE_LOG(LogTemp, Warning, TEXT("1"));
 	if (OtherActor != nullptr && OtherActor != this) {
 		this->Destroy();
 		FVector HitLocation = GetActorLocation();
