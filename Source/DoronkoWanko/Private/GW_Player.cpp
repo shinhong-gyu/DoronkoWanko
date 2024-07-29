@@ -190,7 +190,6 @@ void AGW_Player::Shake()
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
 	}
-
 }
 
 

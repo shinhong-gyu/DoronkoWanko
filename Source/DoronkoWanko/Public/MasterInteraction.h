@@ -34,6 +34,7 @@ public:
     class UWidgetComponent* InteractionWidgetComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UObjectWidget> ObjectWidgetClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	class UObjectWidget* Widget;
 

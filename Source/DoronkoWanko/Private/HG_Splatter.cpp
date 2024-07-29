@@ -66,7 +66,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (OtherActor != nullptr && OtherActor != this) {
 		this->Destroy();
 		FVector HitLocation = GetActorLocation();
-		FRotator HitRoation = GetActorRotation();
+		FRotator HitRoation = -1*OtherActor->GetActorRotation();
 		this->SpawnDecalAtLocation(HitLocation, HitRoation);
 	}
 }
