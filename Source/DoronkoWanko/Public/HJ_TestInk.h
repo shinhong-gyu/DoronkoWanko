@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HJTestInk.generated.h"
+#include "HJ_TestInk.generated.h"
 
 UCLASS()
 class DORONKOWANKO_API AHJTestInk : public AActor

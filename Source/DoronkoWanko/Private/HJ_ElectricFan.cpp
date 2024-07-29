@@ -35,7 +35,6 @@ AHJ_ElectricFan::AHJ_ElectricFan()
 	IsInRange = false;
 
 	InteractionText = FText::FromString(TEXT("E) INTERACTION"));
-
 }
 
 // Called when the game starts or when spawned

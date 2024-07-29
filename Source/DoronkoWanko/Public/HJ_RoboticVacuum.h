@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DynamicObject.h"
-#include "RoboticVacuum.generated.h"
+#include "HJ_RoboticVacuum.generated.h"
 
 UCLASS()
 class DORONKOWANKO_API ARoboticVacuum : public ADynamicObject
@@ -27,14 +27,17 @@ public:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 	/*UPROPERTY(EditAnywhere)
-	class USphereComponent* SphereComp;*/
+	class USphereComponent* SphereComp;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* MeshComp;*/
 
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
 	UPROPERTY(EditAnywhere)
 	float CurrentRotationAngle;
-
+	// 회전 
 	FRotator CheckAngle;
 
 	float Speed = 300; 
@@ -44,10 +47,11 @@ public:
 
 	void Rotate();
 
-	FTimerHandle TimerHandle;
-	/*UFUNCTION(BlueprintCallable)
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);*/
+	// 플레이어 입력 키 받기 
+	int PressE;
 
-	
+	FTimerHandle TimerHandle;
+
+
 
 };

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HJTestInk.h"
+#include "HJ_TestInk.h"
 #include "DynamicObject.h"
 #include "HJ_ElephantHat.generated.h"
 
