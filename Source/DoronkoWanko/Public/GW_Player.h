@@ -88,5 +88,25 @@ public:
 
 
 	AActor* LookAtActor = nullptr;
+		TArray<FColor> ColorArray;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Dirt;
+
+	void OnMyActionDirt(const FInputActionValue& Value);
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Splash;
+
+	void OnMyActionSplash(const FInputActionValue& Value);
+
+		UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Interaction;
+
+		UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Drop;
+	void OnMyActionInteraction(const FInputActionValue& Value);
+	void OnMyActionDrop(const FInputActionValue& Value);
+
 
 };
