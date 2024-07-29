@@ -16,23 +16,31 @@ AHG_DecalActor::AHG_DecalActor()
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxComp->SetupAttachment(RootComponent);
 
+	BoxComp->SetGenerateOverlapEvents(true);
+	BoxComp->SetCollisionProfileName(TEXT("Decal"));
 	// ·£´ýÇÏ°Ô Decal ÆÐÅÏ Âï¾î³»±â
 	UMaterial* SelectedMaterial = nullptr;
-	int32 randInt = FMath::RandRange(0,9);
-	if (randInt == 1) {
-		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("C:/Program Files/Epic Games/UE_5.4/Engine/Plugins/Interchange/Runtime/Content/Materials/DecalMaterial.uasset"));
-		if (tempMaterial.Succeeded())
-		{
-			SelectedMaterial = tempMaterial.Object;
-		}
-	}
-	else{
-		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("C:/Program Files/Epic Games/UE_5.4/Engine/Plugins/Interchange/Runtime/Content/Materials/DecalMaterial.uasset"));
-		if (tempMaterial.Succeeded())
-		{
-			SelectedMaterial = tempMaterial.Object;
-		}
-	}
+
+	//ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("/Game/HongGyu/M_Decal.uasset"));
+	//if (tempMaterial.Succeeded())
+	//{
+		//SelectedMaterial = tempMaterial.Object;
+	//}
+// 	int32 randInt = FMath::RandRange(0,9);
+// 	if (randInt == 1) {
+// 		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("C:/Users/Admin/GitHub/DoronkoWanko/DoronkoWanko/Content/HongGyu/M_Decal.uasset"));
+// 		if (tempMaterial.Succeeded())
+// 		{
+// 			SelectedMaterial = tempMaterial.Object;
+// 		}
+// 	}
+// 	else{
+// 		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("C:/Users/Admin/GitHub/DoronkoWanko/DoronkoWanko/Content/HongGyu/M_Decal.uasset"));
+// 		if (tempMaterial.Succeeded())
+// 		{
+// 			SelectedMaterial = tempMaterial.Object;
+// 		}
+// 	}
 	if (SelectedMaterial)
 	{
 		Decal->SetMaterial(0, SelectedMaterial);

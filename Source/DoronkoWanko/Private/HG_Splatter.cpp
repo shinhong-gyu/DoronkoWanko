@@ -19,24 +19,30 @@ AHG_Splatter::AHG_Splatter()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);
 
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	ProjectileMovementComponent->Activate();
-	ProjectileMovementComponent->Velocity = FVector(0,0,-1)*500.0f;
-	ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
+	SphereComp->SetGenerateOverlapEvents(true);
+	SphereComp->SetCollisionProfileName(TEXT("Splatter"));
+	MeshComp->SetCollisionProfileName(TEXT("Splatter"));
+
+	Velocity = FVector::ZeroVector;
 }
 
 // Called when the game starts or when spawned
 void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AHG_Splatter::OnMyBeginOverlap);
 }
 
 // Called every frame
 void AHG_Splatter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	FVector NewLocation = GetActorLocation() + (Velocity * DeltaTime);
+	SetActorLocation(NewLocation);
 
+	// ม฿ทย
+	Velocity += FVector(0, 0, -980.0f) * DeltaTime;
+	UpdataRotation();
 }
 
 void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator& Rotation)
@@ -54,15 +60,27 @@ void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator&
 	}
 }
 
-void AHG_Splatter::NotifyActorBeginOverlap(AActor* OtherActor)
+void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::NotifyActorBeginOverlap(OtherActor);
-
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetClass()->GetName());
 	if (OtherActor != nullptr && OtherActor != this) {
 		this->Destroy();
 		FVector HitLocation = GetActorLocation();
 		FRotator HitRoation = GetActorRotation();
 		this->SpawnDecalAtLocation(HitLocation, HitRoation);
+	}
+}
+
+void AHG_Splatter::Initalize(FVector initVeloccity)
+{
+	Velocity = initVeloccity;
+}
+
+void AHG_Splatter::UpdataRotation()
+{
+	if (!Velocity.IsNearlyZero()) {
+		FRotator NewRotation = Velocity.Rotation();
+		SetActorRotation(NewRotation);
 	}
 }
 
