@@ -15,12 +15,12 @@ AHJ_Train::AHJ_Train()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 충돌체 생성 
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
-	SetRootComponent(BoxComp);
-	BoxComp->SetBoxExtent(FVector(40.0f, 60.0f, 40.0f));
+	//BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
+	//SetRootComponent(BoxComp);
+	//BoxComp->SetBoxExtent(FVector(40.0f, 60.0f, 40.0f));
 	// 메쉬 생성
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(BoxComp);
+	//MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	//MeshComp->SetupAttachment(BoxComp);
 
 	// 바퀴 메쉬 생성 
 	Wheel1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel1"));
@@ -51,6 +51,8 @@ AHJ_Train::AHJ_Train()
 	// 회전 기본값 지정 
 	RotationSpeed = 115.0f;
 	CurrentRotationAngel = 0.0f;
+
+	InteractionText = FText::FromString(TEXT("E) PRESS"));
 }
 
 // Called when the game starts or when spawned
@@ -104,30 +106,6 @@ void AHJ_Train::Tick(float DeltaTime)
 	}
 	else 
 	{ }
-}
-
-void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	// 플레이어와 충돌 인식 
-	auto* Player = Cast<AGW_Player>(OtherActor);
-
-	if (Player)
-	{
-		IsInRange = true;
-		UE_LOG(LogTemp, Warning, TEXT("WheelHit"));
-	}
-}
-
-void AHJ_Train::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	// 플레이어와 충돌 종료 인식 
-	auto* Player = Cast<AHJ_TrainWheel>(OtherActor);
-
-	if (Player)
-	{
-		IsInRange = false;
-		UE_LOG(LogTemp, Warning, TEXT("WheelOut"));
-	}
 }
 
 

@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DynamicObject.h"
 #include "RoboticVacuum.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API ARoboticVacuum : public AActor
+class DORONKOWANKO_API ARoboticVacuum : public ADynamicObject
 {
 	GENERATED_BODY()
 	
@@ -25,11 +26,8 @@ public:
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
-	UPROPERTY(EditAnywhere)
-	class USphereComponent* SphereComp;
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;
+	/*UPROPERTY(EditAnywhere)
+	class USphereComponent* SphereComp;*/
 
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;

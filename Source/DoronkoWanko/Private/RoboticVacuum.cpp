@@ -11,19 +11,17 @@ ARoboticVacuum::ARoboticVacuum()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 충돌체 생성 
-	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("BoxComp"));
-	SetRootComponent(SphereComp);
-
-	// 메쉬 생성 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(RootComponent);
+	//충돌체 생성 
+	/*SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));*/
+	//SetRootComponent(SphereComp);
 
 	// 회전 기본값 지정 
 	RotationSpeed = 20.0f;
 	CurrentRotationAngle = 0.0f;
 
 	Check = 0;
+
+	InteractionText = FText::FromString(TEXT("E) PRESS"));
 
 }
 
@@ -41,7 +39,7 @@ void ARoboticVacuum::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	FRotator VacuumRotation = FRotator(0.0f, CurrentRotationAngle, 0.0f);
-	SphereComp->SetRelativeRotation(VacuumRotation);
+	BoxComp->SetRelativeRotation(VacuumRotation);
 
 	if (MoveCheck >= 20)
 	{

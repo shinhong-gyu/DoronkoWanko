@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DynamicObject.h"
 #include "HJ_TrainWheel.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_TrainWheel : public AActor
+class DORONKOWANKO_API AHJ_TrainWheel : public ADynamicObject
 {
 	GENERATED_BODY()
 	
@@ -23,10 +24,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+	// MasterInteraction 에서 정의 
+	/*UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
-
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;
+	class UStaticMeshComponent* MeshComp;*/
 
 };

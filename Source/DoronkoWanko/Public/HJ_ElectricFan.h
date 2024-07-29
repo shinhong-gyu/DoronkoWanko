@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DynamicObject.h"
 #include "HJ_ElectricFan.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_ElectricFan : public AActor
+class DORONKOWANKO_API AHJ_ElectricFan : public ADynamicObject
 {
 	GENERATED_BODY()
 	
@@ -26,20 +27,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputComponent* InputComp;
 
-	UPROPERTY(EditAnywhere)
+	/*UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;
+	class UStaticMeshComponent* MeshComp;*/
 
-	UPROPERTY(EditAnywhere)
-	bool IsInRange;
-
-	UFUNCTION(BlueprintCallable)
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION(BlueprintCallable)
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* WingComp;

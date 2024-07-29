@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DynamicObject.h"
 #include "HJ_Train.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_Train : public AActor
+class DORONKOWANKO_API AHJ_Train : public ADynamicObject
 {
 	GENERATED_BODY()
 	
@@ -24,12 +25,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComp;
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;
-
-	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel1;
 
 	UPROPERTY(EditAnywhere)
@@ -40,15 +35,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel4;
-
-	UFUNCTION(BlueprintCallable)
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION(BlueprintCallable)
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UPROPERTY(EditAnywhere)
-	bool IsInRange;
 
 	// 소켓에 부착할 바퀴 클래스 선언 
 	UPROPERTY(EditAnywhere)

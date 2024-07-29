@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "HJTestInk.h"
+#include "DynamicObject.h"
 #include "HJ_ElephantHat.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_ElephantHat : public AActor
+class DORONKOWANKO_API AHJ_ElephantHat : public ADynamicObject
 {
 	GENERATED_BODY()
 	
@@ -23,12 +24,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComp;
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* InkArrow;

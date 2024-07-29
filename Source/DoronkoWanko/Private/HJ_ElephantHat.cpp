@@ -12,18 +12,13 @@ AHJ_ElephantHat::AHJ_ElephantHat()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 충돌체 생성 
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
-	SetRootComponent(BoxComp);
-	BoxComp->SetBoxExtent(FVector(50));
-	// 메쉬 생성 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(RootComponent);
 	// 스폰위치(Arrow) 생성 
 	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
 	InkArrow->SetupAttachment(RootComponent);
 	InkArrow->SetRelativeLocation(FVector(90, 0, 0));
 	InkArrow->SetRelativeRotation(FRotator(0, 0, 0));
+
+	InteractionText = FText::FromString(TEXT("E) PRESS"));
 }
 
 // Called when the game starts or when spawned
@@ -38,6 +33,8 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsInRange)
+	{
 	// 플레이어 E키 입력 받기 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	if (PlayerController && PlayerController->IsInputKeyDown(EKeys::E))
@@ -45,15 +42,16 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 		PressE += 1;
 	}
 	// E키를 입력했을 때 
-	if (PressE >= 1)
-	{ 
-		CurrTime += DeltaTime;
+		if (PressE >= 1)
+		{ 
+			CurrTime += DeltaTime;
 
-		if (CurrTime > MakeTime)
+			if (CurrTime > MakeTime)
 			{
 				SpawnInk();
 				CurrTime = 0;
 			}
+		}
 	}
 	
 

@@ -12,13 +12,13 @@ AHJ_ElectricFan::AHJ_ElectricFan()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 충돌체 생성 
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
-	SetRootComponent(BoxComp);
-	BoxComp->SetBoxExtent(FVector(50));
-	// 메쉬 생성 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(RootComponent);
+	//// 충돌체 생성 
+	//BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
+	//SetRootComponent(BoxComp);
+	//BoxComp->SetBoxExtent(FVector(50));
+	//// 메쉬 생성 
+	//MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	//MeshComp->SetupAttachment(RootComponent);
 
 	// 충돌체 처리 
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
@@ -33,6 +33,8 @@ AHJ_ElectricFan::AHJ_ElectricFan()
 	CurrentRotationAngel = 0.0f;
 
 	IsInRange = false;
+
+	InteractionText = FText::FromString(TEXT("E) INTERACTION"));
 
 }
 
@@ -76,29 +78,4 @@ void AHJ_ElectricFan::Tick(float DeltaTime)
 		// else 일 때, 충돌체를 파괴한다 (내일 구현) 
 	}
 
-}
-
-void AHJ_ElectricFan::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	// 플레이어와 충돌 인식 
-	auto* Player = Cast<AGW_Player>(OtherActor);
-
-	if (Player)
-	{
-		IsInRange = true;
-		UE_LOG(LogTemp, Warning, TEXT("CHECK"));
-	}
-
-}
-
-void AHJ_ElectricFan::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	// 플레이어와 충돌 종료 인식 
-	auto* Player = Cast<AGW_Player>(OtherActor);
-
-	if (Player)
-	{
-		IsInRange = false;
-		UE_LOG(LogTemp, Warning, TEXT("CHECKOUT"));
-	}
 }
