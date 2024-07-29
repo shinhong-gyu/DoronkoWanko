@@ -12,11 +12,12 @@
 #include "I_Interaction.h"
 #include <Kismet/GameplayStatics.h>
 #include "Kismet/KismetSystemLibrary.h"
+#include "HG_Splatter.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	TargetArmLength = 300.0f;
 	ZoomSpeed = 75.0f;
@@ -47,7 +48,7 @@ void AGW_Player::BeginPlay()
 		}
 	}
 
-	
+
 }
 
 // Called every frame
@@ -71,6 +72,7 @@ void AGW_Player::Tick(float DeltaTime)
 		// 바라본 곳에 뭔가 있다.
 		if (OutHit.GetActor() != LookAtActor) {
 			LookAtActor = OutHit.GetActor();
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
 			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 			if (Interface) {
 				Interface->LookAt();
@@ -136,6 +138,12 @@ void AGW_Player::OnMyActionLook(const FInputActionValue& Value)
 void AGW_Player::OnMyActionJump(const FInputActionValue& Value)
 {
 	Jump();
+	Shake();
+	int NumberOfSplatter = FMath::RandRange(3,5);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), NumberOfSplatter)
+	for (int i = 0; i < NumberOfSplatter; i++) {
+		Shake();
+	}
 }
 
 void AGW_Player::OnMyActionZoom(const FInputActionValue& Value)
@@ -167,6 +175,21 @@ void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value)
 void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+
+}
+
+void AGW_Player::Shake()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Shake"))
+	FVector InitialVelocity = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), FMath::RandRange(300, 600));
+
+	FVector SpawnLocation = GetActorLocation();
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+	auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
+
+	if (Splatter) {
+		Splatter->Initalize(InitialVelocity);
+	}
 
 }
 

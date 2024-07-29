@@ -15,10 +15,8 @@ AMasterInteraction::AMasterInteraction()
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);
+
 	InteractionText = FText::FromString(TEXT("E) INTERACTION"));
-	// 	
-	// 	InteractionWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
-	// 	InteractionWidgetComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
