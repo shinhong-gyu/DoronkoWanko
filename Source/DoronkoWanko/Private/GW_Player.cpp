@@ -114,6 +114,8 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
 		input->BindAction(IA_Interaction, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionInteraction);
 		input->BindAction(IA_Drop, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDrop);
+		input->BindAction(IA_Splash, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionSplash);
+		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirt);
 
 	}
 
@@ -143,12 +145,6 @@ void AGW_Player::OnMyActionLook(const FInputActionValue& Value)
 void AGW_Player::OnMyActionJump(const FInputActionValue& Value)
 {
 	Jump();
-	Shake();
-	int NumberOfSplatter = FMath::RandRange(3,5);
-	UE_LOG(LogTemp, Warning, TEXT("%d"), NumberOfSplatter)
-	for (int i = 0; i < NumberOfSplatter; i++) {
-		Shake();
-	}
 }
 
 void AGW_Player::OnMyActionZoom(const FInputActionValue& Value)
