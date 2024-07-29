@@ -76,11 +76,14 @@ public:
 	class UInputAction* IA_Dash;
 	void OnMyActionDashOngoing(const FInputActionValue& Value);
 	void OnMyActionDashCompleted(const FInputActionValue& Value);
+	void Shake();
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHG_Splatter> SplatterFactory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
     float DashSpeed = 1200.0f;
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
     float WalkSpeed = 600.0f;
 
 
