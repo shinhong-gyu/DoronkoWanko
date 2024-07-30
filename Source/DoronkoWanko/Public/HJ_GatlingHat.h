@@ -44,4 +44,6 @@ public:
 
 	float PlayerKey;
 
+	bool bItemRange = false;
+
 };

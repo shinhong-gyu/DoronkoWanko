@@ -33,6 +33,9 @@ AHJ_ElephantHat::AHJ_ElephantHat()
 void AHJ_ElephantHat::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 플레이어 캐스트 
+	GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	
 }
 
@@ -43,25 +46,24 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 
 	if (IsInRange)
 	{
-		// 플레이어 E키 입력 받기 
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-		if (PlayerController && PlayerController->WasInputKeyJustPressed(EKeys::E))
+		if (GW_Player)
 		{
-			PressE += 1;
-			UE_LOG(LogTemp, Warning, TEXT("PressE"));
+			GW_Player->bFire;
 		}
 	}
-	// E키를 입력했을 때 
-	if (PressE >= 1)
-	{ 
-		CurrTime += DeltaTime;
 
-		if (CurrTime > MakeTime)
+	if (GW_Player)
+	{
+		if (GW_Player->bFire)
+		{
+			CurrTime += DeltaTime;
+
+			if (CurrTime > MakeTime)
 			{
 				SpawnInk();
 				CurrTime = 0;
 			}
-
+		}
 	}
 }
 
@@ -72,7 +74,7 @@ void AHJ_ElephantHat::SpawnInk()
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 	if (nullptr != Ink)
 	{
-		Ink->Initalize(FVector(300,0,300));
+		Ink->Initalize(FVector(0, 0, 300) + GW_Player->GetActorForwardVector() * 600);
 	}
 }
 

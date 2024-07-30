@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "HJ_TestInk.h"
 #include "DynamicObject.h"
+#include "GW_Player.h"
 #include "HJ_ElephantHat.generated.h"
 
 UCLASS()
@@ -38,6 +39,6 @@ public:
 
 	float CurrTime;
 
-	int PressE = 0;
+	AGW_Player* GW_Player;
 
 };

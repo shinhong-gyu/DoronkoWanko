@@ -34,6 +34,8 @@ AGW_Player::AGW_Player()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	/*GetCapsuleComponent()->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));*/
 }
 
 // Called when the game starts or when spawned
@@ -257,6 +259,8 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedTrainWheel = OverlappingTrainWheel;
+
+		bFire = true;
 	}
 	if (Overlappinghelmet && !Attachedhelmet)
 	{
@@ -270,8 +274,6 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		Attachedhelmet = Overlappinghelmet;
 	}
 
-	bFire = true;
-
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
@@ -281,6 +283,7 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 		AttachedTrainWheel->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		AttachedTrainWheel = nullptr;
 		OverlappingTrainWheel = nullptr;
+		bFire = false;
 	}
 	else if (Attachedhelmet)
 	{

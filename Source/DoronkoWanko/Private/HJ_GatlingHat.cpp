@@ -11,7 +11,7 @@
 // Sets default values
 AHJ_GatlingHat::AHJ_GatlingHat()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 스폰위치(Arrow) 생성 
@@ -45,17 +45,16 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (IsInRange)
-	//{
-	//	// 플레이어 E키 입력 받기 
-	//	/*APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-	//	if (PlayerController && PlayerController->WasInputKeyJustPressed(EKeys::E))
-	//	{
-	//		PressE += 1;
-	//		UE_LOG(LogTemp, Warning, TEXT("PressE"));
-	//	}*/
-	//}
-	if (GW_Player)
+	if (IsInRange)
+	{
+		if (GW_Player)
+		{
+			GW_Player->bFire;
+		}
+		bItemRange = true;
+	}
+
+	if (GW_Player&&bItemRange)
 	{
 		if (GW_Player->bFire)
 		{
@@ -66,10 +65,8 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 				SpawnInk();
 				CurrTime = 0;
 			}
-
 		}
 	}
-
 }
 
 void AHJ_GatlingHat::SpawnInk()
@@ -79,7 +76,7 @@ void AHJ_GatlingHat::SpawnInk()
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 	if (nullptr != Ink)
 	{
-		Ink->Initalize(FVector(1500, 0, 500));
+		Ink->Initalize(FVector(0, 0, 500) + GW_Player->GetActorForwardVector() * 2500);
 	}
 }
 
