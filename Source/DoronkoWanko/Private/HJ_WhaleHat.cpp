@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HJ_ElephantHat.h"
-#include "Components/BoxComponent.h"
+#include "HJ_WhaleHat.h"
 #include "Components/ArrowComponent.h"
-#include "Kismet/GameplayStatics.h"
+#include "Components/BoxComponent.h"
 #include "GW_Player.h"
 #include "HG_Splatter.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
-AHJ_ElephantHat::AHJ_ElephantHat()
+AHJ_WhaleHat::AHJ_WhaleHat()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -17,27 +17,27 @@ AHJ_ElephantHat::AHJ_ElephantHat()
 	// 스폰위치(Arrow) 생성 
 	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
 	InkArrow->SetupAttachment(RootComponent);
-	InkArrow->SetRelativeLocation(FVector(90, 0, 0));
+	InkArrow->SetRelativeLocation(FVector(0, 0, 100));
 	InkArrow->SetRelativeRotation(FRotator(0, 0, 0));
 
 	// 충돌체 처리 
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AHJ_ElephantHat::OnOverlapBegin); //변경 전 이름 
-	BoxComp->OnComponentEndOverlap.AddDynamic(this, &AHJ_ElephantHat::OnOverlapEnd);
+	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AHJ_WhaleHat::OnOverlapBegin); //변경 전 이름 
+	BoxComp->OnComponentEndOverlap.AddDynamic(this, &AHJ_WhaleHat::OnOverlapEnd);
 
 	// 위젯 생성 
 	InteractionText = FText::FromString(TEXT("E) PRESS"));
 }
 
 // Called when the game starts or when spawned
-void AHJ_ElephantHat::BeginPlay()
+void AHJ_WhaleHat::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void AHJ_ElephantHat::Tick(float DeltaTime)
+void AHJ_WhaleHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -53,26 +53,30 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 	}
 	// E키를 입력했을 때 
 	if (PressE >= 1)
-	{ 
+	{
 		CurrTime += DeltaTime;
 
 		if (CurrTime > MakeTime)
-			{
-				SpawnInk();
-				CurrTime = 0;
-			}
+		{
+			SpawnInk();
+			CurrTime = 0;
+		}
 
 	}
+
 }
 
-void AHJ_ElephantHat::SpawnInk()
+void AHJ_WhaleHat::SpawnInk()
 {
 	// 물감 스폰하기 (코 앞쪽으로 튀어나가게)
+
+	FVector InitialVelocity = FVector(FMath::RandRange(-50, 50), FMath::RandRange(-50, 50), FMath::RandRange(600, 800));
+
 	FTransform T = InkArrow->GetComponentTransform();
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
-	if (nullptr != Ink)
-	{
-		Ink->Initalize(FVector(300,0,300));
+
+	if (nullptr != Ink) {
+		Ink->Initalize(InitialVelocity);
 	}
 }
 

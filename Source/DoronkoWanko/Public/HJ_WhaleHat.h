@@ -4,18 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HJ_TestInk.h"
 #include "DynamicObject.h"
-#include "HJ_ElephantHat.generated.h"
+#include "HJ_WhaleHat.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_ElephantHat : public ADynamicObject
+class DORONKOWANKO_API AHJ_WhaleHat : public ADynamicObject
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AHJ_ElephantHat();
+	AHJ_WhaleHat();
 
 protected:
 	// Called when the game starts or when spawned
@@ -34,7 +33,7 @@ public:
 	void SpawnInk();
 
 	UPROPERTY(EditAnywhere)
-	float MakeTime = 0.1f;
+	float MakeTime = 0.2f;
 
 	float CurrTime;
 

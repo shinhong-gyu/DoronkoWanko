@@ -53,7 +53,7 @@ void ARoboticVacuum::Tick(float DeltaTime)
 			{	PressE += 2;	}
 	}
 
-	if (PressE >= 1)
+	if (PressE >= 0)
 			{
 				FRotator VacuumRotation = FRotator(0.0f, CurrentRotationAngle, 0.0f);
 				BoxComp->SetRelativeRotation(VacuumRotation);
