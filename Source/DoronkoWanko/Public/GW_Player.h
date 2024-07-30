@@ -7,6 +7,7 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputTriggers.h"
 #include "HJ_TrainWheel.h"
+#include "helmet.h"
 #include "GW_Player.generated.h"
 
 UCLASS()
@@ -116,4 +117,10 @@ public:
 	class AHJ_TrainWheel* OverlappingTrainWheel;
 
 	class AHJ_TrainWheel* AttachedTrainWheel;
+
+	class Ahelmet* Overlappinghelmet;
+
+	class Ahelmet* Attachedhelmet;
+
+
 };

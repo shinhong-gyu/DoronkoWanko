@@ -14,6 +14,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "HG_Splatter.h"
+#include "helmet.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -252,6 +253,14 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		OverlappingTrainWheel->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
 		AttachedTrainWheel = OverlappingTrainWheel;
 	}
+	if (Overlappinghelmet && !Attachedhelmet)
+	{
+		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		Overlappinghelmet->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
+		Attachedhelmet = Overlappinghelmet;
+	}
+
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
@@ -262,6 +271,12 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 		AttachedTrainWheel = nullptr;
 		OverlappingTrainWheel = nullptr;
 	}
+	else if (Attachedhelmet)
+	{
+		Attachedhelmet->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Attachedhelmet = nullptr;
+		Overlappinghelmet = nullptr;
+	}
 }
 
 void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -271,8 +286,12 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		OverlappingTrainWheel = TrainWheel;
 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
 	}
+	else if(Ahelmet* hat = Cast<Ahelmet>(OtherActor))
+	{
+		Overlappinghelmet = hat;
+		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *hat->GetName());
+	}
 }
-
 
 
 
