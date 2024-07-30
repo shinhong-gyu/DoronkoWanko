@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DynamicObject.h"
+#include "GW_Player.h"
 #include "HJ_GatlingHat.generated.h"
 
 UCLASS()
@@ -38,5 +39,9 @@ public:
 	float CurrTime;
 
 	int PressE = 0;
+
+	AGW_Player* GW_Player;
+
+	float PlayerKey;
 
 };

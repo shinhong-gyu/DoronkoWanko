@@ -35,6 +35,9 @@ void AHJ_GatlingHat::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 플레이어 캐스트 
+	GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+
 }
 
 // Called every frame
@@ -42,27 +45,29 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsInRange)
+	//if (IsInRange)
+	//{
+	//	// 플레이어 E키 입력 받기 
+	//	/*APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	//	if (PlayerController && PlayerController->WasInputKeyJustPressed(EKeys::E))
+	//	{
+	//		PressE += 1;
+	//		UE_LOG(LogTemp, Warning, TEXT("PressE"));
+	//	}*/
+	//}
+	if (GW_Player)
 	{
-		// 플레이어 E키 입력 받기 
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-		if (PlayerController && PlayerController->WasInputKeyJustPressed(EKeys::E))
+		if (GW_Player->bFire)
 		{
-			PressE += 1;
-			UE_LOG(LogTemp, Warning, TEXT("PressE"));
-		}
-	}
-	// E키를 입력했을 때 
-	if (PressE >= 1)
-	{
-		CurrTime += DeltaTime;
+			CurrTime += DeltaTime;
 
-		if (CurrTime > MakeTime)
-		{
-			SpawnInk();
-			CurrTime = 0;
-		}
+			if (CurrTime > MakeTime)
+			{
+				SpawnInk();
+				CurrTime = 0;
+			}
 
+		}
 	}
 
 }

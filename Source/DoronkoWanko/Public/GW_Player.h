@@ -123,5 +123,7 @@ public:
 
 	class Ahelmet* Attachedhelmet;
 
+	bool bFire = false;
+
 
 };

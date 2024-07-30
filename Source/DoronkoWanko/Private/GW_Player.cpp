@@ -270,6 +270,8 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		Attachedhelmet = Overlappinghelmet;
 	}
 
+	bFire = true;
+
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
