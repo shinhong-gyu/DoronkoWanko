@@ -15,6 +15,7 @@
 #include "Components/CapsuleComponent.h"
 #include "HG_Splatter.h"
 #include "helmet.h"
+#include "DynamicObject.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -251,6 +252,10 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 		OverlappingTrainWheel->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
+		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(OverlappingTrainWheel->GetRootComponent()))
+		{
+			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 		AttachedTrainWheel = OverlappingTrainWheel;
 	}
 	if (Overlappinghelmet && !Attachedhelmet)
@@ -258,6 +263,10 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 		Overlappinghelmet->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
+		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Overlappinghelmet->GetRootComponent()))
+		{
+			HelmetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 		Attachedhelmet = Overlappinghelmet;
 	}
 
@@ -281,7 +290,7 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 
 void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
+	if (ADynamicObject* TrainWheel = Cast<ADynamicObject>(OtherActor))
 	{
 		OverlappingTrainWheel = TrainWheel;
 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
