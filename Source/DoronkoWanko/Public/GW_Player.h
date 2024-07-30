@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputTriggers.h"
+#include "HJ_TrainWheel.h"
+#include "helmet.h"
+#include "DynamicObject.h"
 #include "GW_Player.generated.h"
 
 UCLASS()
@@ -88,5 +91,37 @@ public:
 
 
 	AActor* LookAtActor = nullptr;
+		TArray<FColor> ColorArray;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Dirt;
+
+	void OnMyActionDirt(const FInputActionValue& Value);
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Splash;
+
+	void OnMyActionSplash(const FInputActionValue& Value);
+
+		UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Interaction;
+
+		UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Drop;
+	void OnMyActionInteraction(const FInputActionValue& Value);
+	void OnMyActionDrop(const FInputActionValue& Value);
+
+	UFUNCTION()
+    void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+
+	class ADynamicObject* OverlappingTrainWheel;
+
+	class ADynamicObject* AttachedTrainWheel;
+
+	class Ahelmet* Overlappinghelmet;
+
+	class Ahelmet* Attachedhelmet;
+
 
 };
