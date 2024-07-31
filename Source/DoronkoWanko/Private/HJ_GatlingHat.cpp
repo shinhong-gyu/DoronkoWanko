@@ -55,24 +55,24 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 	//		UE_LOG(LogTemp, Warning, TEXT("PressE"));
 	//	}*/
 	//}
-	if (GW_Player)
-	{
-		if (GW_Player->bFire)
-		{
-			CurrTime += DeltaTime;
-
-			if (CurrTime > MakeTime)
-			{
-				SpawnInk();
-				CurrTime = 0;
-			}
-
-		}
-	}
+	// 	if (GW_Player)
+	// 	{
+	// 		if (GW_Player->bFire)
+	// 		{
+	// 			CurrTime += DeltaTime;
+	// 
+	// 			if (CurrTime > MakeTime)
+	// 			{
+	// 				SpawnInk();
+	// 				CurrTime = 0;
+	// 			}
+	// 
+	// 		}
+	// 	}
 
 }
 
-void AHJ_GatlingHat::SpawnInk()
+void AHJ_GatlingHat::InteractionWith()
 {
 	// 물감 스폰하기 (대포 앞쪽으로 튀어나가게) 
 	FTransform T = InkArrow->GetComponentTransform();

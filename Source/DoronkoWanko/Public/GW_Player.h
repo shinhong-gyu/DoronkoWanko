@@ -108,22 +108,10 @@ public:
 
 		UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Drop;
+
 	void OnMyActionInteraction(const FInputActionValue& Value);
+
+
 	void OnMyActionDrop(const FInputActionValue& Value);
-
-	UFUNCTION()
-    void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
-
-	class AHJ_TrainWheel* OverlappingTrainWheel;
-
-	class AHJ_TrainWheel* AttachedTrainWheel;
-
-	class ADynamicObject* Overlappinghelmet;
-
-	class ADynamicObject* Attachedhelmet;
-
-	bool bFire = false;
-
 
 };

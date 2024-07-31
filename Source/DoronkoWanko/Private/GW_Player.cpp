@@ -52,9 +52,6 @@ void AGW_Player::BeginPlay()
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
 	}
-
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGW_Player::OnOverlapBegin);
-
 }
 
 // Called every frame
@@ -122,7 +119,6 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Drop, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDrop);
 		input->BindAction(IA_Splash, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionSplash);
 		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirt);
-
 	}
 
 }
@@ -249,76 +245,98 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 
 void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 {
-	if (OverlappingTrainWheel && !AttachedTrainWheel)
-	{
-		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
-		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		OverlappingTrainWheel->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
-		OverlappingTrainWheel->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-			1.0f / GetMesh()->GetComponentScale().Y,1.0f / GetMesh()->GetComponentScale().Z));
-		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(OverlappingTrainWheel->GetRootComponent()))
-		{
-			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (LookAtActor != nullptr) {
+		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
+		if(Interact != nullptr){
+			Interact->IteractionWith();
 		}
-		AttachedTrainWheel = OverlappingTrainWheel;
 	}
-	if (Overlappinghelmet && !Attachedhelmet)
-	{
-		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
-		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		Overlappinghelmet->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
-		Overlappinghelmet->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-			1.0f / GetMesh()->GetComponentScale().Y,1.0f / GetMesh()->GetComponentScale().Z));
-		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Overlappinghelmet->GetRootComponent()))
-		{
-			HelmetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-		Attachedhelmet = Overlappinghelmet;
-	}
-
-
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-	if (AttachedTrainWheel)
-	{
-		AttachedTrainWheel->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(AttachedTrainWheel->GetRootComponent()))
-		{
-			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			TrainWheelComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	if (LookAtActor != nullptr) {
+		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
+		if (Interact != nullptr) {
+			Interact->ItemDrop();
 		}
-		AttachedTrainWheel = nullptr;
-		OverlappingTrainWheel = nullptr;
-	}
-	else if (Attachedhelmet)
-	{
-		Attachedhelmet->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Attachedhelmet->GetRootComponent()))
-		{
-			HelmetComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			HelmetComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-		}
-
-		Attachedhelmet = nullptr;
-		Overlappinghelmet = nullptr;
 	}
 }
 
-void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
-	{
-		OverlappingTrainWheel = TrainWheel;
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
-	}
-	else if(ADynamicObject* hat = Cast<ADynamicObject>(OtherActor))
-	{
-		Overlappinghelmet = hat;
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *hat->GetName());
-	}
-}
+// void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
+// {
+// 	if (OverlappingTrainWheel && !AttachedTrainWheel)
+// 	{
+// 		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
+// 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+// 		OverlappingTrainWheel->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
+// 		OverlappingTrainWheel->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
+// 			1.0f / GetMesh()->GetComponentScale().Y,1.0f / GetMesh()->GetComponentScale().Z));
+// 		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(OverlappingTrainWheel->GetRootComponent()))
+// 		{
+// 			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+// 		}
+// 		AttachedTrainWheel = OverlappingTrainWheel;
+// 	}
+// 	if (Overlappinghelmet && !Attachedhelmet)
+// 	{
+// 		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
+// 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+// 		Overlappinghelmet->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
+// 		Overlappinghelmet->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
+// 			1.0f / GetMesh()->GetComponentScale().Y,1.0f / GetMesh()->GetComponentScale().Z));
+// 		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Overlappinghelmet->GetRootComponent()))
+// 		{
+// 			HelmetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+// 		}
+// 		Attachedhelmet = Overlappinghelmet;
+// 	}
+// 
+// 
+// }
+
+// void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
+// {
+// 	if (AttachedTrainWheel)
+// 	{
+// 		AttachedTrainWheel->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+// 		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(AttachedTrainWheel->GetRootComponent()))
+// 		{
+// 			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+// 			TrainWheelComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+// 		}
+// 		AttachedTrainWheel = nullptr;
+// 		OverlappingTrainWheel = nullptr;
+// 	}
+// 	else if (Attachedhelmet)
+// 	{
+// 		Attachedhelmet->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+// 		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Attachedhelmet->GetRootComponent()))
+// 		{
+// 			HelmetComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+// 			HelmetComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+// 		}
+// 
+// 		Attachedhelmet = nullptr;
+// 		Overlappinghelmet = nullptr;
+// 	}
+// }
+
+// void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+// {
+// 	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
+// 	{
+// 		OverlappingTrainWheel = TrainWheel;
+// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
+// 	}
+// 	else if(ADynamicObject* hat = Cast<ADynamicObject>(OtherActor))
+// 	{
+// 		Overlappinghelmet = hat;
+// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *hat->GetName());
+// 	}
+// }
+
+
 
 
 
