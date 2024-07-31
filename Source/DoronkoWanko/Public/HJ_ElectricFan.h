@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DynamicObject.h"
 #include "HJ_ElectricFan.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_ElectricFan : public AActor
+class DORONKOWANKO_API AHJ_ElectricFan : public ADynamicObject
 {
 	GENERATED_BODY()
 	
@@ -26,12 +27,22 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputComponent* InputComp;
 
-	void Interact();
-
-	UPROPERTY(EditAnywhere)
+	/*UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;
+	class UStaticMeshComponent* MeshComp;*/
 
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* WingComp;
+
+	UPROPERTY(EditAnywhere)
+	float RotationSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float CurrentRotationAngel;
+
+	UPROPERTY(EditAnywhere)
+	int PressE = 0;
 };
