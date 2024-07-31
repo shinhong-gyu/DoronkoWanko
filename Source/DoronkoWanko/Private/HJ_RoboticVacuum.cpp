@@ -45,29 +45,21 @@ void ARoboticVacuum::BeginPlay()
 void ARoboticVacuum::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (IsInRange)
-	{
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-			if (PlayerController && PlayerController->IsInputKeyDown(EKeys::E))
-			{	PressE += 2;	}
+	if(bTurnOn){
+		FRotator VacuumRotation = FRotator(0.0f, CurrentRotationAngle, 0.0f);
+		BoxComp->SetRelativeRotation(VacuumRotation);
+		// 회전이 끝난 뒤 앞으로 전진한다 
+		if (MoveCheck >= 20)
+		{
+			SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
+		}
 	}
 
-	if (PressE >= 0)
-			{
-				FRotator VacuumRotation = FRotator(0.0f, CurrentRotationAngle, 0.0f);
-				BoxComp->SetRelativeRotation(VacuumRotation);
-				// 회전이 끝난 뒤 앞으로 전진한다 
-				if (MoveCheck >= 20)
-				{
-					SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
-				}
-			}
 }
 
 void ARoboticVacuum::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	if (PressE >= 1)
+	if (bTurnOn)
 	{
 		if (OtherActor)
 		{
@@ -94,6 +86,12 @@ void ARoboticVacuum::Rotate()
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 		Check = 0;
 	}
+}
+
+void ARoboticVacuum::InteractionWith()
+{
+	UE_LOG(LogTemp,Warning,TEXT("a"))
+	bTurnOn = true;
 }
 
 

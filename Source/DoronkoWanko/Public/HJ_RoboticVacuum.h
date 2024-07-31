@@ -52,6 +52,8 @@ public:
 
 	FTimerHandle TimerHandle;
 
+	bool bTurnOn = false;
 
+	void InteractionWith() override;
 
 };

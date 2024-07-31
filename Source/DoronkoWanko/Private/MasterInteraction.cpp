@@ -44,7 +44,6 @@ void AMasterInteraction::LookAt()
 			// Widget 을 생성하고
 			Widget = CreateWidget<UObjectWidget>(GetWorld(), ObjectWidgetClass);
 			if (Widget != nullptr) {
-				printf("1");
 				Widget->SetText(InteractionText);
 				// 화면에 Widget 을 출력
 				Widget->AddToViewport();
@@ -71,7 +70,7 @@ void AMasterInteraction::FadeAway()
 	}
 }
 
-void AMasterInteraction::IteractionWith()
+void AMasterInteraction::InteractionWith()
 {
 	// 플레이어가 Object 를 바라보며 E 를 눌렀을 때 동작 할 함수
 }

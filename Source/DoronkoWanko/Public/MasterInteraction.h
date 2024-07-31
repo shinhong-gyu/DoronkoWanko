@@ -43,7 +43,7 @@ public:
 	// Player 가 아이템을 보다 다른 곳을 바라볼 때
 	virtual void FadeAway();
 	// E 가 눌렸을 때 할 행동
-	virtual void IteractionWith();
+	virtual void InteractionWith();
 	// Q 가 눌렸을 때 할 행동
 	virtual void ItemDrop();
 	
