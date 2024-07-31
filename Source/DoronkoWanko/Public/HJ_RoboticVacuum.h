@@ -52,6 +52,18 @@ public:
 
 	FTimerHandle TimerHandle;
 
+	bool bTurnOn = false;
+
+	void InteractionWith() override;
+
+	UPROPERTY(EditAnywhere)
+	class UCapsuleComponent* CapsuleComp;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* ColorComp;
+
+	void TurnOn();
+	
 
 
 };

@@ -71,7 +71,7 @@ void AMasterInteraction::FadeAway()
 	}
 }
 
-void AMasterInteraction::IteractionWith()
+void AMasterInteraction::InteractionWith()
 {
 	// 플레이어가 Object 를 바라보며 E 를 눌렀을 때 동작 할 함수
 }

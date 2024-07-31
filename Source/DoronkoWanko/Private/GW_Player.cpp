@@ -248,7 +248,7 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 	if (LookAtActor != nullptr) {
 		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
 		if(Interact != nullptr){
-			Interact->IteractionWith();
+			Interact->InteractionWith();
 		}
 	}
 }
