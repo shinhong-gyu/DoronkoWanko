@@ -40,6 +40,8 @@ public:
 
 	void SpawnDecalAtLocation(const FVector& Location, const FRotator& Rotation);
 
+	FVector ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
+
 	FVector Velocity;
 
 	UFUNCTION()

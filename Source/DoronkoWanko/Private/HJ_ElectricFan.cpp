@@ -48,7 +48,7 @@ void AHJ_ElectricFan::Tick(float DeltaTime)
 
 			InputComp->BindAction("Interact", IE_Pressed, this, &AHJ_ElectricFan::Interact);
 		}
-
+		 
 	// 플레이어가 가까이 오면 인식한다 (공통함수) 
 	// 조건을 2가지로 나눈다. A와 B 
 }

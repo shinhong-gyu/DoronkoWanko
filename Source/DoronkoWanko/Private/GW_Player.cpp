@@ -68,29 +68,23 @@ void AGW_Player::Tick(float DeltaTime)
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, TraceChannel, Params);
+	II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
 		if (OutHit.GetActor() != LookAtActor) {
 			LookAtActor = OutHit.GetActor();
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
-			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 			if (Interface) {
 				Interface->LookAt();
 			}
 		}
-		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Red, false, 3);
-
 	}
 	else {
 		if (IsValid(LookAtActor)) {
-			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 			if (Interface) {
 				Interface->FadeAway();
 				LookAtActor = nullptr;
 			}
 		}
-		// 허공
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 3);
 	}
 }
 
@@ -140,7 +134,6 @@ void AGW_Player::OnMyActionJump(const FInputActionValue& Value)
 	Jump();
 	Shake();
 	int NumberOfSplatter = FMath::RandRange(3,5);
-	UE_LOG(LogTemp, Warning, TEXT("%d"), NumberOfSplatter)
 	for (int i = 0; i < NumberOfSplatter; i++) {
 		Shake();
 	}
@@ -180,7 +173,6 @@ void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
 
 void AGW_Player::Shake()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shake"))
 	FVector InitialVelocity = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), FMath::RandRange(300, 600));
 
 	FVector SpawnLocation = GetActorLocation();
