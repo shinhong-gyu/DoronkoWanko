@@ -4,8 +4,8 @@
 #include "HG_Paintballoon.h"
 #include "HG_Splatter.h"
 #include "Components/BoxComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 AHG_Paintballoon::AHG_Paintballoon()
@@ -13,9 +13,9 @@ AHG_Paintballoon::AHG_Paintballoon()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	ConstructorHelpers::FObjectFinder<UStaticMeshComponent> tempMesh(TEXT("/Script/Engine.StaticMesh'/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempMesh(TEXT("/Script/Engine.StaticMesh'/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere'"));
 	if (tempMesh.Succeeded()) {
-		MeshComp =  tempMesh.Object;
+		MeshComp->SetStaticMesh(tempMesh.Object);
 	}
 }
 
@@ -31,13 +31,15 @@ void AHG_Paintballoon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AHG_Paintballoon::IteractionWith()
+void AHG_Paintballoon::InteractionWith()
 {
 	FVector InitialVelocity = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), FMath::RandRange(300, 600));
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
-	
+	UE_LOG(LogTemp,Warning,TEXT("PaintBalloon"));
+	if(Widget != nullptr) Widget->RemoveFromParent();
+	Destroy();
 	for (int i = 0; i < 5; i++) {
 		auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
 

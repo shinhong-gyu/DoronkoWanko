@@ -36,13 +36,5 @@ void AHJ_TrainWheel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsInRange)
-	{
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-		if (PlayerController && PlayerController->IsInputKeyDown(EKeys::E))
-		{
-		this->Destroy();
-		}
-	}
 }
 

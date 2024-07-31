@@ -22,11 +22,9 @@ AHJ_ElephantHat::AHJ_ElephantHat()
 
 	// 충돌체 처리 
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AHJ_ElephantHat::OnOverlapBegin); //변경 전 이름 
-	BoxComp->OnComponentEndOverlap.AddDynamic(this, &AHJ_ElephantHat::OnOverlapEnd);
 
 	// 위젯 생성 
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
+	InteractionText = FText::FromString(TEXT("E) Put On"));
 }
 
 // Called when the game starts or when spawned
@@ -44,10 +42,6 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsInRange)
-	{
-
-	}
 
 	if (GW_Player)
 	{

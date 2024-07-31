@@ -25,7 +25,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION()
-	virtual void IteractionWith();
+	virtual void InteractionWith();
+	
+	UPROPERTY(EditAnywhere)
+	FColor PaintColor;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> SplatterFactory;

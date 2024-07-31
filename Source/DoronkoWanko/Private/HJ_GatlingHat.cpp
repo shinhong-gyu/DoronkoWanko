@@ -22,8 +22,6 @@ AHJ_GatlingHat::AHJ_GatlingHat()
 
 	// 충돌체 처리 
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AHJ_GatlingHat::OnOverlapBegin); //변경 전 이름 
-	BoxComp->OnComponentEndOverlap.AddDynamic(this, &AHJ_GatlingHat::OnOverlapEnd);
 
 	// 위젯 생성 
 	InteractionText = FText::FromString(TEXT("E) PRESS"));
@@ -45,28 +43,20 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsInRange)
-	{
-		if (GW_Player)
-		{
-
-		}
-		bItemRange = true;
-	}
-
-	if (GW_Player&&bItemRange)
-	{
-		/*if (GW_Player->bFire)
-		{
-			CurrTime += DeltaTime;
-
-			if (CurrTime > MakeTime)
-			{
-				SpawnInk();
-				CurrTime = 0;
-			}
-		}*/
-	}
+	
+// 	if (GW_Player&&bItemRange)
+// 	{
+// 		/*if (GW_Player->bFire)
+// 		{
+// 			CurrTime += DeltaTime;
+// 
+// 			if (CurrTime > MakeTime)
+// 			{
+// 				SpawnInk();
+// 				CurrTime = 0;
+// 			}
+// 		}*/
+// 	}
 }
 
 void AHJ_GatlingHat::SpawnInk()

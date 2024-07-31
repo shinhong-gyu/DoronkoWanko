@@ -24,28 +24,3 @@ void ADynamicObject::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-void ADynamicObject::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	// 플레이어와 충돌 인식 
-	auto* Player = Cast<AGW_Player>(OtherActor);
-
-	if (Player)
-	{
-		IsInRange = true;
-		UE_LOG(LogTemp, Warning, TEXT("CHECK"));
-	}
-
-}
-
-void ADynamicObject::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	// 플레이어와 충돌 종료 인식 
-	auto* Player = Cast<AGW_Player>(OtherActor);
-
-	if (Player)
-	{
-		IsInRange = false;
-		UE_LOG(LogTemp, Warning, TEXT("CHECKOUT"));
-	}
-}
