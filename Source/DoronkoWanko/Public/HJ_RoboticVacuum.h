@@ -47,9 +47,6 @@ public:
 
 	void Rotate();
 
-	// 플레이어 입력 키 받기 
-	int PressE;
-
 	FTimerHandle TimerHandle;
 
 	bool bTurnOn = false;
