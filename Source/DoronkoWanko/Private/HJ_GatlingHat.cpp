@@ -49,14 +49,14 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 	{
 		if (GW_Player)
 		{
-			GW_Player->bFire;
+
 		}
 		bItemRange = true;
 	}
 
 	if (GW_Player&&bItemRange)
 	{
-		if (GW_Player->bFire)
+		/*if (GW_Player->bFire)
 		{
 			CurrTime += DeltaTime;
 
@@ -65,7 +65,7 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 				SpawnInk();
 				CurrTime = 0;
 			}
-		}
+		}*/
 	}
 }
 

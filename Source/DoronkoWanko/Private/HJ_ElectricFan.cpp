@@ -12,12 +12,12 @@ AHJ_ElectricFan::AHJ_ElectricFan()
 
 	InputComp = nullptr;
 
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
-	SetRootComponent(BoxComp);
-	BoxComp->SetBoxExtent(FVector(50));
+	//BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
+	//SetRootComponent(BoxComp);
+	/*BoxComp->SetBoxExtent(FVector(50));*/
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(RootComponent);
+	//MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	//MeshComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned

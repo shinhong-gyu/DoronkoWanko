@@ -46,16 +46,11 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 
 	if (IsInRange)
 	{
-		if (GW_Player)
-		{
-			GW_Player->bFire;
-		}
+
 	}
 
 	if (GW_Player)
 	{
-		if (GW_Player->bFire)
-		{
 			CurrTime += DeltaTime;
 
 			if (CurrTime > MakeTime)
@@ -63,7 +58,6 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 				SpawnInk();
 				CurrTime = 0;
 			}
-		}
 	}
 }
 
