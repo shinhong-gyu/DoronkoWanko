@@ -64,6 +64,7 @@ public:
 
 	void TurnOn();
 	
+	void LookAt() override;
 
 
 };

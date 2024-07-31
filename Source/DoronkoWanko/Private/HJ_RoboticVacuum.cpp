@@ -30,10 +30,8 @@ ARoboticVacuum::ARoboticVacuum()
 	// 충돌체 처리 
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionProfileName(TEXT("MapObject"));
-	CapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &ARoboticVacuum::OnOverlapBegin); //변경 전 이름 
-	CapsuleComp->OnComponentEndOverlap.AddDynamic(this, &ARoboticVacuum::OnOverlapEnd);
 	// 위젯 문구 생성 
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
+	InteractionText = FText::FromString(TEXT("E) Interaction"));
 
 }
 
@@ -111,6 +109,28 @@ void ARoboticVacuum::TurnOn()
 {
 	// 앞으로 갈때 충돌체 켠다 
 	CapsuleComp->SetCollisionProfileName(TEXT("MapObject"));
+}
+
+void ARoboticVacuum::LookAt()
+{
+	if (!bTurnOn) // 아이템이 떨어져 있고
+	{
+		if (Widget == nullptr)  // Widget 이 아직 생성되지 않았다면
+		{
+			// Widget 을 생성하고
+			Widget = CreateWidget<UObjectWidget>(GetWorld(), ObjectWidgetClass);
+			if (Widget != nullptr) {
+				Widget->SetText(InteractionText);
+				// 화면에 Widget 을 출력
+				Widget->AddToViewport();
+			}
+		}
+		else // Widget 이 이미 있다면 
+		{
+			// 그냥 화면에 Widget 을 출력
+			Widget->AddToViewport();
+		}
+	}
 }
 
 

@@ -40,8 +40,6 @@ AHJ_Train::AHJ_Train()
 
 	// 충돌체 처리 
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AHJ_Train::OnOverlapBegin);
-	BoxComp->OnComponentEndOverlap.AddDynamic(this, &AHJ_Train::OnOverlapEnd);
 
 	// 열차 회전 변수 
 	Radius = 500.0f;
@@ -67,45 +65,37 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsInRange)
-	{
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-		if (PlayerController && PlayerController->WasInputKeyJustPressed(EKeys::E))
-		{
-			PressE = PressE + 1;
-		}
-	}
 
 	// 기차 회전 로직 -> Socket 구현되면 조건부 재생 
-	if (PressE == 1)
-	{
-		Wheel2->SetVisibility(true);
-	}
-	else if (PressE == 2)
-	{
-		Wheel3->SetVisibility(true);
-	}
-	else if (PressE >= 3)
-	{
-		Wheel4->SetVisibility(true);
-
-		CurrentAngle += AngularSpeed * DeltaTime;
-		float X = Radius * FMath::Cos(CurrentAngle);
-		float Y = Radius * FMath::Sin(CurrentAngle);
-		float Z = GetActorLocation().Z;
-
-		SetActorLocation(FVector(X, Y, Z));
-
-		CurrentRotationAngel += RotationSpeed * DeltaTime;
-		if (CurrentRotationAngel > 360.0f)
-		{
-			CurrentRotationAngel -= 360.0f;
-		}
-		FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
-		BoxComp->SetRelativeRotation(TrainRotation);
-	}
-	else 
-	{ }
+// 	if (PressE == 1)
+// 	{
+// 		Wheel2->SetVisibility(true);
+// 	}
+// 	else if (PressE == 2)
+// 	{
+// 		Wheel3->SetVisibility(true);
+// 	}
+// 	else if (PressE >= 3)
+// 	{
+// 		Wheel4->SetVisibility(true);
+// 
+// 		CurrentAngle += AngularSpeed * DeltaTime;
+// 		float X = Radius * FMath::Cos(CurrentAngle);
+// 		float Y = Radius * FMath::Sin(CurrentAngle);
+// 		float Z = GetActorLocation().Z;
+// 
+// 		SetActorLocation(FVector(X, Y, Z));
+// 
+// 		CurrentRotationAngel += RotationSpeed * DeltaTime;
+// 		if (CurrentRotationAngel > 360.0f)
+// 		{
+// 			CurrentRotationAngel -= 360.0f;
+// 		}
+// 		FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
+// 		BoxComp->SetRelativeRotation(TrainRotation);
+// 	}
+// 	else 
+// 	{ }
 }
 
 
