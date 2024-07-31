@@ -26,7 +26,7 @@ AHJ_GatlingHat::AHJ_GatlingHat()
 	BoxComp->OnComponentEndOverlap.AddDynamic(this, &AHJ_GatlingHat::OnOverlapEnd);
 
 	// À§Á¬ »ý¼º 
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
+	InteractionText = FText::FromString(TEXT("E) Put On"));
 
 }
 
