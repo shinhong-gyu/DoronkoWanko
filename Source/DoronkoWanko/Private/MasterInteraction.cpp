@@ -44,7 +44,6 @@ void AMasterInteraction::LookAt()
 			// Widget 을 생성하고
 			Widget = CreateWidget<UObjectWidget>(GetWorld(), ObjectWidgetClass);
 			if (Widget != nullptr) {
-				printf("1");
 				Widget->SetText(InteractionText);
 				// 화면에 Widget 을 출력
 				Widget->AddToViewport();

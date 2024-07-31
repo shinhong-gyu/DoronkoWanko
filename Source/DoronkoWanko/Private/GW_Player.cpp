@@ -16,6 +16,8 @@
 #include "HG_Splatter.h"
 #include "helmet.h"
 #include "DynamicObject.h"
+#include "GameFramework/Actor.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -63,14 +65,13 @@ void AGW_Player::Tick(float DeltaTime)
 	Direction = ttt.TransformVector(Direction);
 	AddMovementInput(Direction, 1);
 	Direction = FVector::ZeroVector;
-
 	FHitResult OutHit;
-	FVector Start = this->GetActorLocation();
-	FVector End = Start + CameraComp->GetForwardVector() + 1000.f;
-	ECollisionChannel TraceChannel = ECC_Visibility;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, TraceChannel, Params);
+	FVector Start = GetActorLocation() - FVector(0,0,-36.666f);
+	FVector End = Start + GetActorForwardVector() * 1000;
+	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel,false, ActorsToIgnore, EDrawDebugTrace::None, OutHit,true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
 		if (OutHit.GetActor() != LookAtActor) {
@@ -80,8 +81,9 @@ void AGW_Player::Tick(float DeltaTime)
 			if (Interface) {
 				Interface->LookAt();
 			}
-		}
-		DrawDebugLine(GetWorld(), Start, OutHit.ImpactPoint, FColor::Red, false, 3);
+ 		} 
+// 		DrawDebugSphere(GetWorld(), Start, 50.0f,12,FColor::Green,false,5.0f);
+// 		DrawDebugSphere(GetWorld(),End, 50.0f, 12,FColor::Blue,false,5.0f);
 
 	}
 	else {
@@ -92,11 +94,10 @@ void AGW_Player::Tick(float DeltaTime)
 				LookAtActor = nullptr;
 			}
 		}
-		// 허공
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 3);
+// 		DrawDebugSphere(GetWorld(), Start, 50.0f, 12, FColor::Green, false, 5.0f);
+// 		DrawDebugSphere(GetWorld(), End, 50.0f, 12, FColor::Blue, false, 5.0f);
 	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
-
 }
 
 // Called to bind functionality to input
