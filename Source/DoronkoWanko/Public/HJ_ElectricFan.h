@@ -45,4 +45,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int PressE = 0;
+
+	void InteractionWith();
+
+	bool bTurnOn = false;
 };

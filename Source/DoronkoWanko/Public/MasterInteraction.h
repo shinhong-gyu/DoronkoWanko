@@ -34,6 +34,7 @@ public:
     class UWidgetComponent* InteractionWidgetComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UObjectWidget> ObjectWidgetClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	class UObjectWidget* Widget;
 
@@ -43,6 +44,8 @@ public:
 	virtual void FadeAway();
 	// E 가 눌렸을 때 할 행동
 	virtual void IteractionWith();
+	// Q 가 눌렸을 때 할 행동
+	virtual void ItemDrop();
 	
 	FText InteractionText;
 

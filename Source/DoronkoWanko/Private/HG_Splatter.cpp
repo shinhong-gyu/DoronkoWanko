@@ -21,7 +21,7 @@ AHG_Splatter::AHG_Splatter()
 
 	SphereComp->SetGenerateOverlapEvents(true);
 	SphereComp->SetCollisionProfileName(TEXT("Splatter"));
-	MeshComp->SetCollisionProfileName(TEXT("Splatter"));
+	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 
 	Velocity = FVector::ZeroVector;
 }
@@ -30,7 +30,7 @@ AHG_Splatter::AHG_Splatter()
 void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
-	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AHG_Splatter::OnMyBeginOverlap);
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AHG_Splatter::OnMyBeginOverlap);
 }
 
 // Called every frame
@@ -52,7 +52,6 @@ void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator&
 		if (nullptr != Decal) {
 			UDecalComponent* DecalComp = Decal->GetDecal();
 			if (nullptr != DecalComp) {
-				DecalComp->DecalSize = FVector(32.0f,32.0f,32.0f);
 				DecalComp->SetWorldLocation(Location);
 				DecalComp->SetWorldRotation(Rotation);
 			}
@@ -62,13 +61,15 @@ void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator&
 
 void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetClass()->GetName());
-	if (OtherActor != nullptr && OtherActor != this) {
 		this->Destroy();
-		FVector HitLocation = GetActorLocation();
-		FRotator HitRoation = GetActorRotation();
-		this->SpawnDecalAtLocation(HitLocation, HitRoation);
-	}
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRoation = OtherActor->GetActorRotation();
+		this->SpawnDecalAtLocation(SpawnLocation, SpawnRoation);
+}
+
+FVector AHG_Splatter::ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal)
+{
+	return Vector - FVector::DotProduct(Vector, PlaneNormal) * PlaneNormal;
 }
 
 void AHG_Splatter::Initalize(FVector initVeloccity)
@@ -83,4 +84,3 @@ void AHG_Splatter::UpdataRotation()
 		SetActorRotation(NewRotation);
 	}
 }
-

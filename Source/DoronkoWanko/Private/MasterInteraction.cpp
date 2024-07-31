@@ -76,4 +76,9 @@ void AMasterInteraction::IteractionWith()
 	// 플레이어가 Object 를 바라보며 E 를 눌렀을 때 동작 할 함수
 }
 
+void AMasterInteraction::ItemDrop()
+{
+	// 플레이어의 Object Socket 에 Item 이 있을 때 Q 를 누르면 동작 할 함수
+}
+
 

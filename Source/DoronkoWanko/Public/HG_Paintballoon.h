@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HG_DecalActor.generated.h"
+#include "DynamicObject.h"
+#include "HG_Paintballoon.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHG_DecalActor : public AActor
+class DORONKOWANKO_API AHG_Paintballoon : public ADynamicObject
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AHG_DecalActor();
+	AHG_Paintballoon();
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,16 +23,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	UFUNCTION()
+	virtual void IteractionWith();
 
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComp;
+	TSubclassOf<class AHG_Splatter> SplatterFactory;
 
-	UPROPERTY(EditAnywhere)
-	class UDecalComponent* Decal;
-
-	FColor color = FColor::Green;
-
-	UDecalComponent* GetDecal() const {
-		return Decal;
-	}
 };
