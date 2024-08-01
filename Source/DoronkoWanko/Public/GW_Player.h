@@ -84,10 +84,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> SplatterFactory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
-    float DashSpeed = 1200.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
-    float WalkSpeed = 600.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float DashSpeed = 600.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float WalkSpeed = 250.0f;
 
 
 	AActor* LookAtActor = nullptr;
@@ -113,5 +113,19 @@ public:
 
 
 	void OnMyActionDrop(const FInputActionValue& Value);
+	
+	void attachDynamicObject() ;
+
+	class AMasterItem* AttachedDOb;
+	class AMasterItem* OverlappingDObject;
+	
+
+	bool bCanDropAttachedDOb;
+
+
+	void dropDynamicObject();
+
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 
 };
