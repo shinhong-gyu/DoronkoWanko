@@ -8,7 +8,7 @@
 #include "HJ_ElectricFan.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_ElectricFan : public ADynamicObject
+class DORONKOWANKO_API AHJ_ElectricFan : public AActor
 {
 	GENERATED_BODY()
 	
@@ -24,29 +24,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
-	class UInputComponent* InputComp;
 
-	/*UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;*/
+	class UStaticMeshComponent* MeshComp;
 
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* WingComp;
-
-	UPROPERTY(EditAnywhere)
-	float RotationSpeed;
-
-	UPROPERTY(EditAnywhere)
-	float CurrentRotationAngel;
-
-	UPROPERTY(EditAnywhere)
-	int PressE = 0;
-
-	void InteractionWith();
-
-	bool bTurnOn = false;
 };

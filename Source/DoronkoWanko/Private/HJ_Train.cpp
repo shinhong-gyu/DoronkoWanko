@@ -7,11 +7,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/ArrowComponent.h"
 #include "GW_Player.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
+#include "HJ_TrainBody.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AHJ_Train::AHJ_Train()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 충돌체 생성 
@@ -19,29 +22,15 @@ AHJ_Train::AHJ_Train()
 	//SetRootComponent(BoxComp);
 	//BoxComp->SetBoxExtent(FVector(40.0f, 60.0f, 40.0f));
 	// 메쉬 생성
-	//MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	//MeshComp->SetupAttachment(BoxComp);
+	/*MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	MeshComp->SetupAttachment(RootComponent);*/
 
-	// 바퀴 메쉬 생성 
-	Wheel1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel1"));
-	Wheel2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel2"));
-	Wheel3 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel3"));
-	Wheel4 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel4"));
+	// 기차 연결고리 
+	/*FirstConstraintComp = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("FirstConstraintComp"));
+	FirstConstraintComp->SetupAttachment(RootComponent);
 
-	Wheel1->SetupAttachment(BoxComp);
-	Wheel2->SetupAttachment(BoxComp);
-	Wheel3->SetupAttachment(BoxComp);
-	Wheel4->SetupAttachment(BoxComp);
-
-	// 바퀴 메쉬 처음엔 안보이게 설정 
-	Wheel2->SetVisibility(false);
-	Wheel3->SetVisibility(false);
-	Wheel4->SetVisibility(false);
-
-	// 충돌체 처리 
-	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AHJ_Train::OnOverlapBegin);
-	BoxComp->OnComponentEndOverlap.AddDynamic(this, &AHJ_Train::OnOverlapEnd);
+	SecondConstraintComp = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("SecondConstraintComp"));
+	SecondConstraintComp->SetupAttachment(RootComponent);*/
 
 	// 열차 회전 변수 
 	Radius = 500.0f;
@@ -51,8 +40,6 @@ AHJ_Train::AHJ_Train()
 	// 회전 기본값 지정 
 	RotationSpeed = 115.0f;
 	CurrentRotationAngel = 0.0f;
-
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
 }
 
 // Called when the game starts or when spawned
@@ -60,6 +47,11 @@ void AHJ_Train::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 플레이어 캐스트 
+	/*GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));*/
+
+	//InteractionText = FText::FromString(TEXT("E) COMEON"));
+	
 }
 
 // Called every frame
@@ -67,45 +59,27 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsInRange)
-	{
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-		if (PlayerController && PlayerController->WasInputKeyJustPressed(EKeys::E))
-		{
-			PressE = PressE + 1;
-		}
-	}
+	//if (bTurnOn)
+	//{
+	//	if (GW_Player)
+	//	{
+	CurrentAngle += AngularSpeed * DeltaTime;
+	float X = Radius * FMath::Cos(CurrentAngle);
+	float Y = Radius * FMath::Sin(CurrentAngle);
+	float Z = GetActorLocation().Z;
 
-	// 기차 회전 로직 -> Socket 구현되면 조건부 재생 
-	if (PressE == 1)
-	{
-		Wheel2->SetVisibility(true);
-	}
-	else if (PressE == 2)
-	{
-		Wheel3->SetVisibility(true);
-	}
-	else if (PressE >= 3)
-	{
-		Wheel4->SetVisibility(true);
+	SetActorLocation(FVector(X, Y, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
 
-		CurrentAngle += AngularSpeed * DeltaTime;
-		float X = Radius * FMath::Cos(CurrentAngle);
-		float Y = Radius * FMath::Sin(CurrentAngle);
-		float Z = GetActorLocation().Z;
-
-		SetActorLocation(FVector(X, Y, Z));
-
-		CurrentRotationAngel += RotationSpeed * DeltaTime;
-		if (CurrentRotationAngel > 360.0f)
-		{
-			CurrentRotationAngel -= 360.0f;
-		}
-		FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
-		BoxComp->SetRelativeRotation(TrainRotation);
+	CurrentRotationAngel += RotationSpeed * DeltaTime;
+	if (CurrentRotationAngel > 360.0f)
+	{
+		CurrentRotationAngel -= 360.0f;
 	}
-	else 
-	{ }
+	FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
+	BoxComp->SetRelativeRotation(TrainRotation);
+			/*	}
+			}*/
+	// 	}
 }
 
 

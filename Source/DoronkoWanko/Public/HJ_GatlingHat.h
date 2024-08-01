@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "DynamicObject.h"
 #include "GW_Player.h"
+#include "MasterItem.h"
 #include "HJ_GatlingHat.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_GatlingHat : public ADynamicObject
+class DORONKOWANKO_API AHJ_GatlingHat : public AMasterItem
 {
 	GENERATED_BODY()
 	
@@ -38,12 +38,10 @@ public:
 
 	float CurrTime;
 
-	int PressE = 0;
-
 	AGW_Player* GW_Player;
 
-	float PlayerKey;
+	void InteractionWith() override;
 
-	bool bItemRange = false;
+	bool bTurnOn = false;
 
 };

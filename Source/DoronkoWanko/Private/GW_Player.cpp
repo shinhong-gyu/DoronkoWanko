@@ -38,7 +38,7 @@ AGW_Player::AGW_Player()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
 
-	GetCapsuleComponent() ->SetRelativeScale3D(FVector(3.0f,3.0f,3.0f));
+	GetCapsuleComponent()->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
 }
 
 // Called when the game starts or when spawned
@@ -69,25 +69,23 @@ void AGW_Player::Tick(float DeltaTime)
 	AddMovementInput(Direction, 1);
 	Direction = FVector::ZeroVector;
 	FHitResult OutHit;
-	FVector Start = GetActorLocation() - FVector(0,0,-36.666f);
+	FVector Start = GetActorLocation() - FVector(0, 0, -36.666f);
 	FVector End = Start + GetActorForwardVector() * 1000;
 	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel,false, ActorsToIgnore, EDrawDebugTrace::None, OutHit,true);
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
-		if (OutHit.GetActor() != LookAtActor) {
-			LookAtActor = OutHit.GetActor();
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
-			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-			if (Interface) {
-				Interface->LookAt();
+		if (LookAtActor == nullptr) {
+			if (OutHit.GetActor() != LookAtActor) {
+				LookAtActor = OutHit.GetActor();
+				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+				if (Interface) {
+					Interface->LookAt();
+				}
 			}
- 		} 
-// 		DrawDebugSphere(GetWorld(), Start, 50.0f,12,FColor::Green,false,5.0f);
-// 		DrawDebugSphere(GetWorld(),End, 50.0f, 12,FColor::Blue,false,5.0f);
-
+		}
 	}
 	else {
 		if (IsValid(LookAtActor)) {
@@ -97,9 +95,8 @@ void AGW_Player::Tick(float DeltaTime)
 				LookAtActor = nullptr;
 			}
 		}
-// 		DrawDebugSphere(GetWorld(), Start, 50.0f, 12, FColor::Green, false, 5.0f);
-// 		DrawDebugSphere(GetWorld(), End, 50.0f, 12, FColor::Blue, false, 5.0f);
 	}
+
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
 
@@ -188,7 +185,6 @@ void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
 
 void AGW_Player::Shake()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shake"))
 	FVector InitialVelocity = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), FMath::RandRange(300, 600));
 
 	FVector SpawnLocation = GetActorLocation();
@@ -204,7 +200,6 @@ void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 {
 	FColor NewColor = FColor::MakeRandomColor();
 	ColorArray.Add(NewColor);
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *NewColor.ToString());
 
 	if (GEngine)
 	{
@@ -222,10 +217,9 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 {
 	Shake();
 	int NumberOfSplatter = FMath::RandRange(3, 5);
-	UE_LOG(LogTemp, Warning, TEXT("%d"), NumberOfSplatter)
-		for (int i = 0; i < NumberOfSplatter; i++) {
-			Shake();
-		}
+	for (int i = 0; i < NumberOfSplatter; i++) {
+		Shake();
+	}
 
 	if (ColorArray.Num() > 0)
 	{
@@ -251,6 +245,7 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 {
 	if (LookAtActor != nullptr) {
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
 		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
 		if (Interact != nullptr) {
 			Interact->InteractionWith();

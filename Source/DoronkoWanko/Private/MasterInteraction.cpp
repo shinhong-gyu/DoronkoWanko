@@ -43,7 +43,8 @@ void AMasterInteraction::LookAt()
 		{	
 			// Widget 을 생성하고
 			Widget = CreateWidget<UObjectWidget>(GetWorld(), ObjectWidgetClass);
-			if (Widget != nullptr) {
+			if (Widget != nullptr) //생성하는데 성공 했다면
+			{
 				Widget->SetText(InteractionText);
 				// 화면에 Widget 을 출력
 				Widget->AddToViewport();
