@@ -43,20 +43,19 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
-// 	if (GW_Player&&bItemRange)
-// 	{
-// 		/*if (GW_Player->bFire)
-// 		{
-// 			CurrTime += DeltaTime;
-// 
-// 			if (CurrTime > MakeTime)
-// 			{
-// 				SpawnInk();
-// 				CurrTime = 0;
-// 			}
-// 		}*/
-// 	}
+	if (bTurnOn)
+	{
+		if (GW_Player)
+		{
+			CurrTime += DeltaTime;
+
+			if (CurrTime > MakeTime)
+			{
+				SpawnInk();
+				CurrTime = 0;
+			}
+		}
+	}
 }
 
 void AHJ_GatlingHat::SpawnInk()
@@ -68,5 +67,10 @@ void AHJ_GatlingHat::SpawnInk()
 	{
 		Ink->Initalize(FVector(0, 0, 500) + GW_Player->GetActorForwardVector() * 2500);
 	}
+}
+
+void AHJ_GatlingHat::InteractionWith()
+{
+	bTurnOn = true;
 }
 

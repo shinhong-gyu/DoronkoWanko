@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DynamicObject.h"
+#include "GW_Player.h"
 #include "HJ_WhaleHat.generated.h"
 
 UCLASS()
@@ -37,6 +38,10 @@ public:
 
 	float CurrTime;
 
-	int PressE = 0;
+	void InteractionWith() override;
+
+	bool bTurnOn = false;
+
+	AGW_Player* GW_Player;
 
 };

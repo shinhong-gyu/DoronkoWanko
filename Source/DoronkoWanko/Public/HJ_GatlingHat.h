@@ -38,12 +38,10 @@ public:
 
 	float CurrTime;
 
-	int PressE = 0;
-
 	AGW_Player* GW_Player;
 
-	float PlayerKey;
+	void InteractionWith() override;
 
-	bool bItemRange = false;
+	bool bTurnOn = false;
 
 };

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HJ_TestInk.h"
 #include "DynamicObject.h"
 #include "GW_Player.h"
 #include "HJ_ElephantHat.generated.h"
@@ -38,6 +37,10 @@ public:
 	float MakeTime = 0.1f;
 
 	float CurrTime;
+
+	void InteractionWith() override;
+
+	bool bTurnOn = false;
 
 	AGW_Player* GW_Player;
 
