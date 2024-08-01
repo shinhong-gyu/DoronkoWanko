@@ -18,6 +18,7 @@
 #include "DynamicObject.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
+#include "MasterItem.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -63,6 +64,8 @@ void AGW_Player::Tick(float DeltaTime)
 
 	FTransform ttt = FTransform(GetControlRotation());
 	Direction = ttt.TransformVector(Direction);
+	Direction.Z = 0;
+	Direction.Normalize();
 	AddMovementInput(Direction, 1);
 	Direction = FVector::ZeroVector;
 	FHitResult OutHit;
@@ -252,7 +255,7 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		if (Interact != nullptr) {
 			Interact->InteractionWith();
 			
-			AActor* DynamicObject = Cast<AMasterInteraction>(LookAtActor);
+			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
 			if (DynamicObject)
 			{
 				
@@ -266,13 +269,13 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-	if (AttachedDOb)
+	if (AttachedDOb != nullptr)
 	{
 		auto* Interact = Cast<II_Interaction>(LookAtActor);
 		if (Interact != nullptr)
 		{
 			Interact->ItemDrop();
-			AActor* DynamicObject = Cast<AMasterInteraction>(LookAtActor);
+			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
 			if (DynamicObject)
 			{
 
@@ -287,7 +290,7 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 
 void AGW_Player::attachDynamicObject()
 {
-	OverlappingDObject  = LookAtActor;
+
 	if (OverlappingDObject && !AttachedDOb)
 	{
 		// Overlapping을 플레이어의 특정 소켓에 부착
@@ -323,7 +326,7 @@ void AGW_Player::dropDynamicObject()
 
 void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AActor* dObject = Cast<AActor>(OtherActor))
+	if (AMasterItem* dObject = Cast<AMasterItem>(OtherActor))
 	{
 		OverlappingDObject = dObject;
 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
