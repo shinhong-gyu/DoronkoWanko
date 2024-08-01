@@ -40,6 +40,8 @@ public:
 
 	void InteractionWith() override;
 
+	void ItemDrop() override;
+
 	bool bTurnOn = false;
 
 	AGW_Player* GW_Player;

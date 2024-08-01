@@ -24,7 +24,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	// 잉크 발사 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* InkArrow;
 
@@ -37,8 +37,10 @@ public:
 	float MakeTime = 0.2f;
 
 	float CurrTime;
-
+	// 인터페이스 함수 
 	void InteractionWith() override;
+
+	void ItemDrop() override;
 
 	bool bTurnOn = false;
 

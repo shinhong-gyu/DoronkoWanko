@@ -76,3 +76,8 @@ void AHJ_WhaleHat::InteractionWith()
 	bTurnOn = true;
 }
 
+void AHJ_WhaleHat::ItemDrop()
+{
+	bTurnOn = false;
+}
+

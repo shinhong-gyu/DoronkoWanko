@@ -74,3 +74,8 @@ void AHJ_ElephantHat::InteractionWith()
 	bTurnOn = true;
 }
 
+void AHJ_ElephantHat::ItemDrop()
+{
+	bTurnOn = false;
+}
+

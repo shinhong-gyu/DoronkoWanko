@@ -24,7 +24,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	// 잉크 발사하기 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* InkArrow;
 
@@ -39,9 +39,13 @@ public:
 	float CurrTime;
 
 	AGW_Player* GW_Player;
-
+	// 인터페이스 기능
 	void InteractionWith() override;
 
+	void ItemDrop() override;
+
 	bool bTurnOn = false;
+
+
 
 };
