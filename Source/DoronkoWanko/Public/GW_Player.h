@@ -116,8 +116,8 @@ public:
 	
 	void attachDynamicObject() ;
 
-	class AMasterItem* AttachedDOb;
-	class AMasterItem* OverlappingDObject;
+	class AActor* AttachedDOb;
+	class AActor* OverlappingDObject;
 	
 
 	bool bCanDropAttachedDOb;

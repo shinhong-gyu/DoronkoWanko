@@ -285,7 +285,7 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 
 void AGW_Player::attachDynamicObject()
 {
-
+	OverlappingDObject = LookAtActor;
 	if (OverlappingDObject && !AttachedDOb)
 	{
 		// Overlapping을 플레이어의 특정 소켓에 부착
