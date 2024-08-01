@@ -24,7 +24,7 @@ AHJ_WhaleHat::AHJ_WhaleHat()
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
 
 	// À§Á¬ »ý¼º 
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
+	InteractionText = FText::FromString(TEXT("E) Put On"));
 }
 
 // Called when the game starts or when spawned
