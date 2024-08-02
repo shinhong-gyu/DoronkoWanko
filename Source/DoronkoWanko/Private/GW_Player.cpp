@@ -78,14 +78,15 @@ void AGW_Player::Tick(float DeltaTime)
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
 		if (LookAtActor == nullptr) {
-				if (OutHit.GetActor() != LookAtActor) {
-					LookAtActor = OutHit.GetActor();
-						UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
-						II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-					if (Interface) {
-							Interface->LookAt();
-					}
+			if (OutHit.GetActor() != LookAtActor) {
+				LookAtActor = OutHit.GetActor();
+				UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
+				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+				if (Interface) {
+					Interface->LookAt();
 				}
+			}
 		}
 	}
 	else {

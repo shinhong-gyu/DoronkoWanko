@@ -24,6 +24,5 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	//ÁÂ¿ì ¼Óµµ
 	Direction = FVector::DotProduct(rightVector, velocity);
 
-	
 	IsInAir = player->GetCharacterMovement()->IsFalling();
 }

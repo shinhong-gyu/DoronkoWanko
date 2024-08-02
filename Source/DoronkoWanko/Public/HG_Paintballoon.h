@@ -28,7 +28,7 @@ public:
 	virtual void InteractionWith();
 	
 	UPROPERTY(EditAnywhere)
-	FColor PaintColor;
+	FColor PaintColor = FColor::Red;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> SplatterFactory;

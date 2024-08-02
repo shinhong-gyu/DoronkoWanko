@@ -18,7 +18,7 @@ AHG_Paintballoon::AHG_Paintballoon()
 	if (tempMesh.Succeeded()) {
 		MeshComp->SetStaticMesh(tempMesh.Object);
 	}
-
+	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
 	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
