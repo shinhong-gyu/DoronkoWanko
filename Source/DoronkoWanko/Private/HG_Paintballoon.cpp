@@ -18,6 +18,8 @@ AHG_Paintballoon::AHG_Paintballoon()
 	if (tempMesh.Succeeded()) {
 		MeshComp->SetStaticMesh(tempMesh.Object);
 	}
+
+	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 // Called when the game starts or when spawned

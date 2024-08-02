@@ -39,6 +39,7 @@ void AMasterInteraction::LookAt()
 	// 위젯을 생성하여 화면에 표시하고 싶다.
 	if (bIsDropped) // 아이템이 떨어져 있고
 	{
+		UE_LOG(LogTemp,Warning,TEXT("a"))
 		if (Widget == nullptr)  // Widget 이 아직 생성되지 않았다면
 		{	
 			// Widget 을 생성하고

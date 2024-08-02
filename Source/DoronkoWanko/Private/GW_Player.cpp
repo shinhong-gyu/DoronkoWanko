@@ -78,23 +78,23 @@ void AGW_Player::Tick(float DeltaTime)
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
 		if (LookAtActor == nullptr) {
-			if (OutHit.GetActor() != LookAtActor) {
-				LookAtActor = OutHit.GetActor();
-				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-				if (Interface) {
-					Interface->LookAt();
+				if (OutHit.GetActor() != LookAtActor) {
+					LookAtActor = OutHit.GetActor();
+						UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
+						II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+					if (Interface) {
+							Interface->LookAt();
+					}
 				}
-			}
 		}
 	}
 	else {
-		if (IsValid(LookAtActor)) {
-			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-			if (Interface) {
-				Interface->FadeAway();
-				LookAtActor = nullptr;
-			}
+		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		if (Interface) {
+			Interface->FadeAway();
+			LookAtActor = nullptr;
 		}
+
 	}
 
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
@@ -179,7 +179,7 @@ void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value)
 void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	
+
 
 }
 
@@ -246,14 +246,14 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 {
 	if (LookAtActor != nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
-		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
+			II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
 		if (Interact != nullptr) {
 			Interact->InteractionWith();
-			
+
 			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
 			if (DynamicObject)
 			{
-				
+
 				attachDynamicObject();
 
 			}
@@ -274,10 +274,10 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 			if (DynamicObject)
 			{
 
-				
+
 			}
 
-			
+
 		}
 	}
 	dropDynamicObject();
@@ -326,7 +326,6 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		OverlappingDObject = dObject;
 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
 	}
-
 }
 
 // void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
