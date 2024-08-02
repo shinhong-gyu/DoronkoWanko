@@ -16,9 +16,17 @@ class DORONKOWANKO_API UPlayerAnimInstance : public UAnimInstance
 
 public:
 
-UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category=PlayerAnimInstance);
-	float speed = 0;
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float Speed;
+	//Horizontal
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float Direction;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool IsInAir;
+
 
 
 };

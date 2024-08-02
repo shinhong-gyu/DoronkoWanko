@@ -18,6 +18,7 @@
 #include "DynamicObject.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
+#include "MasterItem.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -63,6 +64,8 @@ void AGW_Player::Tick(float DeltaTime)
 
 	FTransform ttt = FTransform(GetControlRotation());
 	Direction = ttt.TransformVector(Direction);
+	Direction.Z = 0;
+	Direction.Normalize();
 	AddMovementInput(Direction, 1);
 	Direction = FVector::ZeroVector;
 	FHitResult OutHit;
@@ -111,7 +114,7 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionLook);
 		input->BindAction(IA_Jump, ETriggerEvent::Started, this, &AGW_Player::OnMyActionJump);
 		input->BindAction(IA_Zoom, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionZoom);
-		input->BindAction(IA_Dash, ETriggerEvent::Ongoing, this, &AGW_Player::OnMyActionDashOngoing);
+		input->BindAction(IA_Dash, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDashOngoing);
 		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
 		input->BindAction(IA_Interaction, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionInteraction);
 		input->BindAction(IA_Drop, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDrop);
@@ -170,12 +173,13 @@ void AGW_Player::OnMyActionZoom(const FInputActionValue& Value)
 
 void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value)
 {
-	GetCharacterMovement()->MaxWalkSpeed = 1500.0f;
+	GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
 }
 
 void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
 {
-	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	
 
 }
 
@@ -245,18 +249,84 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
 		if (Interact != nullptr) {
 			Interact->InteractionWith();
+			
+			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
+			if (DynamicObject)
+			{
+				
+				attachDynamicObject();
+
+			}
+
 		}
 	}
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-	if (LookAtActor != nullptr) {
-		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
-		if (Interact != nullptr) {
+	if (AttachedDOb != nullptr)
+	{
+		auto* Interact = Cast<II_Interaction>(LookAtActor);
+		if (Interact != nullptr)
+		{
 			Interact->ItemDrop();
+			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
+			if (DynamicObject)
+			{
+
+				
+			}
+
+			
 		}
 	}
+	dropDynamicObject();
+}
+
+void AGW_Player::attachDynamicObject()
+{
+	OverlappingDObject = LookAtActor;
+	if (OverlappingDObject && !AttachedDOb)
+	{
+		// Overlapping을 플레이어의 특정 소켓에 부착
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		OverlappingDObject->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
+		OverlappingDObject->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
+			1.0f / GetMesh()->GetComponentScale().Y, 1.0f / GetMesh()->GetComponentScale().Z));
+		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(OverlappingDObject->GetRootComponent()))
+		{
+			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		AttachedDOb = OverlappingDObject;
+	}
+}
+
+void AGW_Player::dropDynamicObject()
+{
+
+	if (AttachedDOb)
+	{
+		AttachedDOb->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(AttachedDOb->GetRootComponent()))
+		{
+			DObComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			DObComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+		}
+
+		AttachedDOb = nullptr;
+		OverlappingDObject = nullptr;
+	}
+}
+
+void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AMasterItem* dObject = Cast<AMasterItem>(OtherActor))
+	{
+		OverlappingDObject = dObject;
+		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
+	}
+
 }
 
 // void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
@@ -320,17 +390,17 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 
 // void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 // {
+// // 	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
+// // 	{
+// // 		OverlappingTrainWheel = TrainWheel;
+// // 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
+// // 	}
+// // 	else
 // 	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
 // 	{
 // 		OverlappingTrainWheel = TrainWheel;
 // 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
 // 	}
-// 	else if(ADynamicObject* hat = Cast<ADynamicObject>(OtherActor))
-// 	{
-// 		Overlappinghelmet = hat;
-// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *hat->GetName());
-// 	}
-// }
 
 
 

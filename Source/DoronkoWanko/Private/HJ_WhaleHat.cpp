@@ -24,13 +24,15 @@ AHJ_WhaleHat::AHJ_WhaleHat()
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
 
 	// 위젯 생성 
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
+	InteractionText = FText::FromString(TEXT("E) Put On"));
 }
 
 // Called when the game starts or when spawned
 void AHJ_WhaleHat::BeginPlay()
 {
 	Super::BeginPlay();
+	// 플레이어 캐스트 
+	GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	
 }
 
@@ -39,8 +41,21 @@ void AHJ_WhaleHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+	if (bTurnOn)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hong"));
+		if (GW_Player)
+		{
+			CurrTime += DeltaTime;
 
+			if (CurrTime > MakeTime)
+			{
+				SpawnInk();
+				CurrTime = 0;
+			}
+		}
+
+	}
 }
 
 void AHJ_WhaleHat::SpawnInk()
@@ -55,5 +70,15 @@ void AHJ_WhaleHat::SpawnInk()
 	if (nullptr != Ink) {
 		Ink->Initalize(InitialVelocity);
 	}
+}
+
+void AHJ_WhaleHat::InteractionWith()
+{
+	bTurnOn = true;
+}
+
+void AHJ_WhaleHat::ItemDrop()
+{
+	bTurnOn = false;
 }
 

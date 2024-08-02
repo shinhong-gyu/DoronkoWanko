@@ -24,7 +24,7 @@ AHJ_GatlingHat::AHJ_GatlingHat()
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
 
 	// À§Á¬ »ý¼º 
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
+	InteractionText = FText::FromString(TEXT("E) PUT ON"));
 
 }
 
@@ -43,20 +43,17 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
-// 	if (GW_Player&&bItemRange)
-// 	{
-// 		/*if (GW_Player->bFire)
-// 		{
-// 			CurrTime += DeltaTime;
-// 
-// 			if (CurrTime > MakeTime)
-// 			{
-// 				SpawnInk();
-// 				CurrTime = 0;
-// 			}
-// 		}*/
-// 	}
+	if (bTurnOn)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hong_Gatling"));
+			CurrTime += DeltaTime;
+
+			if (CurrTime > MakeTime)
+			{
+				SpawnInk();
+				CurrTime = 0;
+			}
+	}
 }
 
 void AHJ_GatlingHat::SpawnInk()
@@ -68,5 +65,15 @@ void AHJ_GatlingHat::SpawnInk()
 	{
 		Ink->Initalize(FVector(0, 0, 500) + GW_Player->GetActorForwardVector() * 2500);
 	}
+}
+
+void AHJ_GatlingHat::InteractionWith()
+{
+	bTurnOn = true;
+}
+
+void AHJ_GatlingHat::ItemDrop()
+{
+	bTurnOn = false;
 }
 

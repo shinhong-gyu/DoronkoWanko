@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "DynamicObject.h"
 #include "GW_Player.h"
+#include "MasterItem.h"
 #include "HJ_GatlingHat.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_GatlingHat : public ADynamicObject
+class DORONKOWANKO_API AHJ_GatlingHat : public AMasterItem
 {
 	GENERATED_BODY()
 	
@@ -24,7 +24,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	// 잉크 발사하기 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* InkArrow;
 
@@ -38,12 +38,14 @@ public:
 
 	float CurrTime;
 
-	int PressE = 0;
+	// 인터페이스 기능
+	void InteractionWith() override;
+
+	void ItemDrop() override;
+
+	bool bTurnOn = false;
 
 	AGW_Player* GW_Player;
 
-	float PlayerKey;
-
-	bool bItemRange = false;
 
 };

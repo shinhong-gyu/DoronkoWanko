@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DynamicObject.h"
+#include "GW_Player.h"
 #include "HJ_Train.generated.h"
 
 UCLASS()
@@ -24,7 +25,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+	/*UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel1;
 
 	UPROPERTY(EditAnywhere)
@@ -34,16 +35,16 @@ public:
 	class UStaticMeshComponent* Wheel3;
 
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* Wheel4;
+	class UStaticMeshComponent* Wheel4;*/
+
+	/*UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* MeshComp;*/
 
 	// 소켓에 부착할 바퀴 클래스 선언 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHJ_TrainWheel> WheelFactory;
 
 	class AHJ_TrainWheel* CurrentWheel;
-
-	UPROPERTY(EditAnywhere)
-	int PressE = 0;
 
 	// 기차의 몸체(자체) 회전 변수 
 	UPROPERTY(EditAnywhere)
@@ -61,5 +62,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float CurrentRotationAngel;
+
+	bool bTurnOn = false;
+
+	void InteractionWith() override;
+
+	void ItemDrop() override;
+
+	AGW_Player* GW_Player;
 
 };

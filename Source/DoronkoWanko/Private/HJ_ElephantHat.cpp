@@ -11,7 +11,7 @@
 // Sets default values
 AHJ_ElephantHat::AHJ_ElephantHat()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 스폰위치(Arrow) 생성 
@@ -34,7 +34,7 @@ void AHJ_ElephantHat::BeginPlay()
 
 	// 플레이어 캐스트 
 	GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	
+
 }
 
 // Called every frame
@@ -42,9 +42,10 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-	if (GW_Player)
+	if (bTurnOn)
 	{
+		if (GW_Player)
+		{
 			CurrTime += DeltaTime;
 
 			if (CurrTime > MakeTime)
@@ -52,6 +53,7 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 				SpawnInk();
 				CurrTime = 0;
 			}
+		}
 	}
 }
 
@@ -64,5 +66,16 @@ void AHJ_ElephantHat::SpawnInk()
 	{
 		Ink->Initalize(FVector(0, 0, 300) + GW_Player->GetActorForwardVector() * 600);
 	}
+}
+
+void AHJ_ElephantHat::InteractionWith()
+{
+	// 플레이어에서 인터렉션 켜줄 때
+	bTurnOn = true;
+}
+
+void AHJ_ElephantHat::ItemDrop()
+{
+	bTurnOn = false;
 }
 

@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "DynamicObject.h"
+#include "GW_Player.h"
+#include "MasterItem.h"
 #include "HJ_WhaleHat.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_WhaleHat : public ADynamicObject
+class DORONKOWANKO_API AHJ_WhaleHat : public AMasterItem
 {
 	GENERATED_BODY()
 	
@@ -23,7 +24,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	// 잉크 발사 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* InkArrow;
 
@@ -36,7 +37,13 @@ public:
 	float MakeTime = 0.2f;
 
 	float CurrTime;
+	// 인터페이스 함수 
+	void InteractionWith() override;
 
-	int PressE = 0;
+	void ItemDrop() override;
+
+	bool bTurnOn = false;
+
+	AGW_Player* GW_Player;
 
 };
