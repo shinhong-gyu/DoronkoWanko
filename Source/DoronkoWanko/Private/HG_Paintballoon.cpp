@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Engine/StaticMesh.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GW_Player.h"
 
 // Sets default values
 AHG_Paintballoon::AHG_Paintballoon()
@@ -42,9 +43,12 @@ void AHG_Paintballoon::InteractionWith()
 	Destroy();
 	for (int i = 0; i < 5; i++) {
 		auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
-
 		if (Splatter) {
 			Splatter->Initalize(InitialVelocity);
+		}
+		auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		if (Player) {
+			Player->LookAtActor = nullptr;
 		}
 	}
 }

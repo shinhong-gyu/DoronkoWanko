@@ -89,9 +89,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
     float WalkSpeed = 600.0f;
 
-
+public:
 	AActor* LookAtActor = nullptr;
-		TArray<FColor> ColorArray;
+	TArray<FColor> ColorArray;
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Dirt;
