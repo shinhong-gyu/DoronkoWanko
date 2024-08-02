@@ -38,7 +38,6 @@ public:
 
 	float CurrTime;
 
-	AGW_Player* GW_Player;
 	// 인터페이스 기능
 	void InteractionWith() override;
 
@@ -46,6 +45,7 @@ public:
 
 	bool bTurnOn = false;
 
+	AGW_Player* GW_Player;
 
 
 };

@@ -45,6 +45,7 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 
 	if (bTurnOn)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Hong_Gatling"));
 			CurrTime += DeltaTime;
 
 			if (CurrTime > MakeTime)

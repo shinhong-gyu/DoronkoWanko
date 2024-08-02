@@ -7,8 +7,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/ArrowComponent.h"
 #include "GW_Player.h"
-#include "PhysicsEngine/PhysicsConstraintComponent.h"
-#include "HJ_TrainBody.h"
 #include "Components/StaticMeshComponent.h"
 
 // Sets default values
@@ -25,13 +23,6 @@ AHJ_Train::AHJ_Train()
 	/*MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);*/
 
-	// 기차 연결고리 
-	/*FirstConstraintComp = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("FirstConstraintComp"));
-	FirstConstraintComp->SetupAttachment(RootComponent);
-
-	SecondConstraintComp = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("SecondConstraintComp"));
-	SecondConstraintComp->SetupAttachment(RootComponent);*/
-
 	// 열차 회전 변수 
 	Radius = 500.0f;
 	AngularSpeed = 2.0f;
@@ -40,6 +31,8 @@ AHJ_Train::AHJ_Train()
 	// 회전 기본값 지정 
 	RotationSpeed = 115.0f;
 	CurrentRotationAngel = 0.0f;
+	// 위젯 문구 생성 
+	InteractionText = FText::FromString(TEXT("E) Interaction"));
 }
 
 // Called when the game starts or when spawned
@@ -48,10 +41,10 @@ void AHJ_Train::BeginPlay()
 	Super::BeginPlay();
 
 	// 플레이어 캐스트 
-	/*GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));*/
+	GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	//InteractionText = FText::FromString(TEXT("E) COMEON"));
-	
+
 }
 
 // Called every frame
@@ -59,27 +52,36 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (bTurnOn)
-	//{
-	//	if (GW_Player)
-	//	{
-	CurrentAngle += AngularSpeed * DeltaTime;
-	float X = Radius * FMath::Cos(CurrentAngle);
-	float Y = Radius * FMath::Sin(CurrentAngle);
-	float Z = GetActorLocation().Z;
-
-	SetActorLocation(FVector(X, Y, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
-
-	CurrentRotationAngel += RotationSpeed * DeltaTime;
-	if (CurrentRotationAngel > 360.0f)
+	if (bTurnOn)
 	{
-		CurrentRotationAngel -= 360.0f;
+		if (GW_Player)
+		{
+			CurrentAngle += AngularSpeed * DeltaTime;
+			float X = Radius * FMath::Cos(CurrentAngle);
+			float Y = Radius * FMath::Sin(CurrentAngle);
+			float Z = GetActorLocation().Z;
+
+			SetActorLocation(FVector(X, Y, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
+
+			CurrentRotationAngel += RotationSpeed * DeltaTime;
+			if (CurrentRotationAngel > 360.0f)
+			{
+				CurrentRotationAngel -= 360.0f;
+			}
+			FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
+			BoxComp->SetRelativeRotation(TrainRotation);
+		}
 	}
-	FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
-	BoxComp->SetRelativeRotation(TrainRotation);
-			/*	}
-			}*/
-	// 	}
+}
+
+void AHJ_Train::InteractionWith()
+{
+	bTurnOn = true;
+}
+
+void AHJ_Train::ItemDrop()
+{
+	bTurnOn = false;
 }
 
 
