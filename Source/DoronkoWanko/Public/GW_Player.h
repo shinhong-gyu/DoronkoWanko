@@ -89,9 +89,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float WalkSpeed = 250.0f;
 
-
+public:
 	AActor* LookAtActor = nullptr;
-		TArray<FColor> ColorArray;
+	TArray<FColor> ColorArray;
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Dirt;

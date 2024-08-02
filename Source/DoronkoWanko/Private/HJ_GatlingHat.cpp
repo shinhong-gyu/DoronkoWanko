@@ -45,8 +45,7 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 
 	if (bTurnOn)
 	{
-		if (GW_Player)
-		{
+		UE_LOG(LogTemp, Warning, TEXT("Hong_Gatling"));
 			CurrTime += DeltaTime;
 
 			if (CurrTime > MakeTime)
@@ -54,7 +53,6 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 				SpawnInk();
 				CurrTime = 0;
 			}
-		}
 	}
 }
 
@@ -72,5 +70,10 @@ void AHJ_GatlingHat::SpawnInk()
 void AHJ_GatlingHat::InteractionWith()
 {
 	bTurnOn = true;
+}
+
+void AHJ_GatlingHat::ItemDrop()
+{
+	bTurnOn = false;
 }
 

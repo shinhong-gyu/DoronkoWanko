@@ -4,11 +4,12 @@
 #include "HG_DecalActor.h"
 #include "Components/DecalComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AHG_DecalActor::AHG_DecalActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Decal = CreateDefaultSubobject<UDecalComponent>(TEXT("Decal"));
 	SetRootComponent(Decal);
@@ -16,17 +17,27 @@ AHG_DecalActor::AHG_DecalActor()
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxComp->SetupAttachment(RootComponent);
 
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	MeshComp->SetupAttachment(RootComponent);
+
 	BoxComp->SetGenerateOverlapEvents(true);
 	BoxComp->SetCollisionProfileName(TEXT("Decal"));
+	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+
+
+	MeshComp->SetRenderCustomDepth(true);
+
+	MeshComp->CustomDepthStencilValue = 1;
+
 	// ·£´ýÇÏ°Ô Decal ÆÐÅÏ Âï¾î³»±â
 	UMaterial* SelectedMaterial = nullptr;
 
-	//ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("/Game/HongGyu/M_Decal.uasset"));
-	//if (tempMaterial.Succeeded())
-	//{
-		//SelectedMaterial = tempMaterial.Object;
-	//}
-// 	int32 randInt = FMath::RandRange(0,9);
+	static ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("/Game/HongGyu/M_Decal.uasset"));
+	if (tempMaterial.Succeeded())
+	{
+		SelectedMaterial = tempMaterial.Object;
+	}
+	int32 randInt = FMath::RandRange(0, 9);
 // 	if (randInt == 1) {
 // 		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("C:/Users/Admin/GitHub/DoronkoWanko/DoronkoWanko/Content/HongGyu/M_Decal.uasset"));
 // 		if (tempMaterial.Succeeded())
@@ -34,7 +45,7 @@ AHG_DecalActor::AHG_DecalActor()
 // 			SelectedMaterial = tempMaterial.Object;
 // 		}
 // 	}
-// 	else{
+// 	else {
 // 		ConstructorHelpers::FObjectFinder<UMaterial> tempMaterial(TEXT("C:/Users/Admin/GitHub/DoronkoWanko/DoronkoWanko/Content/HongGyu/M_Decal.uasset"));
 // 		if (tempMaterial.Succeeded())
 // 		{

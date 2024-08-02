@@ -63,20 +63,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	float CurrentRotationAngel;
 
-	// 기차 연결고리 변수 
-	/*UPROPERTY(EditAnywhere)
-	class UPhysicsConstraintComponent* FirstConstraintComp;
-
-	UPROPERTY(EditAnywhere)
-	class UPhysicsConstraintComponent* SecondConstraintComp; */
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AHJ_TrainBody* TrainBody1;
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* AHJ_TrainBody2;*/
-
 	bool bTurnOn = false;
+
+	void InteractionWith() override;
+
+	void ItemDrop() override;
 
 	AGW_Player* GW_Player;
 

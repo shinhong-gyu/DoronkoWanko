@@ -60,8 +60,4 @@ public:
 	class UStaticMeshComponent* ColorComp;
 
 	void TurnOn();
-	
-	void LookAt() override;
-
-
 };

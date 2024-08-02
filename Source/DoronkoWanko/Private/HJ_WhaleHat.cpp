@@ -43,6 +43,7 @@ void AHJ_WhaleHat::Tick(float DeltaTime)
 
 	if (bTurnOn)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Hong"));
 		if (GW_Player)
 		{
 			CurrTime += DeltaTime;
@@ -74,5 +75,10 @@ void AHJ_WhaleHat::SpawnInk()
 void AHJ_WhaleHat::InteractionWith()
 {
 	bTurnOn = true;
+}
+
+void AHJ_WhaleHat::ItemDrop()
+{
+	bTurnOn = false;
 }
 
