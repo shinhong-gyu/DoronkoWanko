@@ -23,6 +23,16 @@ AHJ_Train::AHJ_Train()
 	/*MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);*/
 
+	// 열차 바퀴 메쉬 생성
+	Wheel1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel1"));
+	Wheel2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel2"));
+	Wheel1->SetupAttachment(MeshComp);
+	Wheel2->SetupAttachment(MeshComp);
+
+	// 바퀴 안보이게 설정 
+	Wheel1->SetVisibility(false);
+	Wheel2->SetVisibility(false);
+
 	// 열차 회전 변수 
 	Radius = 500.0f;
 	AngularSpeed = 2.0f;
@@ -52,9 +62,13 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bTurnOn)
-	{
-		if (GW_Player)
+		if (WheelCheck == 5)
+		{	Wheel1->SetVisibility(true);	}
+
+		if (WheelCheck == 10)
+		{	Wheel2->SetVisibility(true);	}
+
+		if (WheelCheck > 10)
 		{
 			CurrentAngle += AngularSpeed * DeltaTime;
 			float X = Radius * FMath::Cos(CurrentAngle);
@@ -71,12 +85,11 @@ void AHJ_Train::Tick(float DeltaTime)
 			FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
 			BoxComp->SetRelativeRotation(TrainRotation);
 		}
-	}
 }
 
 void AHJ_Train::InteractionWith()
 {
-	bTurnOn = true;
+	WheelCheck += 1;
 }
 
 void AHJ_Train::ItemDrop()

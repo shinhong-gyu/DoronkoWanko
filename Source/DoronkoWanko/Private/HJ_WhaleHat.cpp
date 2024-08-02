@@ -43,7 +43,6 @@ void AHJ_WhaleHat::Tick(float DeltaTime)
 
 	if (bTurnOn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hong"));
 		if (GW_Player)
 		{
 			CurrTime += DeltaTime;
@@ -54,7 +53,6 @@ void AHJ_WhaleHat::Tick(float DeltaTime)
 				CurrTime = 0;
 			}
 		}
-
 	}
 }
 
@@ -79,6 +77,7 @@ void AHJ_WhaleHat::InteractionWith()
 
 void AHJ_WhaleHat::ItemDrop()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ItemDrop called on WhaleHat"));
 	bTurnOn = false;
 }
 

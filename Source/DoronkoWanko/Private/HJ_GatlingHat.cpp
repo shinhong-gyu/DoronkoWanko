@@ -4,8 +4,8 @@
 #include "HJ_GatlingHat.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
-#include "HG_Splatter.h"
 #include "GW_Player.h"
+#include "HG_Splatter.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -17,7 +17,7 @@ AHJ_GatlingHat::AHJ_GatlingHat()
 	// 스폰위치(Arrow) 생성 
 	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
 	InkArrow->SetupAttachment(RootComponent);
-	InkArrow->SetRelativeLocation(FVector(120, 0, 0));
+	InkArrow->SetRelativeLocation(FVector(0, 0, 100));
 	InkArrow->SetRelativeRotation(FRotator(0, 0, 0));
 
 	// 충돌체 처리 
@@ -45,7 +45,8 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 
 	if (bTurnOn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hong_Gatling"));
+		if (GW_Player)
+		{
 			CurrTime += DeltaTime;
 
 			if (CurrTime > MakeTime)
@@ -53,6 +54,7 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 				SpawnInk();
 				CurrTime = 0;
 			}
+		}
 	}
 }
 
@@ -74,6 +76,7 @@ void AHJ_GatlingHat::InteractionWith()
 
 void AHJ_GatlingHat::ItemDrop()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ItemDrop called on GatlingHat"));
 	bTurnOn = false;
 }
 

@@ -25,13 +25,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	/*UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel1;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel2;
 
 	UPROPERTY(EditAnywhere)
+	int WheelCheck = 0;
+
+	/*UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel3;
 
 	UPROPERTY(EditAnywhere)
