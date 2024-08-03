@@ -248,17 +248,20 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 	if (LookAtActor != nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
 			II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
-		if (Interact != nullptr) {
+		if (Interact != nullptr)
+		{
 			Interact->InteractionWith();
 
-			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
-			if (DynamicObject)
+			if (AMasterItem* MasterItem = Cast<AMasterItem>(LookAtActor))
 			{
-
-				attachDynamicObject();
-
+				// AMasterItem을 부착
+				attachDynamicObject(MasterItem);
 			}
-
+			else if (ADynamicObject* DynamicObject = Cast<ADynamicObject>(LookAtActor))
+			{
+				// ADynamicObject를 부착
+				attachDynamicObject(DynamicObject);
+			}
 		}
 	}
 }
@@ -267,42 +270,75 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
 	if (AttachedDOb != nullptr)
 	{
-		auto* Interact = Cast<II_Interaction>(LookAtActor);
+		II_Interaction* Interact = Cast<II_Interaction>(AttachedDOb);
 		if (Interact != nullptr)
 		{
 			Interact->ItemDrop();
-			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
-			if (DynamicObject)
-			{
-
-
-			}
-
-
 		}
+
+		dropDynamicObject(AttachedDOb);
 	}
-	dropDynamicObject();
+	if (AttachedDynamicObject != nullptr)
+	{
+		II_Interaction* Interact = Cast<II_Interaction>(AttachedDynamicObject);
+		if (Interact != nullptr)
+		{
+			Interact->ItemDrop();
+		}
+
+		dropDynamicObject(AttachedDynamicObject);
+	}
+
+
 }
 
-void AGW_Player::attachDynamicObject()
+void AGW_Player::attachDynamicObject(AActor* ObjectToAttach)
 {
 	OverlappingDObject = LookAtActor;
 	if (OverlappingDObject && !AttachedDOb)
 	{
 		// Overlapping을 플레이어의 특정 소켓에 부착
 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		OverlappingDObject->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
-		OverlappingDObject->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-			1.0f / GetMesh()->GetComponentScale().Y, 1.0f / GetMesh()->GetComponentScale().Z));
-		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(OverlappingDObject->GetRootComponent()))
+		if (AMasterItem* MasterItem = Cast<AMasterItem>(ObjectToAttach))
 		{
-			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			// 기존 부착된 MasterItem을 분리
+			if (AttachedDOb != nullptr)
+			{
+				dropDynamicObject(AttachedDOb);
+			}
+
+			MasterItem->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
+			MasterItem->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
+				1.0f / GetMesh()->GetComponentScale().Y,
+				1.0f / GetMesh()->GetComponentScale().Z));
+			if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(MasterItem->GetRootComponent()))
+			{
+				DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			}
+			AttachedDynamicObject = MasterItem;
 		}
-		AttachedDOb = OverlappingDObject;
+		else if (ADynamicObject* DynamicObject = Cast<ADynamicObject>(ObjectToAttach))
+		{
+			// 기존 부착된 DynamicObject를 분리
+			if (AttachedDynamicObject != nullptr)
+			{
+				dropDynamicObject(AttachedDynamicObject);
+			}
+
+			DynamicObject->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
+			DynamicObject->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
+				1.0f / GetMesh()->GetComponentScale().Y,
+				1.0f / GetMesh()->GetComponentScale().Z));
+			if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(DynamicObject->GetRootComponent()))
+			{
+				DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			}
+			AttachedDynamicObject = DynamicObject;
+		}
 	}
 }
 
-void AGW_Player::dropDynamicObject()
+void AGW_Player::dropDynamicObject(AActor* ObjectToDrop)
 {
 
 	if (AttachedDOb)
@@ -312,11 +348,21 @@ void AGW_Player::dropDynamicObject()
 		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(AttachedDOb->GetRootComponent()))
 		{
 			DObComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			DObComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+			DObComp->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel4);
+// 			DObComp->SetSimulatePhysics(true);
+			
+			UE_LOG(LogTemp, Warning, TEXT("Collision Enabled: %s"), *UEnum::GetValueAsString(DObComp->GetCollisionEnabled()));
+			
 		}
 
-		AttachedDOb = nullptr;
-		OverlappingDObject = nullptr;
+		if (ObjectToDrop == AttachedDOb)
+		{
+			AttachedDOb = nullptr;
+		}
+		else if (ObjectToDrop == AttachedDynamicObject)
+		{
+			AttachedDynamicObject = nullptr;
+		}
 	}
 }
 
@@ -327,6 +373,16 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		OverlappingDObject = dObject;
 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
 	}
+	else if (ADynamicObject* DynamicObject = Cast<ADynamicObject>(OtherActor))
+	{
+		OverlappingDObject = DynamicObject;
+		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *DynamicObject->GetName());
+	}
+// 	else if (ADynamicObject* dObject = Cast<ADynamicObject>(OtherActor))
+// 	{
+// 		OverlappingDObject = dObject;
+// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
+// 	}
 }
 
 // void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
