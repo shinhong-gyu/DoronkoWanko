@@ -36,14 +36,14 @@ void AHG_Paintballoon::Tick(float DeltaTime)
 
 void AHG_Paintballoon::InteractionWith()
 {
-	FVector InitialVelocity = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), FMath::RandRange(300, 600));
+	FVector InitialVelocity;
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
-	UE_LOG(LogTemp,Warning,TEXT("PaintBalloon"));
 	if(Widget != nullptr) Widget->RemoveFromParent();
 	Destroy();
 	for (int i = 0; i < 5; i++) {
+		InitialVelocity = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), FMath::RandRange(300, 600));
 		auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
 		if (Splatter) {
 			Splatter->Initalize(InitialVelocity);

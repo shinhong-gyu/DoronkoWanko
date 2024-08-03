@@ -74,9 +74,10 @@ void AGW_Player::Tick(float DeltaTime)
 	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
+		UE_LOG(LogTemp, Warning, TEXT("1"));
 		if (LookAtActor == nullptr) {
 			if (OutHit.GetActor() != LookAtActor) {
 				LookAtActor = OutHit.GetActor();
@@ -97,7 +98,6 @@ void AGW_Player::Tick(float DeltaTime)
 		}
 
 	}
-
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
 
@@ -217,10 +217,7 @@ void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 {
 	Shake();
-	int NumberOfSplatter = FMath::RandRange(3, 5);
-	for (int i = 0; i < NumberOfSplatter; i++) {
-		Shake();
-	}
+
 
 	if (ColorArray.Num() > 0)
 	{
@@ -267,19 +264,14 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
 	if (AttachedDOb != nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *AttachedDOb->GetClass()->GetName());
 		auto* Interact = Cast<II_Interaction>(AttachedDOb);
 		if (Interact != nullptr)
 		{
 			Interact->ItemDrop();
-			AMasterItem* DynamicObject = Cast<AMasterItem>(AttachedDOb);
-			if (DynamicObject)
-			{
-
-
-			}
-
-
+			dropDynamicObject();
 		}
+		AttachedDOb = nullptr;
 	}
 	dropDynamicObject();
 }
@@ -299,6 +291,11 @@ void AGW_Player::attachDynamicObject()
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedDOb = OverlappingDObject;
+		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		if (Interface) {
+			Interface->FadeAway();
+			LookAtActor = nullptr;
+		}
 	}
 }
 
