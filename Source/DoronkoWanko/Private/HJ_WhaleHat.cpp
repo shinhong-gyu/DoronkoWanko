@@ -72,13 +72,13 @@ void AHJ_WhaleHat::SpawnInk()
 
 void AHJ_WhaleHat::InteractionWith()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Interaction called on WhaleHat"));
 	bTurnOn = true;
 }
 
 void AHJ_WhaleHat::ItemDrop()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemDrop called on WhaleHat"));
 	bTurnOn = false;
+	// ÀåÂø ÇØÁ¦ ÈÄ ¶¥¿¡ µÎ±â
+	SetActorLocation(GW_Player->GetActorLocation() + FVector(50, 0, -80));
 }
 

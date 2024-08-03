@@ -77,5 +77,7 @@ void AHJ_ElephantHat::InteractionWith()
 void AHJ_ElephantHat::ItemDrop()
 {
 	bTurnOn = false;
+	// ÀåÂø ÇØÁ¦ ÈÄ ¶¥¿¡ µÎ±â
+	SetActorLocation(GW_Player->GetActorLocation() + FVector(50, 0, -80));
 }
 

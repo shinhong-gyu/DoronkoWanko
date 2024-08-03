@@ -71,13 +71,13 @@ void AHJ_GatlingHat::SpawnInk()
 
 void AHJ_GatlingHat::InteractionWith()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Interaction called on GatlingHat"));
 	bTurnOn = true;
 }
 
 void AHJ_GatlingHat::ItemDrop()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemDrop called on GatlingHat"));
 	bTurnOn = false;
+	// ÀåÂø ÇØÁ¦ ÈÄ ¶¥¿¡ µÎ±â
+	SetActorLocation(GW_Player->GetActorLocation() + FVector(50, 0, -110));
 }
 
