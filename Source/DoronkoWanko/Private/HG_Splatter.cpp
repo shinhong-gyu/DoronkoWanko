@@ -7,6 +7,7 @@
 #include "Components/DecalComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "DoronkoGameMode.h"
 
 // Sets default values
 AHG_Splatter::AHG_Splatter()
@@ -49,6 +50,10 @@ void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator&
 {
 	if (DecalClass != nullptr) {
 		AHG_DecalActor* Decal = GetWorld()->SpawnActor<AHG_DecalActor>(DecalClass, Location, Rotation);
+		auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());//
+		int32 RandNum = FMath::RandRange(1,9);
+		GM->SetScore(RandNum);
+		GM->UpdataScoreBoard();
 		if (nullptr != Decal) {
 			UDecalComponent* DecalComp = Decal->GetDecal();
 			if (nullptr != DecalComp) {
