@@ -43,7 +43,6 @@ void AHJ_WhaleHat::Tick(float DeltaTime)
 
 	if (bTurnOn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hong"));
 		if (GW_Player)
 		{
 			CurrTime += DeltaTime;
