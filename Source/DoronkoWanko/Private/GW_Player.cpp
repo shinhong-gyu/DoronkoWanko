@@ -267,11 +267,11 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
 	if (AttachedDOb != nullptr)
 	{
-		auto* Interact = Cast<II_Interaction>(LookAtActor);
+		auto* Interact = Cast<II_Interaction>(AttachedDOb);
 		if (Interact != nullptr)
 		{
 			Interact->ItemDrop();
-			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
+			AMasterItem* DynamicObject = Cast<AMasterItem>(AttachedDOb);
 			if (DynamicObject)
 			{
 

@@ -72,6 +72,7 @@ void AHJ_WhaleHat::SpawnInk()
 
 void AHJ_WhaleHat::InteractionWith()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Interaction called on WhaleHat"));
 	bTurnOn = true;
 }
 

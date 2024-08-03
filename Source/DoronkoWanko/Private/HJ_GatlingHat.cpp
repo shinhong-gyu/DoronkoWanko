@@ -71,6 +71,7 @@ void AHJ_GatlingHat::SpawnInk()
 
 void AHJ_GatlingHat::InteractionWith()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Interaction called on GatlingHat"));
 	bTurnOn = true;
 }
 
