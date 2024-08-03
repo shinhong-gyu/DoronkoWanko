@@ -50,16 +50,15 @@ void AHJ_FanWingSplatter::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor->IsA<AHG_Splatter>())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("HitSplatter"));
-		OtherActor->Destroy();
+		OtherActor->Destroy();  
 		// 물감 스폰하기 (선풍기 바람 앞쪽으로 튀어나가게) 
 		FTransform T = InkArrow->GetComponentTransform();
-		auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
-		Ink->SphereComp->SetCollisionProfileName(TEXT("Splatter2"));
+		auto* Ink = GetWorld()->SpawnActor<AHJ_Splatter2>(InkFactory, T);
+		FVector RandomInitial = FVector(FMath::RandRange(-50, 50), FMath::RandRange(-50, 50), FMath::RandRange(200, 800));
+
 		if (nullptr != Ink)
 		{
-			// 선풍기 바람과의 충돌체를 끄고, 발사해라 
-			Ink->Initalize(FVector(0, 0, 500) + HJ_Fan->GetActorForwardVector() * 2500);
-
+			Ink->Initalize(RandomInitial + FVector(HJ_Fan->GetActorForwardVector() * 2500));
 		}
 	}
 }

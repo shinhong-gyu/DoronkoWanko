@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,6 +7,7 @@
 #include "GW_Player.h"
 #include "HG_Splatter.h"
 #include "HJ_FanWing.h"
+#include "HJ_Splatter2.h"
 #include "HJ_FanWingSplatter.generated.h"
 
 UCLASS()
@@ -38,7 +39,7 @@ public:
 	class UArrowComponent* InkArrow;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AHG_Splatter> InkFactory;
+	TSubclassOf<class AHJ_Splatter2> InkFactory;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHJ_FanWing> HJ_FanWing;
