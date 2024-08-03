@@ -43,7 +43,6 @@ void AHJ_WhaleHat::Tick(float DeltaTime)
 
 	if (bTurnOn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hong"));
 		if (GW_Player)
 		{
 			CurrTime += DeltaTime;
@@ -54,7 +53,6 @@ void AHJ_WhaleHat::Tick(float DeltaTime)
 				CurrTime = 0;
 			}
 		}
-
 	}
 }
 
@@ -80,5 +78,7 @@ void AHJ_WhaleHat::InteractionWith()
 void AHJ_WhaleHat::ItemDrop()
 {
 	bTurnOn = false;
+	// ÀåÂø ÇØÁ¦ ÈÄ ¶¥¿¡ µÎ±â
+	SetActorLocation(GW_Player->GetActorLocation() + FVector(50, 0, -80));
 }
 
