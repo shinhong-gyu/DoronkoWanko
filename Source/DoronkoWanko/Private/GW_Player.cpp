@@ -30,6 +30,7 @@ AGW_Player::AGW_Player()
 	ZoomSpeed = 75.0f;
 	MinArmLength = 50.0f;
 	MaxArmLength = 1000.0f;
+	DirtPercentage = 0.0f;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -205,16 +206,29 @@ void AGW_Player::Shake()
 }
 void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 {
-	FColor NewColor = FColor::MakeRandomColor();
-	ColorArray.Add(NewColor);
+// 	FColor NewColor = FColor::MakeRandomColor();
+// 	ColorArray.Add(NewColor);
 
-	if (GEngine)
+// 	if (GEngine)
+// 	{
+// 		// 배열의 모든 항목을 화면에 표시
+// 		for (int32 i = 0; i < ColorArray.Num(); i++)
+// 		{
+// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
+// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
+// 		}
+// 	}
+	if (DirtPercentage < 100.0f)
 	{
-		// 배열의 모든 항목을 화면에 표시
-		for (int32 i = 0; i < ColorArray.Num(); i++)
+		DirtPercentage += 5.0f;
+		if (DirtPercentage > 100.0f)
 		{
-			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
+			DirtPercentage = 100.0f;
+		}
+		FString DirtMessage = FString::Printf(TEXT("Dirt Percentage: %d%%"), static_cast<int32>(DirtPercentage));
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DirtMessage);
 		}
 	}
 }
@@ -222,30 +236,50 @@ void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 {
-	Shake();
-	int NumberOfSplatter = FMath::RandRange(3, 5);
-	for (int i = 0; i < NumberOfSplatter; i++) {
-		Shake();
-	}
-
-	if (ColorArray.Num() > 0)
+	if (DirtPercentage > 0.0f)
 	{
-		ColorArray.RemoveAt(ColorArray.Num() - 1);
-	}
-
-	if (GEngine)
-	{
-		for (int32 i = 0; i < ColorArray.Num(); i++)
+		DirtPercentage -= 0.25f;
+		if (DirtPercentage < 0.0f)
 		{
-			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
+			DirtPercentage = 0.0f;
+		}
+		FString DirtMessage = FString::Printf(TEXT("Dirt Percentage: %d%%"), static_cast<int32>(DirtPercentage));
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, DirtMessage);
 		}
 
-		if (ColorArray.Num() == 0)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Color array is empty"));
+		int NumberOfSplatter = FMath::RandRange(3, 5);
+		for (int i = 0; i < NumberOfSplatter; i++) {
+			Shake();
 		}
 	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot shake: Dirt percentage is 0%"));
+		}
+	}
+
+// 	if (ColorArray.Num() > 0)
+// 	{
+// 		ColorArray.RemoveAt(ColorArray.Num() - 1);
+// 	}
+// 
+// 	if (GEngine)
+// 	{
+// 		for (int32 i = 0; i < ColorArray.Num(); i++)
+// 		{
+// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
+// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
+// 		}
+// 
+// 		if (ColorArray.Num() == 0)
+// 		{
+// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Color array is empty"));
+// 		}
+// 	}
 
 }
 

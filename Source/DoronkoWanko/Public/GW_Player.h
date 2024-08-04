@@ -91,7 +91,8 @@ public:
 
 public:
 	AActor* LookAtActor = nullptr;
-	TArray<FColor> ColorArray;
+// 	TArray<FColor> ColorArray;
+	float DirtPercentage;
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Dirt;
