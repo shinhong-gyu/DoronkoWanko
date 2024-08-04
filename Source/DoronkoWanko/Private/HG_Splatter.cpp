@@ -69,6 +69,10 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		this->Destroy();
 		FVector SpawnLocation = GetActorLocation();
 		FRotator SpawnRoation = OtherActor->GetActorRotation();
+		if (auto* OverlapedActor = Cast<UStaticMeshComponent>(OtherActor)) {
+			OverlapedActor->SetRenderCustomDepth(true);
+			OverlapedActor->CustomDepthStencilValue = 1;
+		}
 		this->SpawnDecalAtLocation(SpawnLocation, SpawnRoation);
 }
 
