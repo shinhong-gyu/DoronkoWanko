@@ -13,6 +13,7 @@ AHJ_FanWing::AHJ_FanWing()
 	PrimaryActorTick.bCanEverTick = true;
 
 	WingArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("WingArrow"));
+	WingArrow->SetupAttachment(BoxComp);
 
 	RotationSpeed = 200.0f;
 	CurrentRotationAngel = 0.0f;
