@@ -40,16 +40,14 @@ void AHJ_FanWing::Tick(float DeltaTime)
 		if (CurrentRotationAngel > 360.0f)
 		{
 			CurrentRotationAngel -= 360.0f;
+
+			FRotator WingRotation = FRotator(CurrentRotationAngel, 0.0f, 0.0f);
+			BoxComp->SetRelativeRotation(WingRotation);
+
+			FTransform T = WingArrow->GetComponentTransform();
+			GetWorld()->SpawnActor<AHJ_FanWingSplatter>(WingSplatter, T);
 		}
-
-		FRotator WingRotation = FRotator(CurrentRotationAngel, 0.0f, 0.0f);
-		BoxComp->SetRelativeRotation(WingRotation);
-
-		FTransform T = WingArrow->GetComponentTransform();
-		GetWorld()->SpawnActor<AHJ_FanWingSplatter>(WingSplatter, T);
 	}
-
-
 }
 
 void AHJ_FanWing::InteractionWith()
