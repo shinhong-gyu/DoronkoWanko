@@ -54,11 +54,11 @@ void AHJ_FanWingSplatter::NotifyActorBeginOverlap(AActor* OtherActor)
 		// 물감 스폰하기 (선풍기 바람 앞쪽으로 튀어나가게) 
 		FTransform T = InkArrow->GetComponentTransform();
 		auto* Ink = GetWorld()->SpawnActor<AHJ_Splatter2>(InkFactory, T);
-		FVector RandomInitial = FVector(FMath::RandRange(-50, 50), FMath::RandRange(-50, 50), FMath::RandRange(200, 800));
+		FVector RandomInitial = FVector(FMath::RandRange(-50, 50), FMath::RandRange(-50, 50), FMath::RandRange(400, 800));
 
 		if (nullptr != Ink)
 		{
-			Ink->Initalize(RandomInitial + FVector(HJ_Fan->GetActorForwardVector() * 2500));
+			Ink->Initalize(RandomInitial + FVector(HJ_Fan->GetActorRightVector() * -1000));
 		}
 	}
 }

@@ -31,4 +31,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
 
+
+	/*UPROPERTY(EditAnywhere)
+	class TSubclassOf<class AHJ_FanWingSplatter> WingSplatter;
+
+	UPROPERTY(EditAnywhere)
+	class UArrowComponent* WingArrow; */
+
 };

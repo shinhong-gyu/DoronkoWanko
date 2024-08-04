@@ -13,6 +13,7 @@ AHJ_FanWing::AHJ_FanWing()
 	PrimaryActorTick.bCanEverTick = true;
 
 	WingArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("WingArrow"));
+	WingArrow->SetupAttachment(BoxComp);
 
 	RotationSpeed = 200.0f;
 	CurrentRotationAngel = 0.0f;
@@ -43,6 +44,9 @@ void AHJ_FanWing::Tick(float DeltaTime)
 
 		FRotator WingRotation = FRotator(CurrentRotationAngel, 0.0f, 0.0f);
 		BoxComp->SetRelativeRotation(WingRotation);
+
+		FTransform T = WingArrow->GetComponentTransform();
+		GetWorld()->SpawnActor<AHJ_FanWingSplatter>(WingSplatter, T);
 	}
 
 
@@ -51,8 +55,6 @@ void AHJ_FanWing::Tick(float DeltaTime)
 void AHJ_FanWing::InteractionWith()
 {
 	bTurnOn = !bTurnOn;
-
-	FTransform T = WingArrow->GetComponentTransform();
-	GetWorld()->SpawnActor<AHJ_FanWingSplatter>(WingSplatter, T);
+	UE_LOG(LogTemp, Warning, TEXT("FanInteraction"));
 }
 
