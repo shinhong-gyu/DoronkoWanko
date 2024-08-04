@@ -114,17 +114,25 @@ public:
 
 	void OnMyActionDrop(const FInputActionValue& Value);
 	
-	void attachDynamicObject(AActor* ObjectToAttach) ;
+	void attachStaticicObject(AActor* ObjectToAttach) ;
 
-	class AActor* AttachedDOb;
-	class AActor* AttachedDynamicObject;
-	class AActor* OverlappingDObject;
-	
+	 UPROPERTY()
+    class AActor* AttachedMasterItem;
 
-	bool bCanDropAttachedDOb;
+    UPROPERTY()
+    class AActor* AttachedStaticObject;
+
+    UPROPERTY()
+    class AActor* OverlappingObject;
+
+// 	bool bIsDropping;
+// 	void ResetDroppingFlag(); // 플래그 초기화 함수
 
 
-	void dropDynamicObject(AActor* ObjectToDrop);
+
+	void dropObject(AActor* ObjectToDrop);
+	void HandleMasterItemAttachment(AActor* ObjectToAttach);
+	void HandleStaticObjectAttachment(AActor* ObjectToAttach);
 	
 	
 
