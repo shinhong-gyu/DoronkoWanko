@@ -19,6 +19,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "MasterItem.h"
+#include "StaticObject.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -39,6 +40,11 @@ AGW_Player::AGW_Player()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	GetCapsuleComponent()->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
+
+	AttachedMasterItem = nullptr;
+	AttachedStaticObject = nullptr;
+	OverlappingObject = nullptr;
+// 	bIsDropping = false;
 }
 
 // Called when the game starts or when spawned
@@ -77,7 +83,6 @@ void AGW_Player::Tick(float DeltaTime)
 	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
-		UE_LOG(LogTemp, Warning, TEXT("1"));
 		if (LookAtActor == nullptr) {
 			if (OutHit.GetActor() != LookAtActor) {
 				LookAtActor = OutHit.GetActor();
@@ -98,6 +103,7 @@ void AGW_Player::Tick(float DeltaTime)
 		}
 
 	}
+
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
 
@@ -118,7 +124,7 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Dash, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDashOngoing);
 		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
 		input->BindAction(IA_Interaction, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionInteraction);
-		input->BindAction(IA_Drop, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDrop);
+		input->BindAction(IA_Drop, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDrop);
 		input->BindAction(IA_Splash, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionSplash);
 		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirt);
 	}
@@ -217,7 +223,10 @@ void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 {
 	Shake();
-
+	int NumberOfSplatter = FMath::RandRange(3, 5);
+	for (int i = 0; i < NumberOfSplatter; i++) {
+		Shake();
+	}
 
 	if (ColorArray.Num() > 0)
 	{
@@ -242,88 +251,191 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 
 void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 {
-	if (LookAtActor != nullptr) {
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
-			II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
-		if (Interact != nullptr) {
+	if (LookAtActor != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName());
+
+		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
+		if (Interact != nullptr)
+		{
 			Interact->InteractionWith();
 
-			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
-			if (DynamicObject)
+			if (AMasterItem* MasterItem = Cast<AMasterItem>(LookAtActor))
 			{
-
-				attachDynamicObject();
-
+				HandleMasterItemAttachment(MasterItem);
 			}
-
+			else if (AStaticObject* DynamicObject = Cast<AStaticObject>(LookAtActor))
+			{
+				HandleStaticObjectAttachment(DynamicObject);
+			}
 		}
 	}
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-	if (AttachedDOb != nullptr)
+	
+
+// 	if (bIsDropping) // 플래그 체크
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("Drop action ignored due to ongoing drop"));
+// 		return;
+// 	}
+
+// 	bIsDropping = true; // 플래그 설정
+// 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGW_Player::ResetDroppingFlag); // 다음 틱에 플래그 초기화
+// 	UE_LOG(LogTemp, Warning, TEXT("OnMyActionDrop called"));
+
+	// Drop DynamicObject first if both are attached
+	if (AttachedStaticObject != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *AttachedDOb->GetClass()->GetName());
-		auto* Interact = Cast<II_Interaction>(AttachedDOb);
+		UE_LOG(LogTemp, Warning, TEXT("Dropping DynamicObject"));
+		II_Interaction* Interact = Cast<II_Interaction>(AttachedStaticObject);
 		if (Interact != nullptr)
 		{
 			Interact->ItemDrop();
-			dropDynamicObject();
 		}
-		AttachedDOb = nullptr;
-	}
-	dropDynamicObject();
-}
 
-void AGW_Player::attachDynamicObject()
-{
-	OverlappingDObject = LookAtActor;
-	if (OverlappingDObject && !AttachedDOb)
+		dropObject(AttachedStaticObject);
+		return;  // Return early after dropping DynamicObject
+	}
+
+	// Drop MasterItem if attached
+	if (AttachedMasterItem != nullptr)
 	{
-		// Overlapping을 플레이어의 특정 소켓에 부착
-		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		OverlappingDObject->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
-		OverlappingDObject->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-			1.0f / GetMesh()->GetComponentScale().Y, 1.0f / GetMesh()->GetComponentScale().Z));
-		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(OverlappingDObject->GetRootComponent()))
+		UE_LOG(LogTemp, Warning, TEXT("Dropping MasterItem"));
+		II_Interaction* Interact = Cast<II_Interaction>(AttachedMasterItem);
+		if (Interact != nullptr)
+		{
+			Interact->ItemDrop();
+		}
+
+		dropObject(AttachedMasterItem);
+	}
+}
+void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
+{
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+
+	if (AMasterItem* MasterItem = Cast<AMasterItem>(ObjectToAttach))
+	{
+		// Attach MasterItem to "HAT" socket
+		MasterItem->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
+		MasterItem->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
+			1.0f / GetMesh()->GetComponentScale().Y,
+			1.0f / GetMesh()->GetComponentScale().Z));
+		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(MasterItem->GetRootComponent()))
 		{
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
-		AttachedDOb = OverlappingDObject;
-		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		if (Interface) {
-			Interface->FadeAway();
-			LookAtActor = nullptr;
+		AttachedMasterItem = MasterItem;
+	}
+	else if (AStaticObject* StaticicObject = Cast<AStaticObject>(ObjectToAttach))
+	{
+		// Attach DynamicObject to "HAND" socket
+		StaticicObject->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
+		StaticicObject->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
+			1.0f / GetMesh()->GetComponentScale().Y,
+			1.0f / GetMesh()->GetComponentScale().Z));
+		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(StaticicObject->GetRootComponent()))
+		{
+			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		AttachedStaticObject = StaticicObject;
+	}
+}
+
+// void AGW_Player::ResetDroppingFlag()
+// {
+// 	bIsDropping = false;
+// }
+
+void AGW_Player::dropObject(AActor* ObjectToDrop)
+{
+
+	if (ObjectToDrop)
+	{
+		ObjectToDrop->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(ObjectToDrop->GetRootComponent()))
+		{
+			DObComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			DObComp->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel4);
+			// 물리 시뮬레이션을 활성화 (필요한 경우)
+// 			DObComp->SetSimulatePhysics(true);
+
+			// 디버그 로그 추가
+			UE_LOG(LogTemp, Warning, TEXT("Collision Enabled: %s"), *UEnum::GetValueAsString(DObComp->GetCollisionEnabled()));
+		}
+
+		if (ObjectToDrop == AttachedStaticObject)
+		{
+			AttachedStaticObject = nullptr;
+		}
+		else if (ObjectToDrop == AttachedMasterItem)
+		{
+			AttachedMasterItem = nullptr;
 		}
 	}
 }
 
-void AGW_Player::dropDynamicObject()
+void AGW_Player::HandleMasterItemAttachment(AActor* ObjectToAttach)
 {
+	// 	if (AttachedDynamicObject != nullptr)
+	// 	{
+	// 		// Drop DynamicObject first if both are attached
+	// 		dropDynamicObject(AttachedDynamicObject);
+	// 	}
 
-	if (AttachedDOb)
+	if (AttachedMasterItem != nullptr)
 	{
-		AttachedDOb->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-
-		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(AttachedDOb->GetRootComponent()))
+		II_Interaction* Interact = Cast<II_Interaction>(AttachedMasterItem);
+		if (Interact != nullptr)
 		{
-			DObComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			DObComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+			Interact->ItemDrop();
 		}
-
-		AttachedDOb = nullptr;
-		OverlappingDObject = nullptr;
+		dropObject(AttachedMasterItem);
 	}
+	// Attach new MasterItem
+	attachStaticicObject(ObjectToAttach);
+
+	II_Interaction* NewInteract = Cast<II_Interaction>(ObjectToAttach);
+	if (NewInteract != nullptr)
+	{
+		NewInteract->InteractionWith();
+	}
+}
+
+void AGW_Player::HandleStaticObjectAttachment(AActor* ObjectToAttach)
+{
+	// Drop existing DynamicObject if attached
+	if (AttachedStaticObject != nullptr)
+	{
+		dropObject(AttachedStaticObject);
+	}
+
+	// Attach new DynamicObject
+	attachStaticicObject(ObjectToAttach);
+
 }
 
 void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AMasterItem* dObject = Cast<AMasterItem>(OtherActor))
+	if (AMasterItem* MasterItem = Cast<AMasterItem>(OtherActor))
 	{
-		OverlappingDObject = dObject;
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
+		OverlappingObject = MasterItem;
+		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *MasterItem->GetName());
 	}
+	else if (AStaticObject* StaticObject = Cast<AStaticObject>(OtherActor))
+	{
+		OverlappingObject = StaticObject;
+		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *StaticObject->GetName());
+	}
+	// 	else if (ADynamicObject* dObject = Cast<ADynamicObject>(OtherActor))
+	// 	{
+	// 		OverlappingDObject = dObject;
+	// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
+	// 	}
 }
 
 // void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)

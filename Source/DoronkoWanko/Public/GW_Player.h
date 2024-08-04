@@ -114,16 +114,27 @@ public:
 
 	void OnMyActionDrop(const FInputActionValue& Value);
 	
-	void attachDynamicObject() ;
+	void attachStaticicObject(AActor* ObjectToAttach) ;
 
-	class AActor* AttachedDOb;
-	class AActor* OverlappingDObject;
+	 UPROPERTY()
+    class AActor* AttachedMasterItem;
+
+    UPROPERTY()
+    class AActor* AttachedStaticObject;
+
+    UPROPERTY()
+    class AActor* OverlappingObject;
+
+// 	bool bIsDropping;
+// 	void ResetDroppingFlag(); // 플래그 초기화 함수
+
+
+
+	void dropObject(AActor* ObjectToDrop);
+	void HandleMasterItemAttachment(AActor* ObjectToAttach);
+	void HandleStaticObjectAttachment(AActor* ObjectToAttach);
 	
-
-	bool bCanDropAttachedDOb;
-
-
-	void dropDynamicObject();
+	
 
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 

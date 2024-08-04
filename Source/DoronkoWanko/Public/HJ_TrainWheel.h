@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DynamicObject.h"
+#include "StaticObject.h"
 #include "HJ_TrainWheel.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_TrainWheel : public ADynamicObject
+class DORONKOWANKO_API AHJ_TrainWheel : public AStaticObject
 {
 	GENERATED_BODY()
 	
