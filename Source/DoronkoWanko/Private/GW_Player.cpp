@@ -70,19 +70,17 @@ void AGW_Player::Tick(float DeltaTime)
 	Direction = FVector::ZeroVector;
 	FHitResult OutHit;
 	FVector Start = GetActorLocation() - FVector(0, 0, -36.666f);
-	FVector End = Start + GetActorForwardVector() * 1000;
+	FVector End = Start + GetActorForwardVector() * 100;
 	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
-		UE_LOG(LogTemp, Warning, TEXT("1"));
 		if (LookAtActor == nullptr) {
 			if (OutHit.GetActor() != LookAtActor) {
 				LookAtActor = OutHit.GetActor();
 				UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
 				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 				if (Interface) {
 					Interface->LookAt();
@@ -243,15 +241,14 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 {
 	if (LookAtActor != nullptr) {
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName())
-			II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
+		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
 		if (Interact != nullptr) {
 			Interact->InteractionWith();
 
 			AMasterItem* DynamicObject = Cast<AMasterItem>(LookAtActor);
 			if (DynamicObject)
 			{
-
+				UE_LOG(LogTemp, Warning, TEXT("Attached : %s"), *DynamicObject->GetClass()->GetName());
 				attachDynamicObject();
 
 			}
@@ -264,7 +261,7 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
 	if (AttachedDOb != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *AttachedDOb->GetClass()->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Attached : %s"), *AttachedDOb->GetClass()->GetName());
 		auto* Interact = Cast<II_Interaction>(AttachedDOb);
 		if (Interact != nullptr)
 		{
@@ -292,6 +289,7 @@ void AGW_Player::attachDynamicObject()
 		}
 		AttachedDOb = OverlappingDObject;
 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		LookAtActor = nullptr;
 		if (Interface) {
 			Interface->FadeAway();
 			LookAtActor = nullptr;
