@@ -91,8 +91,7 @@ public:
 
 public:
 	AActor* LookAtActor = nullptr;
-// 	TArray<FColor> ColorArray;
-	float DirtPercentage;
+	TArray<FColor> ColorArray;
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Dirt;
@@ -115,27 +114,16 @@ public:
 
 	void OnMyActionDrop(const FInputActionValue& Value);
 	
-	void attachStaticicObject(AActor* ObjectToAttach) ;
+	void attachDynamicObject() ;
 
-	 UPROPERTY()
-    class AActor* AttachedMasterItem;
-
-    UPROPERTY()
-    class AActor* AttachedStaticObject;
-
-    UPROPERTY()
-    class AActor* OverlappingObject;
-
-// 	bool bIsDropping;
-// 	void ResetDroppingFlag(); // 플래그 초기화 함수
-
-
-
-	void dropObject(AActor* ObjectToDrop);
-	void HandleMasterItemAttachment(AActor* ObjectToAttach);
-	void HandleStaticObjectAttachment(AActor* ObjectToAttach);
+	class AActor* AttachedDOb;
+	class AActor* OverlappingDObject;
 	
-	
+
+	bool bCanDropAttachedDOb;
+
+
+	void dropDynamicObject();
 
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 

@@ -63,9 +63,17 @@ void AHJ_GatlingHat::SpawnInk()
 	// 물감 스폰하기 (대포 앞쪽으로 튀어나가게) 
 	FTransform T = InkArrow->GetComponentTransform();
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	auto* Ink2 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	auto* Ink3 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	auto* Ink4 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	auto* Ink5 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 	if (nullptr != Ink)
 	{
-		Ink->Initalize(FVector(0, 0, 500) + GW_Player->GetActorForwardVector() * 2500);
+		Ink->Initalize(FVector(0, 0, 500) + GW_Player->GetActorForwardVector() * 800);
+		Ink2->Initalize(FVector(20, 20, 500) + GW_Player->GetActorForwardVector() * 800);
+		Ink3->Initalize(FVector(-20, -20, 500) + GW_Player->GetActorForwardVector() * 800);
+		Ink4->Initalize(FVector(0, 0, 520) + GW_Player->GetActorForwardVector() * 800);
+		Ink5->Initalize(FVector(0, 0, 480) + GW_Player->GetActorForwardVector() * 800);
 	}
 }
 

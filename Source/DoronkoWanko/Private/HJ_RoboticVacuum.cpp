@@ -55,7 +55,7 @@ void ARoboticVacuum::Tick(float DeltaTime)
 		FRotator VacuumRotation = FRotator(0.0f, CurrentRotationAngle, 0.0f);
 		BoxComp->SetRelativeRotation(VacuumRotation);
 		// 회전이 끝난 뒤 앞으로 전진한다 
-		SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
+		SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime, true);
 	}
 }
 
