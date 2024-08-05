@@ -87,7 +87,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float DashSpeed = 600.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    float WalkSpeed = 250.0f;
+    float WalkSpeed = 500.0f;
 
 public:
 	AActor* LookAtActor = nullptr;
