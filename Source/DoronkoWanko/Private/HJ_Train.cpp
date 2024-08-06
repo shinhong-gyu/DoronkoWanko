@@ -80,7 +80,7 @@ void AHJ_Train::Tick(float DeltaTime)
 		float Y = Radius * FMath::Sin(CurrentAngle);
 		float Z = GetActorLocation().Z;
 
-		SetActorLocation(FVector(X, Y, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
+		SetActorLocation(FVector(X - 2100.f, Y - 3450.f, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
 
 		CurrentRotationAngel += RotationSpeed * DeltaTime;
 		if (CurrentRotationAngel > 360.0f)

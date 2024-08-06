@@ -58,7 +58,7 @@ void AHJ_FanWingSplatter::NotifyActorBeginOverlap(AActor* OtherActor)
 
 		if (nullptr != Ink)
 		{
-			Ink->Initalize(RandomInitial + FVector(HJ_Fan->GetActorRightVector() * -1000));
+			Ink->Initalize(RandomInitial + FVector(HJ_Fan->GetActorRightVector() * 1000));
 		}
 	}
 }
