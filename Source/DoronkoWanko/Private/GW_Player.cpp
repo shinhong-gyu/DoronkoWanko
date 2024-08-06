@@ -197,18 +197,18 @@ void AGW_Player::Shake()
 }
 void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 {
-	FColor NewColor = FColor::MakeRandomColor();
-	ColorArray.Add(NewColor);
+	//FColor NewColor = FColor::MakeRandomColor();
+	//ColorArray.Add(NewColor);
 
-	if (GEngine)
-	{
-		// 배열의 모든 항목을 화면에 표시
-		for (int32 i = 0; i < ColorArray.Num(); i++)
-		{
-			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
-		}
-	}
+	//if (GEngine)
+	//{
+	//	// 배열의 모든 항목을 화면에 표시
+	//	for (int32 i = 0; i < ColorArray.Num(); i++)
+	//	{
+	//		FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
+	//		GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
+	//	}
+	//}
 }
 
 
@@ -217,7 +217,7 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 	Shake();
 
 
-	if (ColorArray.Num() > 0)
+	/*if (ColorArray.Num() > 0)
 	{
 		ColorArray.RemoveAt(ColorArray.Num() - 1);
 	}
@@ -234,7 +234,7 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Color array is empty"));
 		}
-	}
+	}*/
 
 }
 
