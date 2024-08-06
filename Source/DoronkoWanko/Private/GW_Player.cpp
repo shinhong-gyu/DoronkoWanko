@@ -303,6 +303,13 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 				HandleStaticObjectAttachment(DynamicObject);
 			}
 		}
+		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		LookAtActor = nullptr;
+		if (Interface) {
+			Interface->FadeAway();
+			LookAtActor = nullptr;
+		}
+
 	}
 }
 
@@ -310,17 +317,6 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
 	
 
-// 	if (bIsDropping) // 플래그 체크
-// 	{
-// 		UE_LOG(LogTemp, Warning, TEXT("Drop action ignored due to ongoing drop"));
-// 		return;
-// 	}
-
-// 	bIsDropping = true; // 플래그 설정
-// 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGW_Player::ResetDroppingFlag); // 다음 틱에 플래그 초기화
-// 	UE_LOG(LogTemp, Warning, TEXT("OnMyActionDrop called"));
-
-	// Drop DynamicObject first if both are attached
 	if (AttachedStaticObject != nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Dropping DynamicObject"));
@@ -351,6 +347,7 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 {
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 
+
 	if (AMasterItem* MasterItem = Cast<AMasterItem>(ObjectToAttach))
 	{
 		// Attach MasterItem to "HAT" socket
@@ -363,12 +360,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedMasterItem = MasterItem;
-		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		LookAtActor = nullptr;
-		if (Interface) {
-			Interface->FadeAway();
-			LookAtActor = nullptr;
-		}
+// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+// 		LookAtActor = nullptr;
+// 		if (Interface) {
+// 			Interface->FadeAway();
+// 			LookAtActor = nullptr;
+// 		}
 	}
 	else if (AStaticObject* StaticicObject = Cast<AStaticObject>(ObjectToAttach))
 	{
@@ -382,19 +379,15 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedStaticObject = StaticicObject;
-		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		LookAtActor = nullptr;
-		if (Interface) {
-			Interface->FadeAway();
-			LookAtActor = nullptr;
-		}
+// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+// 		LookAtActor = nullptr;
+// 		if (Interface) {
+// 			Interface->FadeAway();
+// 			LookAtActor = nullptr;
+// 		}
 	}
 }
 
-// void AGW_Player::ResetDroppingFlag()
-// {
-// 	bIsDropping = false;
-// }
 
 void AGW_Player::dropObject(AActor* ObjectToDrop)
 {
