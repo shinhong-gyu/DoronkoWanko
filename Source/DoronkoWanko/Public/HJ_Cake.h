@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DynamicObject.h"
+#include "GW_Player.h"
 #include "HJ_Cake.generated.h"
 
 UCLASS()
-class DORONKOWANKO_API AHJ_Cake : public AActor
+class DORONKOWANKO_API AHJ_Cake : public ADynamicObject
 {
 	GENERATED_BODY()
 	
@@ -23,4 +25,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	AGW_Player* GW_Player;
+
+	void InteractionWith() override;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> EndingUIFactory;
+
+	UPROPERTY()
+	class UHJ_EndingWidget* EndingUI;
 };
