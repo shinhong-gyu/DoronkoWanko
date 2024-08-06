@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputTriggers.h"
+#include "HJ_TrainWheel.h"
+#include "helmet.h"
+#include "DynamicObject.h"
 #include "GW_Player.generated.h"
 
 UCLASS()
@@ -76,14 +79,65 @@ public:
 	class UInputAction* IA_Dash;
 	void OnMyActionDashOngoing(const FInputActionValue& Value);
 	void OnMyActionDashCompleted(const FInputActionValue& Value);
+	void Shake();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHG_Splatter> SplatterFactory;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float DashSpeed = 600.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float WalkSpeed = 500.0f;
+
+public:
+	AActor* LookAtActor = nullptr;
+	TArray<FColor> ColorArray;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Dirt;
+
+	void OnMyActionDirt(const FInputActionValue& Value);
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Splash;
+
+	void OnMyActionSplash(const FInputActionValue& Value);
+
+		UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Interaction;
+
+		UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_Drop;
+
+	void OnMyActionInteraction(const FInputActionValue& Value);
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
-    float DashSpeed = 1200.0f;
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharMoveComp")
-    float WalkSpeed = 600.0f;
+	void OnMyActionDrop(const FInputActionValue& Value);
+	
+	void attachStaticicObject(AActor* ObjectToAttach) ;
+
+	 UPROPERTY()
+    class AActor* AttachedMasterItem;
+
+    UPROPERTY()
+    class AActor* AttachedStaticObject;
+
+    UPROPERTY()
+    class AActor* OverlappingObject;
+
+// 	bool bIsDropping;
+// 	void ResetDroppingFlag(); // 플래그 초기화 함수
 
 
 
+	void dropObject(AActor* ObjectToDrop);
+	void HandleMasterItemAttachment(AActor* ObjectToAttach);
+	void HandleStaticObjectAttachment(AActor* ObjectToAttach);
+	
+	float DirtPercentage;
 
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	float MakeTime = 0.5;
+	float CurrentTime = 0;
 };

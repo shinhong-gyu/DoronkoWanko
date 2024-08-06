@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DynamicObject.h"
 #include "HJ_ElectricFan.generated.h"
 
 UCLASS()
@@ -23,15 +24,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
-	class UInputComponent* InputComp;
-
-	void Interact();
 
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
+
+
+	/*UPROPERTY(EditAnywhere)
+	class TSubclassOf<class AHJ_FanWingSplatter> WingSplatter;
+
+	UPROPERTY(EditAnywhere)
+	class UArrowComponent* WingArrow; */
 
 };

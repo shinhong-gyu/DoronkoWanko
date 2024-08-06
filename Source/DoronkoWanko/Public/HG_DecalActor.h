@@ -28,4 +28,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UDecalComponent* Decal;
+	
+	UPROPERTY(EditAnywhere)
+	class UMeshComponent* MeshComp;
+
+	FColor color = FColor::Green;
+
+	UDecalComponent* GetDecal() const {
+		return Decal;
+	}
 };
