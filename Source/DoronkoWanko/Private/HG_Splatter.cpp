@@ -25,6 +25,7 @@ AHG_Splatter::AHG_Splatter()
 	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 
 	Velocity = FVector::ZeroVector;
+	MeshComp->SetReceivesDecals(false);
 }
 
 // Called when the game starts or when spawned
@@ -50,30 +51,30 @@ void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator&
 {
 	if (DecalClass != nullptr) {
 		AHG_DecalActor* Decal = GetWorld()->SpawnActor<AHG_DecalActor>(DecalClass, Location, Rotation);
-		auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());//
-		int32 RandNum = FMath::RandRange(1,9);
+		auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+		int32 RandNum = FMath::RandRange(1, 9);
 		GM->SetScore(RandNum);
 		GM->UpdataScoreBoard();
-		if (nullptr != Decal) {
-			UDecalComponent* DecalComp = Decal->GetDecal();
-			if (nullptr != DecalComp) {
-				DecalComp->SetWorldLocation(Location);
-				DecalComp->SetWorldRotation(Rotation);
-			}
-		}
+// 		if (nullptr != Decal) {
+// 			UDecalComponent* DecalComp = Decal->GetDecal();
+// 			if (nullptr != DecalComp) {
+// 				DecalComp->SetWorldLocation(Location);
+// 				DecalComp->SetWorldRotation(Rotation);
+// 			}
+// 		}
 	}
 }
 
 void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-		this->Destroy();
-		FVector SpawnLocation = GetActorLocation();
-		FRotator SpawnRoation = OtherActor->GetActorRotation();
-		if (auto* OverlapedActor = Cast<UStaticMeshComponent>(OtherActor)) {
-			OverlapedActor->SetRenderCustomDepth(true);
-			OverlapedActor->CustomDepthStencilValue = 1;
-		}
-		this->SpawnDecalAtLocation(SpawnLocation, SpawnRoation);
+	this->Destroy();
+	FVector SpawnLocation = GetActorLocation();
+	FRotator SpawnRoation = OtherActor->GetActorRotation();
+	if (auto* OverlapedActor = Cast<UStaticMeshComponent>(OtherActor)) {
+		OverlapedActor->SetRenderCustomDepth(true);
+		OverlapedActor->CustomDepthStencilValue = 1;
+	}
+	this->SpawnDecalAtLocation(SpawnLocation, SpawnRoation);
 }
 
 FVector AHG_Splatter::ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal)

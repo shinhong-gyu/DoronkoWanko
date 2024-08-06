@@ -27,7 +27,7 @@ AHG_DecalActor::AHG_DecalActor()
 
 	MeshComp->SetRenderCustomDepth(true);
 
-	MeshComp->CustomDepthStencilValue = 1;
+	MeshComp->CustomDepthStencilValue = 0;
 
 	// 랜덤하게 Decal 패턴 찍어내기
 	UMaterial* SelectedMaterial = nullptr;
