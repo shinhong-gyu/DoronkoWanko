@@ -41,4 +41,5 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* WingArrow;
 
+	AHJ_FanWingSplatter* SpawnedSplatter;
 };
