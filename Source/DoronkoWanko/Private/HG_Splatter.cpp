@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "DoronkoGameMode.h"
+#include "HJ_FanWingSplatter.h"
 
 // Sets default values
 AHG_Splatter::AHG_Splatter()
@@ -74,7 +75,14 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		OverlapedActor->SetRenderCustomDepth(true);
 		OverlapedActor->CustomDepthStencilValue = 1;
 	}
+
+	// (한준) 추가한 코드 & 오류 있을 경우 수정 
+	if (OtherActor->IsA<AHJ_FanWingSplatter>())
+	{  return;	}
+	else
+	{
 	this->SpawnDecalAtLocation(SpawnLocation, SpawnRoation);
+	}
 }
 
 FVector AHG_Splatter::ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal)
