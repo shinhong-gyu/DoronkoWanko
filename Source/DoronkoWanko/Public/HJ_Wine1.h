@@ -40,5 +40,9 @@ public:
 
 	void InteractionWith() override;
 
+	FVector Vec;
+	FRotator Rot;
+	int check = 0;
+
 
 };
