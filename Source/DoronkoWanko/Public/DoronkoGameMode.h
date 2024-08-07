@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "HJ_ElectricFan.h"
 #include "DoronkoGameMode.generated.h"
 
 /**
@@ -28,4 +29,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UHG_ScoreBoard* ScoreBoard;
+
+	void SpawnWingFan();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHJ_ElectricFan> ElectricFanFactory;
+
+	FTransform FanTransform;
 };
