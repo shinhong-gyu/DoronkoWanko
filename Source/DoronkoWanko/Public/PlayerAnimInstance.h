@@ -18,7 +18,7 @@ public:
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite) 
 	float Speed;
 	//Horizontal
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -27,6 +27,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool IsInAir;
 
+	void PlaySplashMontage();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+class UAnimMontage* SplashMontage;
 
 
 };

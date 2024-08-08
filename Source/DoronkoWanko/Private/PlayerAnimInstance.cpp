@@ -26,3 +26,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	IsInAir = player->GetCharacterMovement()->IsFalling();
 }
+
+void UPlayerAnimInstance::PlaySplashMontage()
+{
+ Montage_Play(SplashMontage);
+}

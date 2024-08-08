@@ -140,4 +140,10 @@ public:
 
 	float MakeTime = 0.5;
 	float CurrentTime = 0;
+
+//Animation
+UPROPERTY()
+class UPlayerAnimInstance* Anim;
+
+
 };

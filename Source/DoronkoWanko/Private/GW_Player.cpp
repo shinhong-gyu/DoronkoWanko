@@ -19,6 +19,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "MasterItem.h"
+#include "PlayerAnimInstance.h"
 #include "StaticObject.h"
 
 // Sets default values
@@ -46,6 +47,11 @@ AGW_Player::AGW_Player()
 	AttachedStaticObject = nullptr;
 	OverlappingObject = nullptr;
 // 	bIsDropping = false;
+	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
+	if (TempAnimInst.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -60,8 +66,10 @@ void AGW_Player::BeginPlay()
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
-		}
+		} 
 	}
+// 	Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+
 }
 
 // Called every frame
@@ -126,7 +134,7 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
 		input->BindAction(IA_Interaction, ETriggerEvent::Started, this, &AGW_Player::OnMyActionInteraction);
 		input->BindAction(IA_Drop, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDrop);
-		input->BindAction(IA_Splash, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionSplash);
+		input->BindAction(IA_Splash, ETriggerEvent::Started, this, &AGW_Player::OnMyActionSplash);
 		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirt);
 	}
 
@@ -202,7 +210,7 @@ void AGW_Player::Shake()
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
 	}
-
+	
 }
 void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 {
@@ -231,11 +239,24 @@ void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DirtMessage);
 		}
 	}
+	if (Anim)
+	{
+		Anim->PlaySplashMontage();
+	}
+
 }
 
 
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
-{
+{	
+// 	check(Anim);
+	if (Anim)
+	{
+		Anim->PlaySplashMontage();
+		UE_LOG(LogTemp,Warning, TEXT("splash"));
+	}
+
+
 	if (DirtPercentage > 0.0f)
 	{
 		DirtPercentage -= 0.25f;
@@ -262,24 +283,6 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 		}
 	}
 
-// 	if (ColorArray.Num() > 0)
-// 	{
-// 		ColorArray.RemoveAt(ColorArray.Num() - 1);
-// 	}
-// 
-// 	if (GEngine)
-// 	{
-// 		for (int32 i = 0; i < ColorArray.Num(); i++)
-// 		{
-// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
-// 		}
-// 
-// 		if (ColorArray.Num() == 0)
-// 		{
-// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Color array is empty"));
-// 		}
-// 	}
 
 }
 
