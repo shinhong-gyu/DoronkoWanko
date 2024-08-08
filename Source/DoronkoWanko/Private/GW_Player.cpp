@@ -89,12 +89,13 @@ void AGW_Player::Tick(float DeltaTime)
 		}
 	}
 	else {
-		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		if (Interface) {
-			Interface->FadeAway();
-			LookAtActor = nullptr;
+		if (LookAtActor != nullptr) {
+			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+			if (Interface) {
+				Interface->FadeAway();
+				LookAtActor = nullptr;
+			}
 		}
-
 	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
