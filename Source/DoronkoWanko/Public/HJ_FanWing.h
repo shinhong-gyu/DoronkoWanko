@@ -11,8 +11,8 @@ UCLASS()
 class DORONKOWANKO_API AHJ_FanWing : public ADynamicObject
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AHJ_FanWing();
 
@@ -20,7 +20,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -33,5 +33,12 @@ public:
 	void InteractionWith() override;
 
 	bool bTurnOn = false;
+
+	// 선풍기 충돌체 소환 
+	UPROPERTY(EditAnywhere)
+	class TSubclassOf<class AHJ_FanWingSplatter> WingSplatter;
+
+	UPROPERTY(EditAnywhere)
+	class UArrowComponent* WingArrow;
 
 };

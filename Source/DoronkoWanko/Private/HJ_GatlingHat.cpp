@@ -4,8 +4,8 @@
 #include "HJ_GatlingHat.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
-#include "HG_Splatter.h"
 #include "GW_Player.h"
+#include "HG_Splatter.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -17,7 +17,7 @@ AHJ_GatlingHat::AHJ_GatlingHat()
 	// 스폰위치(Arrow) 생성 
 	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
 	InkArrow->SetupAttachment(RootComponent);
-	InkArrow->SetRelativeLocation(FVector(120, 0, 0));
+	InkArrow->SetRelativeLocation(FVector(0, 0, 100));
 	InkArrow->SetRelativeRotation(FRotator(0, 0, 0));
 
 	// 충돌체 처리 
@@ -45,7 +45,8 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 
 	if (bTurnOn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hong_Gatling"));
+		if (GW_Player)
+		{
 			CurrTime += DeltaTime;
 
 			if (CurrTime > MakeTime)
@@ -53,6 +54,7 @@ void AHJ_GatlingHat::Tick(float DeltaTime)
 				SpawnInk();
 				CurrTime = 0;
 			}
+		}
 	}
 }
 
@@ -61,9 +63,17 @@ void AHJ_GatlingHat::SpawnInk()
 	// 물감 스폰하기 (대포 앞쪽으로 튀어나가게) 
 	FTransform T = InkArrow->GetComponentTransform();
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	auto* Ink2 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	auto* Ink3 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	auto* Ink4 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	auto* Ink5 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 	if (nullptr != Ink)
 	{
-		Ink->Initalize(FVector(0, 0, 500) + GW_Player->GetActorForwardVector() * 2500);
+		Ink->Initalize(FVector(0, 0, 500) + GW_Player->GetActorForwardVector() * 800);
+		Ink2->Initalize(FVector(20, 20, 500) + GW_Player->GetActorForwardVector() * 800);
+		Ink3->Initalize(FVector(-20, -20, 500) + GW_Player->GetActorForwardVector() * 800);
+		Ink4->Initalize(FVector(0, 0, 520) + GW_Player->GetActorForwardVector() * 800);
+		Ink5->Initalize(FVector(0, 0, 480) + GW_Player->GetActorForwardVector() * 800);
 	}
 }
 
@@ -75,5 +85,7 @@ void AHJ_GatlingHat::InteractionWith()
 void AHJ_GatlingHat::ItemDrop()
 {
 	bTurnOn = false;
+	// 장착 해제 후 땅에 두기
+	SetActorLocation(GW_Player->GetActorLocation() + FVector(50, 0, -110));
 }
 

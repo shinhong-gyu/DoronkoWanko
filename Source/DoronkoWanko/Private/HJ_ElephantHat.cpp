@@ -64,7 +64,7 @@ void AHJ_ElephantHat::SpawnInk()
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 	if (nullptr != Ink)
 	{
-		Ink->Initalize(FVector(0, 0, 300) + GW_Player->GetActorForwardVector() * 600);
+		Ink->Initalize(FVector(0, 0, 600) + GW_Player->GetActorForwardVector() * 600);
 	}
 }
 
@@ -77,5 +77,7 @@ void AHJ_ElephantHat::InteractionWith()
 void AHJ_ElephantHat::ItemDrop()
 {
 	bTurnOn = false;
+	// ÀåÂø ÇØÁ¦ ÈÄ ¶¥¿¡ µÎ±â
+	SetActorLocation(GW_Player->GetActorLocation() + FVector(50, 0, -80));
 }
 

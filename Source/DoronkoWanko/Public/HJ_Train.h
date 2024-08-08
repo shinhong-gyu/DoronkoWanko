@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "DynamicObject.h"
 #include "GW_Player.h"
+#include "HG_Splatter.h"
 #include "HJ_Train.generated.h"
 
 UCLASS()
@@ -25,13 +26,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	/*UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel1;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel2;
 
 	UPROPERTY(EditAnywhere)
+	int WheelCheck = 0;
+
+	/*UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel3;
 
 	UPROPERTY(EditAnywhere)
@@ -63,6 +67,20 @@ public:
 	UPROPERTY(EditAnywhere)
 	float CurrentRotationAngel;
 
+	// 잉크 스폰
+	UPROPERTY(EditAnywhere)
+	class UArrowComponent* InkArrow;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHG_Splatter> InkFactory;
+
+	// 스폰 시간
+	float CurrTime = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float MakeTime = 0.3f;
+
+	// 인터렉션
 	bool bTurnOn = false;
 
 	void InteractionWith() override;

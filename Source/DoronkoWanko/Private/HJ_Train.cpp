@@ -23,6 +23,20 @@ AHJ_Train::AHJ_Train()
 	/*MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(RootComponent);*/
 
+	// 잉크 스폰 
+	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
+	InkArrow->SetupAttachment(BoxComp);
+
+	// 열차 바퀴 메쉬 생성
+	Wheel1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel1"));
+	Wheel2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wheel2"));
+	Wheel1->SetupAttachment(MeshComp);
+	Wheel2->SetupAttachment(MeshComp);
+
+	// 바퀴 안보이게 설정 
+	Wheel1->SetVisibility(false);
+	Wheel2->SetVisibility(false);
+
 	// 열차 회전 변수 
 	Radius = 500.0f;
 	AngularSpeed = 2.0f;
@@ -42,9 +56,6 @@ void AHJ_Train::BeginPlay()
 
 	// 플레이어 캐스트 
 	GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-
-	//InteractionText = FText::FromString(TEXT("E) COMEON"));
-
 }
 
 // Called every frame
@@ -52,31 +63,53 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bTurnOn)
+	if (WheelCheck == 5)
 	{
-		if (GW_Player)
+		Wheel1->SetVisibility(true);
+	}
+
+	if (WheelCheck == 10)
+	{
+		Wheel2->SetVisibility(true);
+	}
+
+	if (WheelCheck > 10)
+	{
+		CurrentAngle += AngularSpeed * DeltaTime;
+		float X = Radius * FMath::Cos(CurrentAngle);
+		float Y = Radius * FMath::Sin(CurrentAngle);
+		float Z = GetActorLocation().Z;
+
+		SetActorLocation(FVector(X - 2100.f, Y - 3450.f, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
+
+		CurrentRotationAngel += RotationSpeed * DeltaTime;
+		if (CurrentRotationAngel > 360.0f)
 		{
-			CurrentAngle += AngularSpeed * DeltaTime;
-			float X = Radius * FMath::Cos(CurrentAngle);
-			float Y = Radius * FMath::Sin(CurrentAngle);
-			float Z = GetActorLocation().Z;
+			CurrentRotationAngel -= 360.0f;
+		}
+		FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
+		BoxComp->SetRelativeRotation(TrainRotation);
 
-			SetActorLocation(FVector(X, Y, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
+		CurrTime += DeltaTime;
 
-			CurrentRotationAngel += RotationSpeed * DeltaTime;
-			if (CurrentRotationAngel > 360.0f)
-			{
-				CurrentRotationAngel -= 360.0f;
+		if (CurrTime > MakeTime)
+		{
+			// 물감 스폰하기 (정수리에서 Ink 가 Spawn 되도록)
+
+			FTransform T = InkArrow->GetComponentTransform();
+			auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+
+			if (nullptr != Ink) {
+				Ink->Initalize(FVector(-100, 0, 0));
 			}
-			FRotator TrainRotation = FRotator(0.0f, CurrentRotationAngel, 0.0f);
-			BoxComp->SetRelativeRotation(TrainRotation);
+			CurrTime = 0;
 		}
 	}
 }
 
 void AHJ_Train::InteractionWith()
 {
-	bTurnOn = true;
+	WheelCheck += 1;
 }
 
 void AHJ_Train::ItemDrop()
