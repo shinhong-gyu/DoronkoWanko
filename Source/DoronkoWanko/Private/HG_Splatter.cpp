@@ -29,9 +29,11 @@ AHG_Splatter::AHG_Splatter()
 
 	Velocity = FVector::ZeroVector;
 	MeshComp->SetReceivesDecals(false);
+	
+	int32 RandValue = FMath::RandRange(1,5);
+	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/Splatoon/M_Paint%d.M_Paint%d"), RandValue, RandValue);
 
-
-	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial(TEXT("/Script/Engine.Material'/Game/HongGyu/Splatoon/M_Paint.M_Paint'"));
+	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial(*MaterialPath);
 	if (TempMaterial.Succeeded()) {
 		SelectedMaterial = TempMaterial.Object;
 	}
@@ -85,18 +87,24 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	float RandNum = FMath::FRandRange(100.0f, 150.0f);
 ;	if (NormalArrow)
 	{
+		FVector end = SpawnLocation + Velocity.GetSafeNormal() * 10000;
 		FHitResult hitInfo;
 		FCollisionQueryParams params;
+		FCollisionObjectQueryParams QParams;
+		QParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
 		params.AddIgnoredActor(this);
-		bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, SpawnLocation, SpawnLocation + GetActorForwardVector() * 10000, ECC_WorldDynamic, params);
+		bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, SpawnLocation, end, QParams, params);
 		if (bHit)
 		{
-			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-15.0f, RandNum, RandNum), OtherComp, NAME_None, SpawnLocation, hitInfo.ImpactNormal.Rotation(), EAttachLocation::KeepWorldPosition);
+			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-15.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
+			//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
+			//DrawDebugLine(GetWorld(), hitInfo.ImpactPoint, (hitInfo.ImpactNormal * 10000.0f), FColor::Blue, false, 10000.0f);
 			//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
 
 			float RandRotZ = FMath::FRandRange(0.0f, 360.0f);
 
-			Decal->AddRelativeRotation(FRotator(0,0,RandRotZ));
+			//Decal->AddRelativeRotation(FRotator(0,0,RandRotZ));
 		}
 	}
 
@@ -107,7 +115,7 @@ void AHG_Splatter::OnMyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRoation = UKismetMathLibrary::MakeRotFromX(Hit.ImpactNormal);
 	float RandNum = FMath::FRandRange(100.0f, 150.0f);
-	UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-30.0f, RandNum, RandNum), OtherComp, NAME_None, SpawnLocation, SpawnRoation, EAttachLocation::KeepWorldPosition);
+	UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-15.0f, RandNum, RandNum), OtherComp, NAME_None, SpawnLocation, SpawnRoation, EAttachLocation::KeepWorldPosition);
 	if (Decal) {
 		Decal->AddRelativeRotation(FRotator(FMath::FRandRange(0.0f, 360.0f), 0, 0));
 	}
