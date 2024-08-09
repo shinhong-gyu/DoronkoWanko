@@ -96,7 +96,11 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Dirt;
 
-	void OnMyActionDirt(const FInputActionValue& Value);
+	void OnMyActionDirtStart(const FInputActionValue& Value);
+	void OnMyActionDirtOngoing(const FInputActionValue& Value);
+
+	void OnMyActionDirtEnd(const FInputActionValue& Value);
+
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Splash;
@@ -125,8 +129,6 @@ public:
     UPROPERTY()
     class AActor* OverlappingObject;
 
-// 	bool bIsDropping;
-// 	void ResetDroppingFlag(); // 플래그 초기화 함수
 
 
 
@@ -145,5 +147,12 @@ public:
 UPROPERTY()
 class UPlayerAnimInstance* Anim;
 
+bool bIsRightMouseDown;
+
+UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+class USoundBase* Bite;
+
+UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+class USoundBase* Drop;
 
 };

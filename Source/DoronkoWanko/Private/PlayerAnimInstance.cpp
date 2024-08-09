@@ -25,9 +25,41 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Direction = FVector::DotProduct(rightVector, velocity);
 
 	IsInAir = player->GetCharacterMovement()->IsFalling();
+	if (Montage_IsPlaying(RubMontage))
+	{
+		if (player && player->bIsRightMouseDown) // bIsRightMouseDown: 마우스 오른쪽 버튼이 눌려있는 상태
+		{
+			Montage_JumpToSection(FName("rub"), RubMontage); // "rub" 섹션으로 점프하여 루프 시작
+		}
+	}
+
 }
 
 void UPlayerAnimInstance::PlaySplashMontage()
 {
- Montage_Play(SplashMontage);
+
+Montage_Play(SplashMontage);
+		
 }
+
+void UPlayerAnimInstance::PlayRubMontage()
+{
+	Montage_Play(RubMontage);
+
+	AGW_Player* Player = Cast<AGW_Player>(TryGetPawnOwner());
+	if (Player)
+	{
+		Player->GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	}
+}
+// void UPlayerAnimInstance::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+// {
+// 	Super::OnNotifyBegin(NotifyName, BranchingPointPayload);
+// 
+// 	if (NotifyName == FName("rubStart"))
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("rubStart Notify triggered"));
+// 
+// 		
+// 	}
+// }

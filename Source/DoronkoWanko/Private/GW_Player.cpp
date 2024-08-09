@@ -47,11 +47,11 @@ AGW_Player::AGW_Player()
 	AttachedStaticObject = nullptr;
 	OverlappingObject = nullptr;
 // 	bIsDropping = false;
-	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
-	if (TempAnimInst.Succeeded())
-	{
-		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
-	}
+// 	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
+// 	if (TempAnimInst.Succeeded())
+// 	{
+// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
+// 	}
 }
 
 // Called when the game starts or when spawned
@@ -68,8 +68,11 @@ void AGW_Player::BeginPlay()
 			subSys->AddMappingContext(IMC_Player, 0);
 		} 
 	}
-// 	Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-
+	Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (Anim)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("ANim"))
+	}
 }
 
 // Called every frame
@@ -135,7 +138,11 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Interaction, ETriggerEvent::Started, this, &AGW_Player::OnMyActionInteraction);
 		input->BindAction(IA_Drop, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDrop);
 		input->BindAction(IA_Splash, ETriggerEvent::Started, this, &AGW_Player::OnMyActionSplash);
-		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirt);
+		input->BindAction(IA_Dirt, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDirtStart);
+		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirtOngoing);
+		input->BindAction(IA_Dirt, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDirtEnd);
+
+
 	}
 
 }
@@ -210,9 +217,10 @@ void AGW_Player::Shake()
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
 	}
+
 	
 }
-void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
+void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
 // 	FColor NewColor = FColor::MakeRandomColor();
 // 	ColorArray.Add(NewColor);
@@ -226,6 +234,18 @@ void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 // 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
 // 		}
 // 	}
+	check(Anim)
+		if (Anim)
+		{
+			Anim->PlayRubMontage();
+			UE_LOG(LogTemp, Warning, TEXT("Rub"));
+		}
+
+
+}
+
+void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
+{
 	if (DirtPercentage < 100.0f)
 	{
 		DirtPercentage += 5.0f;
@@ -239,21 +259,22 @@ void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DirtMessage);
 		}
 	}
-	if (Anim)
-	{
-		Anim->PlaySplashMontage();
-	}
 
+}
+
+void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
+{
 }
 
 
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 {	
-// 	check(Anim);
+// 	UPlayerAnimInstance* anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	check(Anim)
 	if (Anim)
 	{
 		Anim->PlaySplashMontage();
-		UE_LOG(LogTemp,Warning, TEXT("splash"));
+		UE_LOG(LogTemp, Warning, TEXT("splash"));
 	}
 
 
@@ -304,6 +325,7 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 			else if (AStaticObject* DynamicObject = Cast<AStaticObject>(LookAtActor))
 			{
 				HandleStaticObjectAttachment(DynamicObject);
+				UGameplayStatics::PlaySound2D(GetWorld(), Bite);
 			}
 		}
 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
@@ -314,6 +336,7 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		}
 
 	}
+	
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
@@ -345,6 +368,8 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 
 		dropObject(AttachedMasterItem);
 	}
+	UGameplayStatics::PlaySound2D(GetWorld(), Drop);
+
 }
 void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 {

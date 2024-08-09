@@ -18,7 +18,8 @@ public:
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite) 
+	void OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float Speed;
 	//Horizontal
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -29,8 +30,17 @@ public:
 
 	void PlaySplashMontage();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 class UAnimMontage* SplashMontage;
+
+// PlayerAnimInstance.h
+// UPROPERTY(EditAnywhere, BlueprintReadWrite)
+// bool bIsSplashing;
+// 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+class UAnimMontage* RubMontage;
+
+void PlayRubMontage();
 
 
 };
