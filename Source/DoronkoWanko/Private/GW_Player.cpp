@@ -97,12 +97,13 @@ void AGW_Player::Tick(float DeltaTime)
 		}
 	}
 	else {
-		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		if (Interface) {
-			Interface->FadeAway();
-			LookAtActor = nullptr;
+		if (LookAtActor != nullptr) {
+			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+			if (Interface) {
+				Interface->FadeAway();
+				LookAtActor = nullptr;
+			}
 		}
-
 	}
 
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
@@ -261,26 +262,6 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot shake: Dirt percentage is 0%"));
 		}
 	}
-
-// 	if (ColorArray.Num() > 0)
-// 	{
-// 		ColorArray.RemoveAt(ColorArray.Num() - 1);
-// 	}
-// 
-// 	if (GEngine)
-// 	{
-// 		for (int32 i = 0; i < ColorArray.Num(); i++)
-// 		{
-// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
-// 		}
-// 
-// 		if (ColorArray.Num() == 0)
-// 		{
-// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Color array is empty"));
-// 		}
-// 	}
-
 }
 
 void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)

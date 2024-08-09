@@ -8,7 +8,9 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "DoronkoGameMode.h"
-#include "HJ_FanWingSplatter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Materials/Material.h"
 
 // Sets default values
 AHG_Splatter::AHG_Splatter()
@@ -27,6 +29,16 @@ AHG_Splatter::AHG_Splatter()
 
 	Velocity = FVector::ZeroVector;
 	MeshComp->SetReceivesDecals(false);
+	
+	int32 RandValue = FMath::RandRange(1,5);
+	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/Splatoon/M_Paint%d.M_Paint%d"), RandValue, RandValue);
+
+	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial(*MaterialPath);
+	if (TempMaterial.Succeeded()) {
+		SelectedMaterial = TempMaterial.Object;
+	}
+
+	this->SetLifeSpan(3.0f);
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +46,7 @@ void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AHG_Splatter::OnMyBeginOverlap);
+	SphereComp->OnComponentHit.AddDynamic(this, &AHG_Splatter::OnMyHit);
 }
 
 // Called every frame
@@ -56,38 +69,58 @@ void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator&
 		int32 RandNum = FMath::RandRange(1, 9);
 		GM->SetScore(RandNum);
 		GM->UpdataScoreBoard();
-		/*GM->SetScore(RandNum);
-		GM->UpdataScoreBoard();*/
-		// 		if (nullptr != Decal) {
-		// 			UDecalComponent* DecalComp = Decal->GetDecal();
-		// 			if (nullptr != DecalComp) {
-		// 				DecalComp->SetWorldLocation(Location);
-		// 				DecalComp->SetWorldRotation(Rotation);
-		// 			}
-		// 		}
+		if (nullptr != Decal) {
+			UDecalComponent* DecalComp = Decal->GetDecal();
+			if (nullptr != DecalComp) {
+				DecalComp->SetWorldLocation(Location);
+				DecalComp->SetWorldRotation(Rotation);
+			}
+		}
 	}
 }
 
 void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	this->Destroy();
 	FVector SpawnLocation = GetActorLocation();
-	FRotator SpawnRoation = OtherActor->GetActorRotation();
-	if (auto* OverlapedActor = Cast<UStaticMeshComponent>(OtherActor)) {
-		OverlapedActor->SetRenderCustomDepth(true);
-		OverlapedActor->CustomDepthStencilValue = 1;
+	FRotator SpawnRoation;
+	this->Destroy();
+	float RandNum = FMath::FRandRange(100.0f, 150.0f);
+;	if (NormalArrow)
+	{
+		FVector end = SpawnLocation + Velocity.GetSafeNormal() * 10000;
+		FHitResult hitInfo;
+		FCollisionQueryParams params;
+		FCollisionObjectQueryParams QParams;
+		QParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+		params.AddIgnoredActor(this);
+		bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, SpawnLocation, end, QParams, params);
+		if (bHit)
+		{
+			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-15.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
+			//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
+			//DrawDebugLine(GetWorld(), hitInfo.ImpactPoint, (hitInfo.ImpactNormal * 10000.0f), FColor::Blue, false, 10000.0f);
+			//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
+
+			float RandRotZ = FMath::FRandRange(0.0f, 360.0f);
+
+			//Decal->AddRelativeRotation(FRotator(0,0,RandRotZ));
+		}
 	}
 
-	// (한준) 추가한 코드 & 오류 있을 경우 수정 
-	if (OtherActor->IsA<AHJ_FanWingSplatter>())
-	{
-		return;
-	}
-	else
-	{
-		this->SpawnDecalAtLocation(SpawnLocation, SpawnRoation);
+}
+void AHG_Splatter::OnMyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	this->Destroy();
+	FVector SpawnLocation = GetActorLocation();
+	FRotator SpawnRoation = UKismetMathLibrary::MakeRotFromX(Hit.ImpactNormal);
+	float RandNum = FMath::FRandRange(100.0f, 150.0f);
+	UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-15.0f, RandNum, RandNum), OtherComp, NAME_None, SpawnLocation, SpawnRoation, EAttachLocation::KeepWorldPosition);
+	if (Decal) {
+		Decal->AddRelativeRotation(FRotator(FMath::FRandRange(0.0f, 360.0f), 0, 0));
 	}
 }
+
 
 FVector AHG_Splatter::ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal)
 {
