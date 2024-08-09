@@ -11,6 +11,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Materials/Material.h"
+#include "HG_MissonStamp.h"
+#include "GameFramework/Actor.h"
 
 // Sets default values
 AHG_Splatter::AHG_Splatter()
@@ -29,8 +31,8 @@ AHG_Splatter::AHG_Splatter()
 
 	Velocity = FVector::ZeroVector;
 	MeshComp->SetReceivesDecals(false);
-	
-	int32 RandValue = FMath::RandRange(1,5);
+
+	int32 RandValue = FMath::RandRange(1, 5);
 	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/Splatoon/M_Paint%d.M_Paint%d"), RandValue, RandValue);
 
 	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial(*MaterialPath);
@@ -89,26 +91,29 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	int32 RanInt = FMath::RandRange(1, 9);
 	GM->SetScore(RanInt);
 	GM->UpdataScoreBoard();
-;	if (NormalArrow)
+	FVector end = SpawnLocation + Velocity.GetSafeNormal() * 10000;
+	FHitResult hitInfo;
+	FCollisionQueryParams params;
+	FCollisionObjectQueryParams QParams;
+	QParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+	params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, SpawnLocation, end, QParams, params);
+	if (bHit)
 	{
-		FVector end = SpawnLocation + Velocity.GetSafeNormal() * 10000;
-		FHitResult hitInfo;
-		FCollisionQueryParams params;
-		FCollisionObjectQueryParams QParams;
-		QParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
-		params.AddIgnoredActor(this);
-		bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, SpawnLocation, end, QParams, params);
-		if (bHit)
-		{
-			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
-			//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
-			//DrawDebugLine(GetWorld(), hitInfo.ImpactPoint, (hitInfo.ImpactNormal * 10000.0f), FColor::Blue, false, 10000.0f);
-			//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
+		UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
+		//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
+		//DrawDebugLine(GetWorld(), hitInfo.ImpactPoint, (hitInfo.ImpactNormal * 10000.0f), FColor::Blue, false, 10000.0f);
+		//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
 
-			float RandRotZ = FMath::FRandRange(0.0f, 360.0f);
+		float RandRotZ = FMath::FRandRange(0.0f, 360.0f);
 
-			//Decal->AddRelativeRotation(FRotator(0,0,RandRotZ));
+		//Decal->AddRelativeRotation(FRotator(0,0,RandRotZ));
+	}
+	TArray<AHG_MissonStamp*> StampArray = IsStampInRange(hitInfo.ImpactPoint,RandNum,RandNum);
+	if (StampArray.Num() != 0) {
+		for (auto s : StampArray) {
+			s->Decal->SetVisibility(true);
 		}
 	}
 
@@ -143,3 +148,18 @@ void AHG_Splatter::UpdataRotation()
 		SetActorRotation(NewRotation);
 	}
 }
+
+TArray<AHG_MissonStamp*> AHG_Splatter::IsStampInRange(FVector Pos, float Param1, float Param2)
+{
+	TArray<AActor*> StampArray;
+	TArray<AHG_MissonStamp*> Result;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StampFactory, StampArray);
+	for (auto a : StampArray) {
+		FVector Dist = Pos - (a->GetActorLocation());
+		if ((Param1/2) * (Param1/2) + (Param2/2) * (Param2/2) > Dist.Size() * Dist.Size()) {
+			Result.Add(Cast<AHG_MissonStamp>(a));
+		}
+	}
+	return Result;
+}
+

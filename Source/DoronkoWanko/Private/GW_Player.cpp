@@ -45,7 +45,7 @@ AGW_Player::AGW_Player()
 	AttachedMasterItem = nullptr;
 	AttachedStaticObject = nullptr;
 	OverlappingObject = nullptr;
-// 	bIsDropping = false;
+	// 	bIsDropping = false;
 }
 
 // Called when the game starts or when spawned
@@ -207,18 +207,18 @@ void AGW_Player::Shake()
 }
 void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 {
-// 	FColor NewColor = FColor::MakeRandomColor();
-// 	ColorArray.Add(NewColor);
+	// 	FColor NewColor = FColor::MakeRandomColor();
+	// 	ColorArray.Add(NewColor);
 
-// 	if (GEngine)
-// 	{
-// 		// 배열의 모든 항목을 화면에 표시
-// 		for (int32 i = 0; i < ColorArray.Num(); i++)
-// 		{
-// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
-// 		}
-// 	}
+	// 	if (GEngine)
+	// 	{
+	// 		// 배열의 모든 항목을 화면에 표시
+	// 		for (int32 i = 0; i < ColorArray.Num(); i++)
+	// 		{
+	// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
+	// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
+	// 		}
+	// 	}
 	if (DirtPercentage < 100.0f)
 	{
 		DirtPercentage += 5.0f;
@@ -239,7 +239,7 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 {
 	if (DirtPercentage > 0.0f)
 	{
-		DirtPercentage -= 0.25f;
+		DirtPercentage -= 1.0f;
 		if (DirtPercentage < 0.0f)
 		{
 			DirtPercentage = 0.0f;
@@ -249,11 +249,8 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, DirtMessage);
 		}
+		Shake();
 
-		int NumberOfSplatter = FMath::RandRange(3, 5);
-		for (int i = 0; i < NumberOfSplatter; i++) {
-			Shake();
-		}
 	}
 	else
 	{
@@ -296,7 +293,7 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-	
+
 
 	if (AttachedStaticObject != nullptr)
 	{
@@ -341,12 +338,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedMasterItem = MasterItem;
-// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-// 		LookAtActor = nullptr;
-// 		if (Interface) {
-// 			Interface->FadeAway();
-// 			LookAtActor = nullptr;
-// 		}
+		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		// 		LookAtActor = nullptr;
+		// 		if (Interface) {
+		// 			Interface->FadeAway();
+		// 			LookAtActor = nullptr;
+		// 		}
 	}
 	else if (AStaticObject* StaticicObject = Cast<AStaticObject>(ObjectToAttach))
 	{
@@ -360,12 +357,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedStaticObject = StaticicObject;
-// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-// 		LookAtActor = nullptr;
-// 		if (Interface) {
-// 			Interface->FadeAway();
-// 			LookAtActor = nullptr;
-// 		}
+		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		// 		LookAtActor = nullptr;
+		// 		if (Interface) {
+		// 			Interface->FadeAway();
+		// 			LookAtActor = nullptr;
+		// 		}
 	}
 }
 
