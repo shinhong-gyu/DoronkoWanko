@@ -78,34 +78,34 @@ void AGW_Player::Tick(float DeltaTime)
 	FHitResult OutHit;
 	FVector Start = GetActorLocation() - FVector(0, 0, -36.666f);
 	FVector End = Start + GetActorForwardVector() * 100;
-	//ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
-	//TArray<AActor*> ActorsToIgnore;
-	//ActorsToIgnore.Add(this);
-	//bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
-	//if (bHit) {
-	//	// 바라본 곳에 뭔가 있다.
-	//	if (LookAtActor == nullptr) {
-	//		if (OutHit.GetActor() != LookAtActor) {
-	//			LookAtActor = OutHit.GetActor();
-	//			UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
-	//			UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
-	//			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-	//			if (Interface) {
-	//				Interface->LookAt();
-	//			}
-	//		}
-	//	}
-	//}
-	//else {
-	//	II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-	//	if (Interface) {
-	//		Interface->FadeAway();
-	//		LookAtActor = nullptr;
-	//	}
+	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
+	if (bHit) {
+		// 바라본 곳에 뭔가 있다.
+		if (LookAtActor == nullptr) {
+			if (OutHit.GetActor() != LookAtActor) {
+				LookAtActor = OutHit.GetActor();
+				UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
+				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+				if (Interface) {
+					Interface->LookAt();
+				}
+			}
+		}
+	}
+	else {
+		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		if (Interface) {
+			Interface->FadeAway();
+			LookAtActor = nullptr;
+		}
 
-	//}
+	}
 
-	//SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
+	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
 
 // Called to bind functionality to input

@@ -56,13 +56,15 @@ void AHG_Splatter::SpawnDecalAtLocation(const FVector& Location, const FRotator&
 		int32 RandNum = FMath::RandRange(1, 9);
 		GM->SetScore(RandNum);
 		GM->UpdataScoreBoard();
-// 		if (nullptr != Decal) {
-// 			UDecalComponent* DecalComp = Decal->GetDecal();
-// 			if (nullptr != DecalComp) {
-// 				DecalComp->SetWorldLocation(Location);
-// 				DecalComp->SetWorldRotation(Rotation);
-// 			}
-// 		}
+		/*GM->SetScore(RandNum);
+		GM->UpdataScoreBoard();*/
+		// 		if (nullptr != Decal) {
+		// 			UDecalComponent* DecalComp = Decal->GetDecal();
+		// 			if (nullptr != DecalComp) {
+		// 				DecalComp->SetWorldLocation(Location);
+		// 				DecalComp->SetWorldRotation(Rotation);
+		// 			}
+		// 		}
 	}
 }
 
@@ -78,10 +80,12 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 
 	// (한준) 추가한 코드 & 오류 있을 경우 수정 
 	if (OtherActor->IsA<AHJ_FanWingSplatter>())
-	{  return;	}
+	{
+		return;
+	}
 	else
 	{
-	this->SpawnDecalAtLocation(SpawnLocation, SpawnRoation);
+		this->SpawnDecalAtLocation(SpawnLocation, SpawnRoation);
 	}
 }
 

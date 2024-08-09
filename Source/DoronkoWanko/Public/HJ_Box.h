@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "HJ_ElectricFan.h"
+#include "HJ_WhaleHat.h"
+#include "HJ_TrainWheel.h"
 #include "HJ_Box.generated.h"
 
 UCLASS()
@@ -40,4 +42,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHJ_ElectricFan> ElectricFanFactory;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHJ_WhaleHat> HatFactory;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHJ_TrainWheel> WheelFactory;
 };
