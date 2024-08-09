@@ -16,8 +16,8 @@ AHG_EnterTrigger::AHG_EnterTrigger()
 
 	SetRootComponent(BoxComp);
 
-	BoxComp->SetGenerateOverlapEvents(true);
-	BoxComp->SetCollisionProfileName(TEXT("EnterTrigger"));
+	/*BoxComp->SetGenerateOverlapEvents(true);
+	BoxComp->SetCollisionProfileName(TEXT("EnterTrigger"));*/
 
 	RoomName = FText::FromString(TEXT("Default"));
 }
@@ -38,7 +38,7 @@ void AHG_EnterTrigger::Tick(float DeltaTime)
 
 void AHG_EnterTrigger::EnterTriggered()
 {
-	auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	/*auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	if (Player) {
 		if (RoomSelf != Player->LocState) {
 			Player->SetLocState(RoomSelf);
@@ -57,14 +57,14 @@ void AHG_EnterTrigger::EnterTriggered()
 				EnterTriggered();
 			}
 		}
-	}
+	}*/
 
 }
 
 void AHG_EnterTrigger::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA<AGW_Player>()) {
-		EnterTriggered();
-	}
+	//if (OtherActor->IsA<AGW_Player>()) {
+	//	EnterTriggered();
+	//}
 }
 
