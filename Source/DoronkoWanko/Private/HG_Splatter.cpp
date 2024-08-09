@@ -85,6 +85,10 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	FRotator SpawnRoation;
 	this->Destroy();
 	float RandNum = FMath::FRandRange(100.0f, 150.0f);
+	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+	int32 RanInt = FMath::RandRange(1, 9);
+	GM->SetScore(RanInt);
+	GM->UpdataScoreBoard();
 ;	if (NormalArrow)
 	{
 		FVector end = SpawnLocation + Velocity.GetSafeNormal() * 10000;
@@ -97,7 +101,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, SpawnLocation, end, QParams, params);
 		if (bHit)
 		{
-			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-15.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
+			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
 			//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
 			//DrawDebugLine(GetWorld(), hitInfo.ImpactPoint, (hitInfo.ImpactNormal * 10000.0f), FColor::Blue, false, 10000.0f);
 			//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());

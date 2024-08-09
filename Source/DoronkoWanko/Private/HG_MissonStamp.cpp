@@ -18,6 +18,7 @@ AHG_MissonStamp::AHG_MissonStamp()
 		DecalMaterial = FindMaterial.Object;
 		Decal->SetMaterial(0, DecalMaterial);
 		Decal->DecalSize = FVector(32.0f,32.0f,32.0f);
+		Decal->SetSortOrder(1);
 	}
 }
 
