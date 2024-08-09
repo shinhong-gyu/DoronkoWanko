@@ -101,8 +101,8 @@ void AGW_Player::Tick(float DeltaTime)
 			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 			if (Interface) {
 				Interface->FadeAway();
-				LookAtActor = nullptr;
 			}
+			LookAtActor = nullptr;
 		}
 	}
 
@@ -454,6 +454,11 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
 	// 	}
 }
+
+// void AGW_Player::SetLocState(EPlayerRoomState Loc)
+// {
+// 	LocState = Loc;
+// }
 
 // void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 // {
