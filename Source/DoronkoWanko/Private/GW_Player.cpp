@@ -19,6 +19,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "MasterItem.h"
+#include "PlayerAnimInstance.h"
 #include "StaticObject.h"
 
 // Sets default values
@@ -45,7 +46,12 @@ AGW_Player::AGW_Player()
 	AttachedMasterItem = nullptr;
 	AttachedStaticObject = nullptr;
 	OverlappingObject = nullptr;
-	// 	bIsDropping = false;
+// 	bIsDropping = false;
+// 	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
+// 	if (TempAnimInst.Succeeded())
+// 	{
+// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
+// 	}
 }
 
 // Called when the game starts or when spawned
@@ -60,7 +66,12 @@ void AGW_Player::BeginPlay()
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
-		}
+		} 
+	}
+	Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (Anim)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("ANim"))
 	}
 }
 
@@ -97,13 +108,12 @@ void AGW_Player::Tick(float DeltaTime)
 		}
 	}
 	else {
-		if (LookAtActor != nullptr) {
-			II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-			if (Interface) {
-				Interface->FadeAway();
-				LookAtActor = nullptr;
-			}
+		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		if (Interface) {
+			Interface->FadeAway();
+			LookAtActor = nullptr;
 		}
+
 	}
 
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
@@ -127,8 +137,12 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
 		input->BindAction(IA_Interaction, ETriggerEvent::Started, this, &AGW_Player::OnMyActionInteraction);
 		input->BindAction(IA_Drop, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDrop);
-		input->BindAction(IA_Splash, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionSplash);
-		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirt);
+		input->BindAction(IA_Splash, ETriggerEvent::Started, this, &AGW_Player::OnMyActionSplash);
+		input->BindAction(IA_Dirt, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDirtStart);
+		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirtOngoing);
+		input->BindAction(IA_Dirt, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDirtEnd);
+
+
 	}
 
 }
@@ -204,21 +218,34 @@ void AGW_Player::Shake()
 		Splatter->Initalize(InitialVelocity);
 	}
 
+	
 }
-void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
+void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
-	// 	FColor NewColor = FColor::MakeRandomColor();
-	// 	ColorArray.Add(NewColor);
+// 	FColor NewColor = FColor::MakeRandomColor();
+// 	ColorArray.Add(NewColor);
 
-	// 	if (GEngine)
-	// 	{
-	// 		// 배열의 모든 항목을 화면에 표시
-	// 		for (int32 i = 0; i < ColorArray.Num(); i++)
-	// 		{
-	// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-	// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
-	// 		}
-	// 	}
+// 	if (GEngine)
+// 	{
+// 		// 배열의 모든 항목을 화면에 표시
+// 		for (int32 i = 0; i < ColorArray.Num(); i++)
+// 		{
+// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
+// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
+// 		}
+// 	}
+	check(Anim)
+		if (Anim)
+		{
+			Anim->PlayRubMontage();
+			UE_LOG(LogTemp, Warning, TEXT("Rub"));
+		}
+
+
+}
+
+void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
+{
 	if (DirtPercentage < 100.0f)
 	{
 		DirtPercentage += 5.0f;
@@ -232,14 +259,28 @@ void AGW_Player::OnMyActionDirt(const FInputActionValue& Value)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DirtMessage);
 		}
 	}
+
+}
+
+void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
+{
 }
 
 
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
-{
+{	
+// 	UPlayerAnimInstance* anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	check(Anim)
+	if (Anim)
+	{
+		Anim->PlaySplashMontage();
+		UE_LOG(LogTemp, Warning, TEXT("splash"));
+	}
+
+
 	if (DirtPercentage > 0.0f)
 	{
-		DirtPercentage -= 1.0f;
+		DirtPercentage -= 0.25f;
 		if (DirtPercentage < 0.0f)
 		{
 			DirtPercentage = 0.0f;
@@ -249,8 +290,11 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, DirtMessage);
 		}
-		Shake();
 
+		int NumberOfSplatter = FMath::RandRange(3, 5);
+		for (int i = 0; i < NumberOfSplatter; i++) {
+			Shake();
+		}
 	}
 	else
 	{
@@ -259,6 +303,8 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot shake: Dirt percentage is 0%"));
 		}
 	}
+
+
 }
 
 void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
@@ -279,6 +325,7 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 			else if (AStaticObject* DynamicObject = Cast<AStaticObject>(LookAtActor))
 			{
 				HandleStaticObjectAttachment(DynamicObject);
+				UGameplayStatics::PlaySound2D(GetWorld(), Bite);
 			}
 		}
 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
@@ -289,11 +336,12 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		}
 
 	}
+	
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-
+	
 
 	if (AttachedStaticObject != nullptr)
 	{
@@ -320,6 +368,8 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 
 		dropObject(AttachedMasterItem);
 	}
+	UGameplayStatics::PlaySound2D(GetWorld(), Drop);
+
 }
 void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 {
@@ -338,12 +388,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedMasterItem = MasterItem;
-		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		// 		LookAtActor = nullptr;
-		// 		if (Interface) {
-		// 			Interface->FadeAway();
-		// 			LookAtActor = nullptr;
-		// 		}
+// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+// 		LookAtActor = nullptr;
+// 		if (Interface) {
+// 			Interface->FadeAway();
+// 			LookAtActor = nullptr;
+// 		}
 	}
 	else if (AStaticObject* StaticicObject = Cast<AStaticObject>(ObjectToAttach))
 	{
@@ -357,12 +407,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedStaticObject = StaticicObject;
-		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		// 		LookAtActor = nullptr;
-		// 		if (Interface) {
-		// 			Interface->FadeAway();
-		// 			LookAtActor = nullptr;
-		// 		}
+// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+// 		LookAtActor = nullptr;
+// 		if (Interface) {
+// 			Interface->FadeAway();
+// 			LookAtActor = nullptr;
+// 		}
 	}
 }
 
