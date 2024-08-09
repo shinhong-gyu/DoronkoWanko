@@ -20,6 +20,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "MasterItem.h"
 #include "StaticObject.h"
+#include "HG_EnterTrigger.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -105,7 +106,26 @@ void AGW_Player::Tick(float DeltaTime)
 			LookAtActor = nullptr;
 		}
 	}
-
+	switch (LocState)
+	{
+	case EPlayerRoomState::KITCHEN:
+		UE_LOG(LogTemp, Warning, TEXT("1"));
+		break;
+	case EPlayerRoomState::LIVINGROOM:
+		UE_LOG(LogTemp, Warning, TEXT("2"));
+		break;
+	case EPlayerRoomState::BASEMENTLIVINGROOM:
+		UE_LOG(LogTemp, Warning, TEXT("3"));
+		break;
+	case EPlayerRoomState::WINECELLAR:
+		UE_LOG(LogTemp, Warning, TEXT("4"));
+		break;
+	case EPlayerRoomState::NURSERY:
+		UE_LOG(LogTemp, Warning, TEXT("5"));
+		break;
+	default:
+		break;
+	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
 
@@ -448,6 +468,9 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		OverlappingObject = StaticObject;
 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *StaticObject->GetName());
 	}
+	if (OtherActor->IsA<AHG_EnterTrigger>()) {
+		AHG_EnterTrigger* Trigger = Cast<AHG_EnterTrigger>(OtherActor);
+	}
 	// 	else if (ADynamicObject* dObject = Cast<ADynamicObject>(OtherActor))
 	// 	{
 	// 		OverlappingDObject = dObject;
@@ -455,10 +478,10 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	// 	}
 }
 
-// void AGW_Player::SetLocState(EPlayerRoomState Loc)
-// {
-// 	LocState = Loc;
-// }
+void AGW_Player::SetLocState(EPlayerRoomState Loc)
+{
+	LocState = Loc;
+}
 
 // void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 // {

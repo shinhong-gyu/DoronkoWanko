@@ -9,7 +9,7 @@ void UHG_EnterInstruction::NativeTick(const FGeometry& MyGeometry, float InDelta
 	Super::NativeTick(MyGeometry,InDeltaTime);
 	LifeTime -= InDeltaTime;
 	if (LifeTime <= 0) {
-		this->RemoveFromParent();
+		RemoveFromParent();
 	}
 }
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GW_Player.h"
 #include "HG_EnterTrigger.generated.h"
 
 UCLASS()
@@ -34,5 +35,6 @@ public:
 	UFUNCTION()
 	void OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-
+	UPROPERTY(EditAnywhere)
+	EPlayerRoomState RoomSelf;
 };

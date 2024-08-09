@@ -13,15 +13,15 @@
 
 
 // 플레이어가 현재 어느방에 있는지를 나타내는 ENUM
-//UENUM(BlueprintType)
-// enum class EPlayerRoomState : uint8
-// {
-// 	KITCHEN,
-// 	LIVINGROOM,
-// 	BASEMENTLIVINGROOM,
-// 	WINECELLAR,
-// 	NURSERY,
-// };
+UENUM(BlueprintType)
+enum class EPlayerRoomState : uint8
+{
+	KITCHEN,
+	LIVINGROOM,
+	BASEMENTLIVINGROOM,
+	WINECELLAR,
+	NURSERY,
+};
 
 UCLASS()
 class DORONKOWANKO_API AGW_Player : public ACharacter
@@ -157,11 +157,12 @@ public:
 	TSubclassOf<class UHG_EnterInstruction> WidgetFactory;
 
 	UPROPERTY(EditAnywhere)
-	class UHG_EnterInstruction* Widget;
-// 	// 플레이어가 현재 위치한 방
-// 	EPlayerRoomState LocState = EPlayerRoomState::LIVINGROOM;
-// 
-// 	// 방이 바뀔 때 마다 LocState를 업데이트 하는 함수
-// 	void SetLocState(EPlayerRoomState Loc);
+	class UHG_EnterInstruction* EnterWidget;
+	// 플레이어가 현재 위치한 방
+	UPROPERTY(EditAnywhere)
+	EPlayerRoomState LocState = EPlayerRoomState::LIVINGROOM;
+ 
+ 	// 방이 바뀔 때 마다 LocState를 업데이트 하는 함수
+	void SetLocState(EPlayerRoomState Loc);
 
 };
