@@ -57,6 +57,10 @@ public:
 
 	void UpdataRotation();
 
+	TArray<class AHG_MissonStamp*> IsStampInRange(FVector Pos ,float Param1,float Param2);
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class AHG_MissonStamp> StampFactory;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> NormalArrow;
