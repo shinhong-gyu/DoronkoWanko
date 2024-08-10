@@ -44,7 +44,6 @@ public:
 	float Speed = 300;
 
 	float Check = 0;
-	float MoveCheck = 0;
 
 	void Rotate();
 
@@ -67,10 +66,12 @@ public:
 
 	// 페인트 스폰 
 	UPROPERTY(EditAnywhere)
-	float MakeTime = 0.2;
+	float MakeTime = 0.25;
 
 	float CurrTime = 0;
 	int SpawnCheck = 0;
+	int SpawnTimeCheck = 0;
+	int StopCheck = 0;
 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* InkArrow;

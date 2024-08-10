@@ -74,17 +74,27 @@ void ARoboticVacuum::Tick(float DeltaTime)
 
 		if (CurrTime > MakeTime)
 		{
-			// 물감 스폰하기 (정수리에서 Ink 가 Spawn 되도록)
-
-			FTransform T = InkArrow->GetComponentTransform();
+			/*FTransform T = InkArrow->GetComponentTransform();
 			auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 
 			if (nullptr != Ink) {
 				Ink->MeshComp->SetVisibility(false);
-				Ink->Initalize(FVector(0, -100, 0));
-			}
-			CurrTime = 0;
+				Ink->Initalize(FVector(0, -50, 0));*/
+				SpawnTimeCheck++;
+				/*	}
+					CurrTime = 0;*/
 		}
+		// 10초 이상 지나면 정지 
+		if (SpawnTimeCheck > 50)
+		{
+			SpawnCheck = 0;	Speed = 0;
+			ColorComp->SetVisibility(false);
+			ColorComp2->SetVisibility(false);
+			StopCheck++;
+		}
+		// 정지 후에 초기화 
+		if (StopCheck > 0)
+		{ SpawnCheck = 0;	SpawnTimeCheck = 0;	bTurnOn = false;	}
 	}
 }
 
@@ -94,7 +104,6 @@ void ARoboticVacuum::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		if (OtherActor)
 		{
-			MoveCheck = 0;
 			if (Check < 10)
 			{
 				if (!GetWorld()->GetTimerManager().IsTimerActive(TimerHandle))
@@ -106,8 +115,8 @@ void ARoboticVacuum::NotifyActorBeginOverlap(AActor* OtherActor)
 
 			if (OtherActor->IsA<AHG_Splatter>())
 			{
-				SpawnCheck++;
-				ColorComp2->SetVisibility(true);
+				SpawnCheck++;	StopCheck = 0;
+				/*ColorComp2->SetVisibility(true);*/
 			}
 		}
 	}
@@ -117,7 +126,6 @@ void ARoboticVacuum::Rotate()
 {
 	CurrentRotationAngle += RotationSpeed * 1;
 	Check += 1;
-	MoveCheck += 1;
 	// 회전할 때 충돌체 끄고 
 	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -131,7 +139,7 @@ void ARoboticVacuum::Rotate()
 
 void ARoboticVacuum::InteractionWith()
 {
-	bTurnOn = true; 
+	bTurnOn = true;
 	ColorComp->SetVisibility(true);
 
 	if (!GetWorld()->GetTimerManager().IsTimerActive(TimerHandle))
