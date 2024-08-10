@@ -15,14 +15,6 @@ AHJ_Train::AHJ_Train()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 충돌체 생성 
-	//BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
-	//SetRootComponent(BoxComp);
-	//BoxComp->SetBoxExtent(FVector(40.0f, 60.0f, 40.0f));
-	// 메쉬 생성
-	/*MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(RootComponent);*/
-
 	// 잉크 스폰 
 	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
 	InkArrow->SetupAttachment(BoxComp);
