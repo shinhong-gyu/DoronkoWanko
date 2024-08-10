@@ -10,6 +10,7 @@
 void ADoronkoGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	PlayBGM();
 
 	ScoreBoard = Cast<UHG_ScoreBoard>(CreateWidget(GetWorld(), ScoreBoardFactory, FName("ScoreBoard")));
 	if (nullptr != ScoreBoard) {
@@ -23,6 +24,14 @@ void ADoronkoGameMode::BeginPlay()
 
 	// 미디어 플레이어를 재생하고 싶다 
 	/*Lv1UI->OpenSource*/
+}
+
+void ADoronkoGameMode::PlayBGM()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), BGM);
+	//	BGM 사운드 길이만큼 타이머 반복설정 
+	float Duration = BGM->GetDuration();
+	GetWorldTimerManager().SetTimer(BGMHandler, this, &ADoronkoGameMode::PlayBGM, Duration, false);
 }
 
 void ADoronkoGameMode::SetScore(int32 Point)

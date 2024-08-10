@@ -21,6 +21,13 @@ class DORONKOWANKO_API ADoronkoGameMode : public AGameModeBase
 public:
 	virtual void BeginPlay() override;
 
+	// BGM
+	UPROPERTY(EditAnywhere)
+	class USoundBase* BGM;
+	void PlayBGM();
+	FTimerHandle BGMHandler;
+
+	// Á¡¼ö UI 
 	int32 GameScore = 0;
 
 	void SetScore(int32 Point);
