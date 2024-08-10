@@ -60,11 +60,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* ColorComp;
 
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* ColorComp2;
+
 	void TurnOn();
 
 	// 페인트 스폰 
 	UPROPERTY(EditAnywhere)
-	float MakeTime = 0.1;
+	float MakeTime = 0.2;
 
 	float CurrTime = 0;
 	int SpawnCheck = 0;

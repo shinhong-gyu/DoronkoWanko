@@ -20,9 +20,13 @@ ARoboticVacuum::ARoboticVacuum()
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("SphereComp"));
 	CapsuleComp->SetupAttachment(RootComponent);
 
-	// 전원버튼 생성
+	// 전원버튼 생성(Green)
 	ColorComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ColorComp"));
 	ColorComp->SetupAttachment(RootComponent);
+
+	// 전원버튼 생성(Red)
+	ColorComp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ColorComp2"));
+	ColorComp2->SetupAttachment(RootComponent);
 
 	// 회전 기본값 지정 
 	RotationSpeed = 20.0f;
@@ -47,7 +51,7 @@ void ARoboticVacuum::BeginPlay()
 	CheckAngle = GetActorRotation();
 	// 전원버튼 숨긴 채 시작 
 	ColorComp->SetVisibility(false);
-
+	ColorComp2->SetVisibility(false);
 }
 
 // Called every frame
@@ -76,7 +80,8 @@ void ARoboticVacuum::Tick(float DeltaTime)
 			auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 
 			if (nullptr != Ink) {
-				Ink->Initalize(FVector(-500, 0, 0));
+				Ink->MeshComp->SetVisibility(false);
+				Ink->Initalize(FVector(0, -100, 0));
 			}
 			CurrTime = 0;
 		}
@@ -98,11 +103,12 @@ void ARoboticVacuum::NotifyActorBeginOverlap(AActor* OtherActor)
 					GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ARoboticVacuum::Rotate, 0.03f, true);
 				}
 			}
-		}
 
-		if (OtherActor->IsA<AHG_Splatter>())
-		{
-			SpawnCheck ++;
+			if (OtherActor->IsA<AHG_Splatter>())
+			{
+				SpawnCheck++;
+				ColorComp2->SetVisibility(true);
+			}
 		}
 	}
 }
