@@ -46,7 +46,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 		countLv1++;
 	}
 
-	if (GameScore > 2400)
+	if (GameScore > 3600 && GameScore < 3610)
 	{	// 컷씬 영상 추가 재생방지 
 		if (countLv2 == 0) {
 		// Lv.2 기차바퀴 소환 
@@ -56,7 +56,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 		countLv2++;
 	}
 
-	if (GameScore > 3600)
+	if (GameScore > 5000 && GameScore < 5010)
 	{ 
 		if (countLv3 == 0) {
 			// Lv.3 고래모자 소환 
@@ -66,7 +66,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 		countLv3++;
 	}
 
-	if (GameScore > 4800)
+	if (GameScore > 7500 && GameScore < 7510)
 	{	// Lv.4 기차바퀴 소환 & 컷씬 영상 추가 재생방지 
 		if (countLv3 == 0) {
 			// Lv.3 고래모자 소환 
@@ -78,7 +78,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 		SpawnTrainWheel2();
 	}
 
-	if (GameScore > 5000)
+	if (GameScore > 10000 && GameScore < 10010)
 	{
 		// Lv.5 와인버튼 소환 
 		SpawnWineButton();
