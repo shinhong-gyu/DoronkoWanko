@@ -53,12 +53,13 @@ public:
 
 	// 열차 바퀴 소환 
 	void SpawnTrainWheel();
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AHJ_TrainWheel> WheelFactory;
 	FTransform Transform2;
 	// 추가 스폰 방지 
 	bool bTrainWheel1 = true;
 	// 추가 컷신 재생방지 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLv2 = false;
 	int countLv2 = 0;
 
@@ -69,6 +70,7 @@ public:
 	FTransform Transform3;
 	bool bWhaleHat = true;
 	// 추가 컷신 재생방지 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLv3 = false;
 	int countLv3 = 0;
 
@@ -77,6 +79,7 @@ public:
 	FTransform Transform4;
 	bool bTrainWheel2 = true;
 	// 추가 컷신 재생방지 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLv4 = false;
 	int countLv4 = 0;
 

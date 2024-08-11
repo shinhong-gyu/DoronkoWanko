@@ -17,9 +17,9 @@ void ADoronkoGameMode::BeginPlay()
 		ScoreBoard->AddToViewport();
 	}
 
-	// 시퀀스 UI를 생성하고 
+	//// 시퀀스 UI를 생성하고 
 	Lv1UI = Cast<UWBP_Doronko_Lv1>(CreateWidget(GetWorld(), UIFactory));
-	// 화면에 보이게 하고싶다 
+	//// 화면에 보이게 하고싶다 
 	Lv1UI->AddToViewport();
 
 	// 미디어 플레이어를 재생하고 싶다 
