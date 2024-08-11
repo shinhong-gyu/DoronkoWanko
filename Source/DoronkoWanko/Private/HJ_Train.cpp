@@ -34,12 +34,12 @@ AHJ_Train::AHJ_Train()
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// 열차 회전 변수 
-	Radius = 500.0f;
-	AngularSpeed = 2.0f;
+	Radius = 850.0f;
+	AngularSpeed = 0.8f;
 	CurrentAngle = 0.0f;
 
 	// 회전 기본값 지정 
-	RotationSpeed = 115.0f;
+	RotationSpeed = 46.0f;
 	CurrentRotationAngel = 0.0f;
 	// 위젯 문구 생성 
 	InteractionText = FText::FromString(TEXT("E) Interaction"));
@@ -62,7 +62,7 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (WheelCheck == 1)
+	/*if (WheelCheck == 1)
 	{
 		Wheel1->SetVisibility(true);
 	}
@@ -73,14 +73,14 @@ void AHJ_Train::Tick(float DeltaTime)
 	}
 
 	if (WheelCheck > 2)
-	{
+	{*/
 		SoundCheck++;
 		CurrentAngle += AngularSpeed * DeltaTime;
 		float X = Radius * FMath::Cos(CurrentAngle);
 		float Y = Radius * FMath::Sin(CurrentAngle);
 		float Z = GetActorLocation().Z;
 
-		SetActorLocation(FVector(X - 2100.f, Y - 3450.f, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
+		SetActorLocation(FVector(X - 1300.f, Y - 2500.f, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
 
 		CurrentRotationAngel += RotationSpeed * DeltaTime;
 		if (CurrentRotationAngel > 360.0f)
@@ -104,7 +104,7 @@ void AHJ_Train::Tick(float DeltaTime)
 				Ink->Initalize(FVector(-100, 0, 0));
 			}
 			CurrTime = 0;
-		}
+	/*	}*/
 	}
 
 	if (SoundCheck > 0 && SoundCheck < 2)
