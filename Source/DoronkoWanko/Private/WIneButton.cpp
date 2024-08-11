@@ -53,7 +53,7 @@ void AWIneButton::InteractionWith()
 
 void AWIneButton::Shake()
 {
-	FVector InitialVelocity = FVector(FMath::RandRange(-1200, 1200), FMath::RandRange(-1200, 1200), FMath::RandRange(-1200, 1200));
+	FVector InitialVelocity = FVector(FMath::RandRange(-1200, 1200), FMath::RandRange(-1200, 1200), FMath::RandRange(-600, 1800));
 
 	FTransform T = InkArrow->GetComponentTransform();
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);

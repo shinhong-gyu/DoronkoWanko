@@ -52,6 +52,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 		if (countLv1 == 0) {
 			SpawnWingFan();
 			bLv1 = true;
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv1++;
 	}
@@ -62,6 +63,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 		// Lv.2 기차바퀴 소환 
 		SpawnTrainWheel();
 		bLv2 = true;
+		UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv2++;
 	}
@@ -72,6 +74,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 			// Lv.3 고래모자 소환 
 			SpawnWhaleHat();
 			bLv3 = true;
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv3++;
 	}
@@ -82,6 +85,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 			// Lv.3 고래모자 소환 
 			SpawnWhaleHat();
 			bLv3 = true;
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv3++;
 		// Lv.4 기차바퀴(2) 소환 
@@ -89,7 +93,7 @@ void ADoronkoGameMode::SetScore(int32 Point)
 	}
 
 	/*if (GameScore > 10000 && GameScore < 10010)*/ // 테스트 후 복구 예정 
-	if (GameScore >= 600 && GameScore < 610)
+	if (GameScore >= 9000 && GameScore < 9010)
 	{
 		// Lv.5 와인버튼 소환 
 		SpawnWineButton();

@@ -114,14 +114,6 @@ public:
 	UPROPERTY()
 	class UWBP_Doronko_Lv4* Lv4UI;
 
-
-
-
-
-
-
-
-
-
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USoundBase* itemSFX;
 };
