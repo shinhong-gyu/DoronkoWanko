@@ -96,6 +96,28 @@ public:
 	UPROPERTY()
 	class UWBP_Doronko_Lv1* Lv1UI;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactory2;
+
+	UPROPERTY()
+	class UWBP_Doronko_Lv2* Lv2UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactory3;
+
+	UPROPERTY()
+	class UWBP_Doronko_Lv3* Lv3UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactory4;
+
+	UPROPERTY()
+	class UWBP_Doronko_Lv4* Lv4UI;
+
+
+
+
+
 
 
 

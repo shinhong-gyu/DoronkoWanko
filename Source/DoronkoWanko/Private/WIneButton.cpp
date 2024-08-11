@@ -3,12 +3,17 @@
 
 #include "WIneButton.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/ArrowComponent.h"
+#include "HG_Splatter.h"
 
 // Sets default values
 AWIneButton::AWIneButton()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
+	InkArrow->SetupAttachment(RootComponent);
 
 	Red = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Red"));
 	Red->SetupAttachment(RootComponent);
@@ -38,7 +43,24 @@ void AWIneButton::InteractionWith()
 	Red->SetVisibility(true);
 	MeshComp->SetVisibility(true);
 
+	for (int i = 0; i < 500; i++) {
+		Shake();
+	}
+
 	// 물감 터뜨리기 or 와인거치대 기울여서 떨어뜨리기 
 	// 기능 확정된 후 추가 함수 기재하기 
+}
+
+void AWIneButton::Shake()
+{
+	FVector InitialVelocity = FVector(FMath::RandRange(-1200, 1200), FMath::RandRange(-1200, 1200), FMath::RandRange(-1200, 1200));
+
+	FTransform T = InkArrow->GetComponentTransform();
+	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+
+	if (nullptr != Ink) {
+		Ink->MeshComp->SetVisibility(false);
+		Ink->Initalize(InitialVelocity);
+	}
 }
 

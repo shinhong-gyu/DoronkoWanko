@@ -35,4 +35,14 @@ public:
 
 	void InteractionWith() override;
 
+	// 페인트 스폰 
+
+	void Shake();
+
+	UPROPERTY(EditAnywhere)
+	class UArrowComponent* InkArrow;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHG_Splatter> InkFactory;
+
 };

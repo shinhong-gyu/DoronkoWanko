@@ -6,6 +6,9 @@
 #include "HJ_ElectricFan.h"
 #include "Kismet/GameplayStatics.h"
 #include "WBP_Doronko_Lv1.h"
+#include "WBP_Doronko_Lv2.h"
+#include "WBP_Doronko_Lv3.h"
+#include "WBP_Doronko_Lv4.h"
 
 void ADoronkoGameMode::BeginPlay()
 {
@@ -22,8 +25,15 @@ void ADoronkoGameMode::BeginPlay()
 	//// 화면에 보이게 하고싶다 
 	Lv1UI->AddToViewport();
 
-	// 미디어 플레이어를 재생하고 싶다 
-	/*Lv1UI->OpenSource*/
+	Lv2UI = Cast<UWBP_Doronko_Lv2>(CreateWidget(GetWorld(), UIFactory2));
+	Lv2UI->AddToViewport();
+
+	Lv3UI = Cast<UWBP_Doronko_Lv3>(CreateWidget(GetWorld(), UIFactory3));
+	Lv3UI->AddToViewport();
+
+	Lv4UI = Cast<UWBP_Doronko_Lv4>(CreateWidget(GetWorld(), UIFactory4));
+	Lv4UI->AddToViewport();
+
 }
 
 void ADoronkoGameMode::PlayBGM()
@@ -78,7 +88,8 @@ void ADoronkoGameMode::SetScore(int32 Point)
 		SpawnTrainWheel2();
 	}
 
-	if (GameScore > 10000 && GameScore < 10010)
+	/*if (GameScore > 10000 && GameScore < 10010)*/ // 테스트 후 복구 예정 
+	if (GameScore >= 600 && GameScore < 610)
 	{
 		// Lv.5 와인버튼 소환 
 		SpawnWineButton();
