@@ -60,7 +60,7 @@ void AHJ_WhaleHat::SpawnInk()
 {
 	// 물감 스폰하기 (정수리에서 Ink 가 Spawn 되도록)
 
-	FVector InitialVelocity = FVector(FMath::RandRange(-50, 50), FMath::RandRange(-50, 50), FMath::RandRange(600, 800));
+	FVector InitialVelocity = FVector(FMath::RandRange(-50, 50), FMath::RandRange(-50, 50), FMath::RandRange(800, 1000));
 
 	FTransform T = InkArrow->GetComponentTransform();
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);

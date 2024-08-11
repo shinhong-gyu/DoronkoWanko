@@ -82,7 +82,7 @@ public:
 	float CurrTime = 0;
 	
 	UPROPERTY(EditAnywhere)
-	float MakeTime = 0.3f;
+	float MakeTime = 0.2f;
 
 	// 기차 효과음 
 	UPROPERTY(EditAnywhere)
