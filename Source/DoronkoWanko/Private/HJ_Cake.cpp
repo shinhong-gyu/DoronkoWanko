@@ -12,7 +12,7 @@ AHJ_Cake::AHJ_Cake()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 困连 巩备 积己 
-	InteractionText = FText::FromString(TEXT("E) Ending"));
+	InteractionText = FText::FromString(TEXT("Ending"));
 
 }
 

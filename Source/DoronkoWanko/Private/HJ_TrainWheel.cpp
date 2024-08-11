@@ -20,7 +20,7 @@ AHJ_TrainWheel::AHJ_TrainWheel()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(BoxComp);*/
 
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
+	InteractionText = FText::FromString(TEXT("PRESS"));
 
 }
 

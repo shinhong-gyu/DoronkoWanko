@@ -42,7 +42,7 @@ AHJ_Train::AHJ_Train()
 	RotationSpeed = 46.0f;
 	CurrentRotationAngel = 0.0f;
 	// 困连 巩备 积己 
-	InteractionText = FText::FromString(TEXT("E) Interaction"));
+	InteractionText = FText::FromString(TEXT("Interaction"));
 }
 
 // Called when the game starts or when spawned

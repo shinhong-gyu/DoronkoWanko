@@ -16,7 +16,7 @@ AHJ_Wine1::AHJ_Wine1()
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// 困连 巩备 积己 
-	InteractionText = FText::FromString(TEXT("E) INTERACTION"));
+	InteractionText = FText::FromString(TEXT("INTERACTION"));
 
 }
 

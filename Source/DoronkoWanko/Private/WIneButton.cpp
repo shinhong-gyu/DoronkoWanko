@@ -21,7 +21,7 @@ AWIneButton::AWIneButton()
 	Red->SetVisibility(false);
 
 	// 困连 巩备 积己 
-	InteractionText = FText::FromString(TEXT("E) Interaction"));
+	InteractionText = FText::FromString(TEXT("Interaction"));
 }
 
 // Called when the game starts or when spawned

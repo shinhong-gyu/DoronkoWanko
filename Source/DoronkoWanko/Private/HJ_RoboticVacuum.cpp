@@ -36,7 +36,7 @@ ARoboticVacuum::ARoboticVacuum()
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionProfileName(TEXT("MapObject"));
 	// 困连 巩备 积己 
-	InteractionText = FText::FromString(TEXT("E) Interaction"));
+	InteractionText = FText::FromString(TEXT("Interaction"));
 
 	// 其牢飘 胶迄 Arrow 积己 
 	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
