@@ -25,6 +25,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void ItemDrop() override;
+
 	// MasterInteraction 에서 정의 
 	/*UPROPERTY(EditAnywhere)
 	class UBoxComponent* BoxComp;

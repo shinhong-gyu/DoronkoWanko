@@ -78,4 +78,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> InkFactory;
+
+	// 没家扁 累悼 家府 
+	UPROPERTY(EditAnywhere)
+	class USoundBase* VacuumSFX;
 };

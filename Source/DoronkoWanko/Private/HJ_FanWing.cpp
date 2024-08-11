@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
 #include "HJ_FanWingSplatter.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AHJ_FanWing::AHJ_FanWing()
@@ -55,6 +56,7 @@ void AHJ_FanWing::InteractionWith()
 
     if (bTurnOn)
     {
+        UGameplayStatics::PlaySound2D(GetWorld(), FanWingSFX);
         SpawnedSplatter = GetWorld()->SpawnActor<AHJ_FanWingSplatter>(WingSplatter, WingArrow->GetComponentTransform());
     }
     else

@@ -38,3 +38,8 @@ void AHJ_TrainWheel::Tick(float DeltaTime)
 
 }
 
+void AHJ_TrainWheel::ItemDrop()
+{
+	//this->Destroy();
+}
+

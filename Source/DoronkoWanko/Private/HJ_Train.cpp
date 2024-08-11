@@ -29,6 +29,10 @@ AHJ_Train::AHJ_Train()
 	Wheel1->SetVisibility(false);
 	Wheel2->SetVisibility(false);
 
+	// 충돌체 처리
+	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	// 열차 회전 변수 
 	Radius = 500.0f;
 	AngularSpeed = 2.0f;
@@ -48,6 +52,9 @@ void AHJ_Train::BeginPlay()
 
 	// 플레이어 캐스트 
 	GW_Player = Cast<AGW_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+
+	// 기차 바퀴 캐스트
+	CurrentWheel = Cast<AHJ_TrainWheel>(UGameplayStatics::GetActorOfClass(GetWorld(), WheelFactory));
 }
 
 // Called every frame
@@ -55,18 +62,19 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (WheelCheck == 5)
+	if (WheelCheck == 1)
 	{
 		Wheel1->SetVisibility(true);
 	}
 
-	if (WheelCheck == 10)
+	if (WheelCheck == 2)
 	{
 		Wheel2->SetVisibility(true);
 	}
 
-	if (WheelCheck > 10)
+	if (WheelCheck > 2)
 	{
+		SoundCheck++;
 		CurrentAngle += AngularSpeed * DeltaTime;
 		float X = Radius * FMath::Cos(CurrentAngle);
 		float Y = Radius * FMath::Sin(CurrentAngle);
@@ -92,16 +100,45 @@ void AHJ_Train::Tick(float DeltaTime)
 			auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 
 			if (nullptr != Ink) {
+				Ink->MeshComp->SetVisibility(false);
 				Ink->Initalize(FVector(-100, 0, 0));
 			}
 			CurrTime = 0;
 		}
 	}
+
+	if (SoundCheck > 0 && SoundCheck < 2)
+	{
+		playSFX();
+	}
 }
+
+void AHJ_Train::playSFX()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), TrainSFX);
+}
+
+void AHJ_Train::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	// 바퀴가 함께 충돌할 때만 상호작용 가능 
+	if (OtherActor->IsA<AHJ_TrainWheel>())
+	{
+		AbleInteract = true;
+		// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
+		OtherActor->Destroy();
+	}
+}
+
 
 void AHJ_Train::InteractionWith()
 {
-	WheelCheck += 1;
+	if (AbleInteract)
+	{
+		WheelCheck += 1;
+		// 열차 바퀴를 파괴하는 함수 필요 
+		/*CurrentWheel->Destroy();*/
+		AbleInteract = false;
+	}
 }
 
 void AHJ_Train::ItemDrop()

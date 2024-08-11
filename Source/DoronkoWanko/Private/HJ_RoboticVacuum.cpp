@@ -74,15 +74,15 @@ void ARoboticVacuum::Tick(float DeltaTime)
 
 		if (CurrTime > MakeTime)
 		{
-			/*FTransform T = InkArrow->GetComponentTransform();
+			FTransform T = InkArrow->GetComponentTransform();
 			auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 
 			if (nullptr != Ink) {
 				Ink->MeshComp->SetVisibility(false);
-				Ink->Initalize(FVector(0, -50, 0));*/
+				Ink->Initalize(FVector(0, -50, 0));
 				SpawnTimeCheck++;
-				/*	}
-					CurrTime = 0;*/
+			}
+			CurrTime = 0;
 		}
 		// 10초 이상 지나면 정지 
 		if (SpawnTimeCheck > 50)
@@ -116,7 +116,7 @@ void ARoboticVacuum::NotifyActorBeginOverlap(AActor* OtherActor)
 			if (OtherActor->IsA<AHG_Splatter>())
 			{
 				SpawnCheck++;	StopCheck = 0;
-				/*ColorComp2->SetVisibility(true);*/
+				ColorComp2->SetVisibility(true);
 			}
 		}
 	}
@@ -141,6 +141,7 @@ void ARoboticVacuum::InteractionWith()
 {
 	bTurnOn = true;
 	ColorComp->SetVisibility(true);
+	UGameplayStatics::PlaySound2D(GetWorld(), VacuumSFX);
 
 	if (!GetWorld()->GetTimerManager().IsTimerActive(TimerHandle))
 	{
