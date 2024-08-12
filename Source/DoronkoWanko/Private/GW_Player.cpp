@@ -270,11 +270,6 @@ void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
 		{
 			DirtPercentage = 100.0f;
 		}
-		FString DirtMessage = FString::Printf(TEXT("Dirt Percentage: %d%%"), static_cast<int32>(DirtPercentage));
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DirtMessage);
-		}
 	}
 
 }
@@ -302,24 +297,13 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 		{
 			DirtPercentage = 0.0f;
 		}
-		FString DirtMessage = FString::Printf(TEXT("Dirt Percentage: %d%%"), static_cast<int32>(DirtPercentage));
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, DirtMessage);
-		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
 		for (int i = 0; i < NumberOfSplatter; i++) {
 			Shake();
 		}
 	}
-	else
-	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot shake: Dirt percentage is 0%"));
-		}
-	}
+	else return;
 
 
 }
