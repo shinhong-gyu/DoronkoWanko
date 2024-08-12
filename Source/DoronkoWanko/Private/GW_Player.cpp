@@ -476,6 +476,7 @@ void AGW_Player::HandleMasterItemAttachment(AActor* ObjectToAttach)
 
 void AGW_Player::HandleStaticObjectAttachment(AActor* ObjectToAttach)
 {
+	UE_LOG(LogTemp,Warning,TEXT("1"));
 	// Drop existing DynamicObject if attached
 	if (AttachedStaticObject != nullptr)
 	{
