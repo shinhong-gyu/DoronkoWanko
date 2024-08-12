@@ -32,7 +32,7 @@ AGW_Player::AGW_Player()
 	ZoomSpeed = 75.0f;
 	MinArmLength = 50.0f;
 	MaxArmLength = 1000.0f;
-	DirtPercentage = 0.0f;
+	DirtPercentage = 20.0f;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
