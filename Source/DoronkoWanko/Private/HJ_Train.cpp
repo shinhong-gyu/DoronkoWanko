@@ -123,26 +123,31 @@ void AHJ_Train::playSFX()
 
 void AHJ_Train::NotifyActorBeginOverlap(AActor* OtherActor)
 {
+	if (OtherActor->IsA<AGW_Player>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
+	}
 	 //바퀴가 함께 충돌할 때만 상호작용 가능 
-	//UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
-	//if (OtherActor->IsA<AHJ_TrainWheel>())
-	//{
-	//	AbleInteract = true;
-	//	// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
-	//	OtherActor->Destroy();
-	//}
-}
+	/*UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));*/
 
-void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	
-	UE_LOG(LogTemp, Warning, TEXT("12 %s"),*OtherActor->GetClass()->GetName());
 	if (OtherActor->IsA<AHJ_TrainWheel>())
 	{
 		AbleInteract = true;
 		// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
 		OtherActor->Destroy();
 	}
+}
+
+void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	
+	//UE_LOG(LogTemp, Warning, TEXT("12 %s"),*OtherActor->GetClass()->GetName());
+	//if (OtherActor->IsA<AHJ_TrainWheel>())
+	//{
+	//	AbleInteract = true;
+	//	// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
+	//	OtherActor->Destroy();
+	//}
 }
 
 
