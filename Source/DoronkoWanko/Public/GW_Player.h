@@ -170,7 +170,7 @@ public:
 	TSubclassOf<class UHG_EnterInstruction> WidgetFactory;
 
 	UPROPERTY(EditAnywhere)
-	class UHG_EnterInstruction* EnterWidget;
+	class UHG_EnterInstruction* EnterWidget = nullptr;
 	// 플레이어가 현재 위치한 방
 	UPROPERTY(EditAnywhere)
 	EPlayerRoomState LocState = EPlayerRoomState::LIVINGROOM;

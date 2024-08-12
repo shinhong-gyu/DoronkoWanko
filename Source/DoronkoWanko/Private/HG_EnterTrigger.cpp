@@ -43,8 +43,8 @@ void AHG_EnterTrigger::EnterTriggered()
 		UE_LOG(LogTemp, Warning, TEXT("Player"));
 		if (RoomSelf != Player->LocState) {
 			UE_LOG(LogTemp, Warning, TEXT("Roomself"));
-			Player->SetLocState(RoomSelf);
 			if (Player->EnterWidget == nullptr) {
+				Player->SetLocState(RoomSelf);
 				UE_LOG(LogTemp,Warning,TEXT("Player->EnterWidget == nullptr"));
 				Player->EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), Player->WidgetFactory);
 				if (Player->EnterWidget) {
@@ -54,7 +54,6 @@ void AHG_EnterTrigger::EnterTriggered()
 				}
 			}
 			else {
-
 				UE_LOG(LogTemp, Warning, TEXT("else"));
 				Player->EnterWidget->RemoveFromParent();
 				Player->EnterWidget = nullptr;

@@ -114,9 +114,27 @@ void AGW_Player::Tick(float DeltaTime)
 			Interface->FadeAway();
 			LookAtActor = nullptr;
 		}
-
 	}
-
+// 	switch (LocState)
+// 	{
+// 	case EPlayerRoomState::KITCHEN:
+// 		UE_LOG(LogTemp, Warning, TEXT("1"));
+// 		break;
+// 	case EPlayerRoomState::LIVINGROOM:
+// 		UE_LOG(LogTemp, Warning, TEXT("2"));
+// 		break;
+// 	case EPlayerRoomState::BASEMENTLIVINGROOM:
+// 		UE_LOG(LogTemp, Warning, TEXT("3"));
+// 		break;
+// 	case EPlayerRoomState::WINECELLAR:
+// 		UE_LOG(LogTemp, Warning, TEXT("4"));
+// 		break;
+// 	case EPlayerRoomState::NURSERY:
+// 		UE_LOG(LogTemp, Warning, TEXT("5"));
+// 		break;
+// 	default:
+// 		break;
+// 	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
 
@@ -142,8 +160,6 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Dirt, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDirtStart);
 		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirtOngoing);
 		input->BindAction(IA_Dirt, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDirtEnd);
-
-
 	}
 
 }
@@ -518,15 +534,17 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 	default:
 		break;
 	}
-
-	if (EnterWidget != nullptr) {
-		EnterWidget->SetText(TempText);
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("gdgd"));
-		EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), WidgetFactory);
-		EnterWidget->SetText(TempText);
-		EnterWidget->AddToViewport();
+	if (EnterWidget) {
+		if (EnterWidget->LifeTime > 0) {
+			EnterWidget->SetText(TempText);
+			EnterWidget->LifeTime = 2.0f;
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("gdgd"));
+			EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), WidgetFactory);
+			EnterWidget->SetText(TempText);
+			EnterWidget->AddToViewport();
+		}
 	}
 	LocState = Loc;
 }
