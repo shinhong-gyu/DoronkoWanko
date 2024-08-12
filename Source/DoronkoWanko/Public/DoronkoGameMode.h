@@ -28,7 +28,7 @@ public:
 	FTimerHandle BGMHandler;
 
 	// 점수 UI 
-	int32 GameScore = 0;
+	int32 GameScore = 0; // 변경 필요 
 
 	void SetScore(int32 Point);
 
