@@ -30,6 +30,7 @@ AHJ_Train::AHJ_Train()
 	Wheel2->SetVisibility(false);
 
 	// 충돌체 처리
+	BoxComp->SetGenerateOverlapEvents(true);
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -55,6 +56,8 @@ void AHJ_Train::BeginPlay()
 
 	// 기차 바퀴 캐스트
 	CurrentWheel = Cast<AHJ_TrainWheel>(UGameplayStatics::GetActorOfClass(GetWorld(), WheelFactory));
+
+	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AHJ_Train::OnOverlapBegin);
 }
 
 // Called every frame
@@ -120,10 +123,22 @@ void AHJ_Train::playSFX()
 
 void AHJ_Train::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	// 바퀴가 함께 충돌할 때만 상호작용 가능 
+	 //바퀴가 함께 충돌할 때만 상호작용 가능 
+	//UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
+	//if (OtherActor->IsA<AHJ_TrainWheel>())
+	//{
+	//	AbleInteract = true;
+	//	// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
+	//	OtherActor->Destroy();
+	//}
+}
+
+void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	
+	UE_LOG(LogTemp, Warning, TEXT("12 %s"),*OtherActor->GetClass()->GetName());
 	if (OtherActor->IsA<AHJ_TrainWheel>())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
 		AbleInteract = true;
 		// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
 		OtherActor->Destroy();
