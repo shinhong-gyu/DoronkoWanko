@@ -15,5 +15,6 @@ void UHG_EnterInstruction::NativeTick(const FGeometry& MyGeometry, float InDelta
 
 void UHG_EnterInstruction::SetText(FText Name)
 {
+	UE_LOG(LogTemp,Warning,TEXT("aaaa"));
 	RoomName->SetText(Name);
 }

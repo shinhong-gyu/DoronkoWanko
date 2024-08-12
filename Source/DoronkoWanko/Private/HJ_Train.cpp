@@ -123,6 +123,7 @@ void AHJ_Train::NotifyActorBeginOverlap(AActor* OtherActor)
 	// 바퀴가 함께 충돌할 때만 상호작용 가능 
 	if (OtherActor->IsA<AHJ_TrainWheel>())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
 		AbleInteract = true;
 		// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
 		OtherActor->Destroy();

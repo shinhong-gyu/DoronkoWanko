@@ -11,6 +11,17 @@
 #include "DynamicObject.h"
 #include "GW_Player.generated.h"
 
+UENUM(BlueprintType)
+enum class EPlayerRoomState : uint8
+{
+   KITCHEN,
+   LIVINGROOM,
+   BASEMENTLIVINGROOM,
+   WINECELLAR,
+   NURSERY,
+};
+
+
 UCLASS()
 class DORONKOWANKO_API AGW_Player : public ACharacter
 {
@@ -24,7 +35,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -33,25 +44,25 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
-    float TargetArmLength = 300.0f;
+	float TargetArmLength = 300.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
-    float ZoomSpeed = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
+	float ZoomSpeed = 100.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
-    float MinArmLength = 50.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
+	float MinArmLength = 50.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
-    float MaxArmLength = 1000.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
+	float MaxArmLength = 1000.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	class USpringArmComponent* SpringArmComp;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	class UCameraComponent* CameraComp;
 
 
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	class UInputMappingContext* IMC_Player;
 
@@ -60,7 +71,7 @@ public:
 	void OnMyActionMove(const FInputActionValue& Value);
 
 	FVector Direction;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Look;
 
@@ -70,7 +81,7 @@ public:
 	class UInputAction* IA_Jump;
 
 	void OnMyActionJump(const FInputActionValue& Value);
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Zoom;
 	void OnMyActionZoom(const FInputActionValue& Value);
@@ -85,9 +96,9 @@ public:
 	TSubclassOf<class AHG_Splatter> SplatterFactory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    float DashSpeed = 600.0f;
+	float DashSpeed = 600.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    float WalkSpeed = 500.0f;
+	float WalkSpeed = 500.0f;
 
 public:
 	AActor* LookAtActor = nullptr;
@@ -107,27 +118,27 @@ public:
 
 	void OnMyActionSplash(const FInputActionValue& Value);
 
-		UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Interaction;
 
-		UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Drop;
 
 	void OnMyActionInteraction(const FInputActionValue& Value);
 
 
 	void OnMyActionDrop(const FInputActionValue& Value);
-	
-	void attachStaticicObject(AActor* ObjectToAttach) ;
 
-	 UPROPERTY()
-    class AActor* AttachedMasterItem;
+	void attachStaticicObject(AActor* ObjectToAttach);
 
-    UPROPERTY()
-    class AActor* AttachedStaticObject;
+	UPROPERTY()
+	class AActor* AttachedMasterItem;
 
-    UPROPERTY()
-    class AActor* OverlappingObject;
+	UPROPERTY()
+	class AActor* AttachedStaticObject;
+
+	UPROPERTY()
+	class AActor* OverlappingObject;
 
 
 
@@ -135,7 +146,7 @@ public:
 	void dropObject(AActor* ObjectToDrop);
 	void HandleMasterItemAttachment(AActor* ObjectToAttach);
 	void HandleStaticObjectAttachment(AActor* ObjectToAttach);
-	
+
 	float DirtPercentage;
 
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -143,16 +154,27 @@ public:
 	float MakeTime = 0.5;
 	float CurrentTime = 0;
 
-//Animation
-UPROPERTY()
-class UPlayerAnimInstance* Anim;
+	//Animation
+	UPROPERTY()
+	class UPlayerAnimInstance* Anim;
 
-bool bIsRightMouseDown;
+	bool bIsRightMouseDown;
 
-UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-class USoundBase* Bite;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class USoundBase* Bite;
 
-UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-class USoundBase* Drop;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class USoundBase* Drop;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UHG_EnterInstruction> WidgetFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UHG_EnterInstruction* EnterWidget;
+	// 플레이어가 현재 위치한 방
+	UPROPERTY(EditAnywhere)
+	EPlayerRoomState LocState = EPlayerRoomState::LIVINGROOM;
+
+	// 방이 바뀔 때 마다 LocState를 업데이트 하는 함수
+	void SetLocState(EPlayerRoomState Loc);
 };

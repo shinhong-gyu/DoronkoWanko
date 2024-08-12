@@ -38,9 +38,11 @@ void AHG_EnterTrigger::Tick(float DeltaTime)
 
 void AHG_EnterTrigger::EnterTriggered()
 {
-	/*auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	if (Player) {
+		UE_LOG(LogTemp, Warning, TEXT("Player"));
 		if (RoomSelf != Player->LocState) {
+			UE_LOG(LogTemp, Warning, TEXT("Roomself"));
 			Player->SetLocState(RoomSelf);
 			if (Player->EnterWidget == nullptr) {
 				UE_LOG(LogTemp,Warning,TEXT("Player->EnterWidget == nullptr"));
@@ -52,19 +54,21 @@ void AHG_EnterTrigger::EnterTriggered()
 				}
 			}
 			else {
+
+				UE_LOG(LogTemp, Warning, TEXT("else"));
 				Player->EnterWidget->RemoveFromParent();
 				Player->EnterWidget = nullptr;
 				EnterTriggered();
 			}
 		}
-	}*/
+	}
 
 }
 
 void AHG_EnterTrigger::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//if (OtherActor->IsA<AGW_Player>()) {
-	//	EnterTriggered();
-	//}
+	if (OtherActor->IsA<AGW_Player>()) {
+		EnterTriggered();
+	}
 }
 

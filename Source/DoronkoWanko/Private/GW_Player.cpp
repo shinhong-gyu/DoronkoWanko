@@ -21,6 +21,7 @@
 #include "MasterItem.h"
 #include "PlayerAnimInstance.h"
 #include "StaticObject.h"
+#include "HG_EnterInstruction.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -503,6 +504,31 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	// 		OverlappingDObject = dObject;
 	// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
 	// 	}
+}
+void AGW_Player::SetLocState(EPlayerRoomState Loc)
+{
+	FText TempText;
+	switch (Loc)
+	{
+	case EPlayerRoomState::KITCHEN:   TempText = FText::FromString(TEXT("Kitchen"));   break;
+	case EPlayerRoomState::LIVINGROOM:   TempText = FText::FromString(TEXT("Living Room"));      break;
+	case EPlayerRoomState::BASEMENTLIVINGROOM:   TempText = FText::FromString(TEXT("Basement Living Room"));      break;
+	case EPlayerRoomState::WINECELLAR: TempText = FText::FromString(TEXT("Wine Cellar"));      break;
+	case EPlayerRoomState::NURSERY:   TempText = FText::FromString(TEXT("Nursery"));      break;
+	default:
+		break;
+	}
+
+	if (EnterWidget != nullptr) {
+		EnterWidget->SetText(TempText);
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("gdgd"));
+		EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), WidgetFactory);
+		EnterWidget->SetText(TempText);
+		EnterWidget->AddToViewport();
+	}
+	LocState = Loc;
 }
 
 // void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
