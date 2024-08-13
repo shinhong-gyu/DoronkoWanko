@@ -14,6 +14,7 @@
 #include "HG_MissonStamp.h"
 #include "GameFramework/Actor.h"
 #include "HJ_RoboticVacuum.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
 AHG_Splatter::AHG_Splatter()
@@ -49,7 +50,6 @@ void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AHG_Splatter::OnMyBeginOverlap);
-	SphereComp->OnComponentHit.AddDynamic(this, &AHG_Splatter::OnMyHit);
 }
 
 // Called every frame
@@ -110,28 +110,22 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		//DrawDebugLine(GetWorld(), hitInfo.ImpactPoint, (hitInfo.ImpactNormal * 10000.0f), FColor::Blue, false, 10000.0f);
 		//GetWorld()->SpawnActor<AActor>(NormalArrow, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator());
 
-		float RandRotZ = FMath::FRandRange(0.0f, 360.0f);
-
-		//Decal->AddRelativeRotation(FRotator(0,0,RandRotZ));
+		if (Decal) {
+			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Decal->GetDecalMaterial(), this);
+			if (DynamicMaterial) {
+				DynamicMaterial->SetVectorParameterValue("Color", MyColor);
+				Decal->SetDecalMaterial(DynamicMaterial);
+			}
+		}
 	}
 	TArray<AHG_MissonStamp*> StampArray = IsStampInRange(hitInfo.ImpactPoint,RandNum,RandNum);
 	if (StampArray.Num() != 0) {
 		for (auto s : StampArray) {
 			s->Decal->SetVisibility(true);
+			GM->StampCount++;
 		}
 	}
 
-}
-void AHG_Splatter::OnMyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	this->Destroy();
-	FVector SpawnLocation = GetActorLocation();
-	FRotator SpawnRoation = UKismetMathLibrary::MakeRotFromX(Hit.ImpactNormal);
-	float RandNum = FMath::FRandRange(100.0f, 150.0f);
-	UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-15.0f, RandNum, RandNum), OtherComp, NAME_None, SpawnLocation, SpawnRoation, EAttachLocation::KeepWorldPosition);
-	if (Decal) {
-		Decal->AddRelativeRotation(FRotator(FMath::FRandRange(0.0f, 360.0f), 0, 0));
-	}
 }
 
 
@@ -165,5 +159,10 @@ TArray<AHG_MissonStamp*> AHG_Splatter::IsStampInRange(FVector Pos, float Param1,
 		}
 	}
 	return Result;
+}
+
+void AHG_Splatter::SetMyColor(FLinearColor Value)
+{
+	MyColor = Value;
 }
 

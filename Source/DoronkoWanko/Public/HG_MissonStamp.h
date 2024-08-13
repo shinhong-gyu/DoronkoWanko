@@ -28,4 +28,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UMaterial* DecalMaterial;
+
+
+	UPROPERTY(EditAnywhere)
+	int32 StampID;
 };

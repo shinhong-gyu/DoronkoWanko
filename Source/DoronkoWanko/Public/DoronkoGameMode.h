@@ -83,11 +83,14 @@ public:
 	bool bLv4 = false;
 	int countLv4 = 0;
 
+	int StampCount = 0;
+
 	// 와인버튼 소환 
 	void SpawnWineButton();
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AWIneButton> ButtonFactory;
 	FTransform Transform5;
+
 
 	// 시퀀스 UI 소환 
 	UPROPERTY(EditAnywhere)

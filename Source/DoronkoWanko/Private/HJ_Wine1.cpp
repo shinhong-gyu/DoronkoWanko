@@ -42,11 +42,11 @@ void AHJ_Wine1::SpawnInk()
 	if (check < 20)
 	{
 	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, Vec, Rot);
-	
 		if (Ink)
 		{
 			FVector InitialVelocity = FVector(FMath::RandRange(-10, 10), FMath::RandRange(-10, 10), FMath::RandRange(100, 150));
 			Ink->Initalize(InitialVelocity);
+			Ink->SetMyColor(FColor::Purple);
 		}
 	}
 

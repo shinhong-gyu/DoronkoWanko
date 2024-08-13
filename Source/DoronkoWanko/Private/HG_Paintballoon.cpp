@@ -7,6 +7,7 @@
 #include "Engine/StaticMesh.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GW_Player.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
 AHG_Paintballoon::AHG_Paintballoon()
@@ -41,12 +42,22 @@ void AHG_Paintballoon::InteractionWith()
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
 	if(Widget != nullptr) Widget->RemoveFromParent();
+	UMaterialInterface* MaterialInterface = MeshComp->GetMaterial(0);
+	if (MaterialInterface) {
+		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(MaterialInterface);
+		if (!DynamicMaterial) {
+			DynamicMaterial = UMaterialInstanceDynamic::Create(MaterialInterface,this);
+		}
+		FName ParameterName = "Color";
+		DynamicMaterial->GetVectorParameterValue(ParameterName, MyColor);
+	}
 	Destroy();
 	for (int i = 0; i < 5; i++) {
 		InitialVelocity = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), FMath::RandRange(300, 600));
 		auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
 		if (Splatter) {
 			Splatter->Initalize(InitialVelocity);
+			Splatter->SetMyColor(MyColor);
 		}
 		auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (Player) {

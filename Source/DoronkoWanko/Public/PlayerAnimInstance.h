@@ -7,7 +7,7 @@
 #include "PlayerAnimInstance.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class DORONKOWANKO_API UPlayerAnimInstance : public UAnimInstance
@@ -24,23 +24,23 @@ public:
 	//Horizontal
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float Direction;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool IsInAir;
 
 	void PlaySplashMontage();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-class UAnimMontage* SplashMontage;
+	class UAnimMontage* SplashMontage;
 
-// PlayerAnimInstance.h
-// UPROPERTY(EditAnywhere, BlueprintReadWrite)
-// bool bIsSplashing;
-// 
+	// PlayerAnimInstance.h
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// bool bIsSplashing;
+	// 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-class UAnimMontage* RubMontage;
+	class UAnimMontage* RubMontage;
 
-void PlayRubMontage();
+	void PlayRubMontage();
 
 
 };
