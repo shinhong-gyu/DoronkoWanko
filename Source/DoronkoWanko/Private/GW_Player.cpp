@@ -233,14 +233,22 @@ void AGW_Player::Shake()
 
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
+		int RandInt = FMath::RandRange(1,2);
+		if (RandInt == 1) {
+			Splatter->SetMyColor(FLinearColor::Red);
+		}
+		else {
+			Splatter->SetMyColor(FLinearColor::White);
+		}
+		
 	}
 
 	
 }
 void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
-// 	FColor NewColor = FColor::MakeRandomColor();
-// 	ColorArray.Add(NewColor);
+	FColor NewColor = FColor::MakeRandomColor();
+	ColorArray.Add(NewColor);
 
 // 	if (GEngine)
 // 	{
