@@ -8,7 +8,7 @@
 // Sets default values
 AHJ_Wine1::AHJ_Wine1()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 충돌체 설정
@@ -16,8 +16,8 @@ AHJ_Wine1::AHJ_Wine1()
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// 위젯 문구 생성 
-	InteractionText = FText::FromString(TEXT("E) INTERACTION"));
-	
+	InteractionText = FText::FromString(TEXT("INTERACTION"));
+
 }
 
 // Called when the game starts or when spawned
@@ -31,25 +31,30 @@ void AHJ_Wine1::BeginPlay()
 void AHJ_Wine1::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	Vec = MeshComp->GetComponentLocation();
+	Rot = MeshComp->GetComponentRotation();
 }
 
 void AHJ_Wine1::SpawnInk()
 {
-	FVector Location = GetActorLocation();
-	FRotator Rotation = GetActorRotation();
-	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, Location, Rotation);
-	if (Ink)
+	// 한 번 와인 흘린 뒤, 또 쳐도 작동 안하도록 
+	if (check < 20)
 	{
-		FVector InitialVelocity = FVector(FMath::RandRange(-10, 10), FMath::RandRange(-10, 10), FMath::RandRange(100, 150));
-		Ink->Initalize(InitialVelocity);
+	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, Vec, Rot);
+		if (Ink)
+		{
+			FVector InitialVelocity = FVector(FMath::RandRange(-10, 10), FMath::RandRange(-10, 10), FMath::RandRange(100, 150));
+			Ink->Initalize(InitialVelocity);
+			Ink->SetMyColor(FColor::Purple);
+		}
 	}
 
-	/*Check += 4;
-	if (Check >= 20)
+	check += 4;
+	if (check >= 20)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-		Check = 0;
-	}*/
+	}
 }
 
 void AHJ_Wine1::InteractionWith()

@@ -17,7 +17,7 @@ AHJ_CoffeeCup::AHJ_CoffeeCup()
 
 
 	// 困连 巩备 积己 
-	InteractionText = FText::FromString(TEXT("E) INTERACTION"));
+	InteractionText = FText::FromString(TEXT("INTERACTION"));
 
 }
 

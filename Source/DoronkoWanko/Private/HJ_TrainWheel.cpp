@@ -20,7 +20,7 @@ AHJ_TrainWheel::AHJ_TrainWheel()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(BoxComp);*/
 
-	InteractionText = FText::FromString(TEXT("E) PRESS"));
+	InteractionText = FText::FromString(TEXT("PRESS"));
 
 }
 
@@ -36,5 +36,10 @@ void AHJ_TrainWheel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AHJ_TrainWheel::ItemDrop()
+{
+	//this->Destroy();
 }
 

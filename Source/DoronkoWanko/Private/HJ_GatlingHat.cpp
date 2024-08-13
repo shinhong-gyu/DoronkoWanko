@@ -24,7 +24,7 @@ AHJ_GatlingHat::AHJ_GatlingHat()
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
 
 	// À§Á¬ »ý¼º 
-	InteractionText = FText::FromString(TEXT("E) PUT ON"));
+	InteractionText = FText::FromString(TEXT("PUT ON"));
 
 }
 

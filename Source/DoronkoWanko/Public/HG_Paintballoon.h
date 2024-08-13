@@ -11,8 +11,8 @@ UCLASS()
 class DORONKOWANKO_API AHG_Paintballoon : public ADynamicObject
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AHG_Paintballoon();
 
@@ -20,15 +20,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 	UFUNCTION()
 	virtual void InteractionWith();
-	
+
 	UPROPERTY(EditAnywhere)
-	FColor PaintColor = FColor::Red;
+	FLinearColor MyColor;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> SplatterFactory;

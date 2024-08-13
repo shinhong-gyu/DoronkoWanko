@@ -7,6 +7,7 @@
 #include "DynamicObject.h"
 #include "GW_Player.h"
 #include "HG_Splatter.h"
+#include "HJ_TrainWheel.h"
 #include "HJ_Train.generated.h"
 
 UCLASS()
@@ -25,6 +26,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
+
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	bool AbleInteract = false;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* Wheel1;
@@ -78,7 +84,13 @@ public:
 	float CurrTime = 0;
 	
 	UPROPERTY(EditAnywhere)
-	float MakeTime = 0.3f;
+	float MakeTime = 0.2f;
+
+	// 기차 효과음 
+	UPROPERTY(EditAnywhere)
+	class USoundBase* TrainSFX;
+	int SoundCheck = 0;
+	void playSFX();
 
 	// 인터렉션
 	bool bTurnOn = false;

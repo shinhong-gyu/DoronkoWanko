@@ -21,6 +21,7 @@
 #include "MasterItem.h"
 #include "PlayerAnimInstance.h"
 #include "StaticObject.h"
+#include "HG_EnterInstruction.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -31,7 +32,7 @@ AGW_Player::AGW_Player()
 	ZoomSpeed = 75.0f;
 	MinArmLength = 50.0f;
 	MaxArmLength = 1000.0f;
-	DirtPercentage = 0.0f;
+	DirtPercentage = 20.0f;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -113,9 +114,27 @@ void AGW_Player::Tick(float DeltaTime)
 			Interface->FadeAway();
 			LookAtActor = nullptr;
 		}
-
 	}
-
+// 	switch (LocState)
+// 	{
+// 	case EPlayerRoomState::KITCHEN:
+// 		UE_LOG(LogTemp, Warning, TEXT("1"));
+// 		break;
+// 	case EPlayerRoomState::LIVINGROOM:
+// 		UE_LOG(LogTemp, Warning, TEXT("2"));
+// 		break;
+// 	case EPlayerRoomState::BASEMENTLIVINGROOM:
+// 		UE_LOG(LogTemp, Warning, TEXT("3"));
+// 		break;
+// 	case EPlayerRoomState::WINECELLAR:
+// 		UE_LOG(LogTemp, Warning, TEXT("4"));
+// 		break;
+// 	case EPlayerRoomState::NURSERY:
+// 		UE_LOG(LogTemp, Warning, TEXT("5"));
+// 		break;
+// 	default:
+// 		break;
+// 	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
 
@@ -141,8 +160,6 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Dirt, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDirtStart);
 		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirtOngoing);
 		input->BindAction(IA_Dirt, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDirtEnd);
-
-
 	}
 
 }
@@ -216,14 +233,22 @@ void AGW_Player::Shake()
 
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
+		int RandInt = FMath::RandRange(1,2);
+		if (RandInt == 1) {
+			Splatter->SetMyColor(FLinearColor::Red);
+		}
+		else {
+			Splatter->SetMyColor(FLinearColor::White);
+		}
+		
 	}
 
 	
 }
 void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
-// 	FColor NewColor = FColor::MakeRandomColor();
-// 	ColorArray.Add(NewColor);
+	FColor NewColor = FColor::MakeRandomColor();
+	ColorArray.Add(NewColor);
 
 // 	if (GEngine)
 // 	{
@@ -253,11 +278,6 @@ void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
 		{
 			DirtPercentage = 100.0f;
 		}
-		FString DirtMessage = FString::Printf(TEXT("Dirt Percentage: %d%%"), static_cast<int32>(DirtPercentage));
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DirtMessage);
-		}
 	}
 
 }
@@ -285,24 +305,13 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 		{
 			DirtPercentage = 0.0f;
 		}
-		FString DirtMessage = FString::Printf(TEXT("Dirt Percentage: %d%%"), static_cast<int32>(DirtPercentage));
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, DirtMessage);
-		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
 		for (int i = 0; i < NumberOfSplatter; i++) {
 			Shake();
 		}
 	}
-	else
-	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cannot shake: Dirt percentage is 0%"));
-		}
-	}
+	else return;
 
 
 }
@@ -475,6 +484,7 @@ void AGW_Player::HandleMasterItemAttachment(AActor* ObjectToAttach)
 
 void AGW_Player::HandleStaticObjectAttachment(AActor* ObjectToAttach)
 {
+	UE_LOG(LogTemp,Warning,TEXT("1"));
 	// Drop existing DynamicObject if attached
 	if (AttachedStaticObject != nullptr)
 	{
@@ -503,6 +513,33 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	// 		OverlappingDObject = dObject;
 	// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
 	// 	}
+}
+void AGW_Player::SetLocState(EPlayerRoomState Loc)
+{
+	FText TempText;
+	switch (Loc)
+	{
+	case EPlayerRoomState::KITCHEN:   TempText = FText::FromString(TEXT("Kitchen"));   break;
+	case EPlayerRoomState::LIVINGROOM:   TempText = FText::FromString(TEXT("Living Room"));      break;
+	case EPlayerRoomState::BASEMENTLIVINGROOM:   TempText = FText::FromString(TEXT("Basement Living Room"));      break;
+	case EPlayerRoomState::WINECELLAR: TempText = FText::FromString(TEXT("Wine Cellar"));      break;
+	case EPlayerRoomState::NURSERY:   TempText = FText::FromString(TEXT("Nursery"));      break;
+	default:
+		break;
+	}
+	if (EnterWidget) {
+		if (EnterWidget->LifeTime > 0) {
+			EnterWidget->SetText(TempText);
+			EnterWidget->LifeTime = 2.0f;
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("gdgd"));
+			EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), WidgetFactory);
+			EnterWidget->SetText(TempText);
+			EnterWidget->AddToViewport();
+		}
+	}
+	LocState = Loc;
 }
 
 // void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)

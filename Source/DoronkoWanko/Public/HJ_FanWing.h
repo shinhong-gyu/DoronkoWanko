@@ -41,4 +41,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* WingArrow;
 
+	AHJ_FanWingSplatter* SpawnedSplatter;
+
+	// ¼±Ç³±â ¼Ò¸® 
+	UPROPERTY(EditAnywhere)
+	class USoundBase* FanWingSFX;
 };
