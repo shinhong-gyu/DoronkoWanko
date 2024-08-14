@@ -65,7 +65,7 @@ void AHJ_Train::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*if (WheelCheck == 1)
+	if (WheelCheck == 1)
 	{
 		Wheel1->SetVisibility(true);
 	}
@@ -76,14 +76,14 @@ void AHJ_Train::Tick(float DeltaTime)
 	}
 
 	if (WheelCheck > 2)
-	{*/
+	{
 		SoundCheck++;
 		CurrentAngle += AngularSpeed * DeltaTime;
 		float X = Radius * FMath::Cos(CurrentAngle);
 		float Y = Radius * FMath::Sin(CurrentAngle);
 		float Z = GetActorLocation().Z;
 
-		SetActorLocation(FVector(X - 1200.f, Y - 2500.f, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
+		SetActorLocation(FVector(X - 1650.f, Y - 4300.f, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
 
 		CurrentRotationAngel += RotationSpeed * DeltaTime;
 		if (CurrentRotationAngel > 360.0f)
@@ -107,7 +107,7 @@ void AHJ_Train::Tick(float DeltaTime)
 				Ink->Initalize(FVector(-100, 0, 0));
 			}
 			CurrTime = 0;
-		/*}*/
+		}
 	}
 
 	if (SoundCheck > 0 && SoundCheck < 2)
@@ -159,13 +159,13 @@ void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Othe
 
 void AHJ_Train::InteractionWith()
 {
-	if (AbleInteract)
-	{
+	//if (AbleInteract)
+	//{
 		WheelCheck += 1;
 		// 열차 바퀴를 파괴하는 함수 필요 
 		/*CurrentWheel->Destroy();*/
 		AbleInteract = false;
-	}
+	/*}*/
 }
 
 void AHJ_Train::ItemDrop()
