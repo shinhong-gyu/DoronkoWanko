@@ -82,7 +82,7 @@ void AGW_Player::BeginPlay()
 		if (MinimapUI)
 		{
 			MinimapUI->AddToViewport();
-			MinimapUI->ShowFloor(1);
+			/*MinimapUI->ShowFloor(1);*/
 		}
 	}
 }
