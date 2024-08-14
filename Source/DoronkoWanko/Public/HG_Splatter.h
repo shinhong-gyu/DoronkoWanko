@@ -61,7 +61,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> NormalArrow;
 	
-	FLinearColor MyColor;
+	FLinearColor MyColor = FLinearColor::Yellow;
 
 	void SetMyColor(FLinearColor Value);
 

@@ -16,6 +16,7 @@
 #include "HJ_RoboticVacuum.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "DecalInfoStruct.h"
+#include "HG_EnterInstruction.h"
 
 // Sets default values
 AHG_Splatter::AHG_Splatter()
@@ -98,8 +99,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, RandNum, RandNum);
 		if (HittedDecalInfo.DecalComp != nullptr && MyColor == HittedDecalInfo.Color) {
-			UE_LOG(LogTemp,Warning,TEXT("aAAAAAAAAAAAAAAAAA"));
-			HittedDecalInfo.DecalComp->DecalSize += FVector(0.0f, 1000.0f, 1000.0f);
+			HittedDecalInfo.DecalComp->DecalSize += FVector(0.0f, 1.0f, 1.0f);
 		}
 		else {
 			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
@@ -119,9 +119,10 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	TArray<AHG_MissonStamp*> StampArray = IsStampInRange(hitInfo.ImpactPoint, RandNum, RandNum);
 	if (StampArray.Num() != 0) {
 		for (auto s : StampArray) {
-			// ID가 N(1~5) 인 스탬프를 찾았다.
-			s->Decal->SetVisibility(true);
-			GM->StampCount++;
+			if (s->Decal->GetVisibleFlag() == false) {
+				s->Decal->SetVisibility(true);
+				GM->StampCount++;
+			}	
 		}
 	}
 }

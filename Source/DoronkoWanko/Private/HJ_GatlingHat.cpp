@@ -74,6 +74,7 @@ void AHJ_GatlingHat::SpawnInk()
 		Ink3->Initalize(FVector(-20, -20, 500) + GW_Player->GetActorForwardVector() * 800);
 		Ink4->Initalize(FVector(0, 0, 520) + GW_Player->GetActorForwardVector() * 800);
 		Ink5->Initalize(FVector(0, 0, 480) + GW_Player->GetActorForwardVector() * 800);
+
 	}
 }
 
