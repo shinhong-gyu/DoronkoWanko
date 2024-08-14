@@ -119,6 +119,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	TArray<AHG_MissonStamp*> StampArray = IsStampInRange(hitInfo.ImpactPoint, RandNum, RandNum);
 	if (StampArray.Num() != 0) {
 		for (auto s : StampArray) {
+			// ID가 N(1~5) 인 스탬프를 찾았다.
 			s->Decal->SetVisibility(true);
 			GM->StampCount++;
 		}
