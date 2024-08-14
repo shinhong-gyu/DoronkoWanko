@@ -64,19 +64,19 @@ void AHG_EnterTrigger::EnterTriggered()
 	switch (RoomSelf)
 	{
 	case EPlayerRoomState::KITCHEN:
-		/*Player->MinimapUI->ShowFloor(1);*/
+		Player->MinimapUI->ShowFloor(1);
 		break;
 	case EPlayerRoomState::LIVINGROOM:
-		/*Player->MinimapUI->ShowFloor(1);*/
+		Player->MinimapUI->ShowFloor(1);
 		break;
 	case EPlayerRoomState::BASEMENTLIVINGROOM:
-		/*Player->MinimapUI->ShowFloor(0);*/
+		Player->MinimapUI->ShowFloor(0);
 		break;
 	case EPlayerRoomState::WINECELLAR:
-		/*Player->MinimapUI->ShowFloor(0);*/
+		Player->MinimapUI->ShowFloor(0);
 		break;
 	case EPlayerRoomState::NURSERY:
-		/*Player->MinimapUI->ShowFloor(2);*/
+		Player->MinimapUI->ShowFloor(2);
 		break;
 	}
 }

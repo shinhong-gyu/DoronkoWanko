@@ -78,11 +78,11 @@ void AGW_Player::BeginPlay()
 
 	if (MinimapUIClass)
 	{
-		MinimapUI = CreateWidget<UHJ_MinimapUI>(GetWorld(), MinimapUIClass);
+		MinimapUI = CreateWidget<UHJMiniMapWidget>(GetWorld(), MinimapUIClass);
 		if (MinimapUI)
 		{
 			MinimapUI->AddToViewport();
-			/*MinimapUI->ShowFloor(1);*/
+			MinimapUI->ShowFloor(1);
 		}
 	}
 }

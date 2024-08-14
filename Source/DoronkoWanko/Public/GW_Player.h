@@ -10,6 +10,7 @@
 #include "helmet.h"
 #include "DynamicObject.h"
 #include "HJ_MinimapUI.h"
+#include "HJMiniMapWidget.h"
 #include "GW_Player.generated.h"
 
 UENUM(BlueprintType)
@@ -183,5 +184,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UUserWidget> MinimapUIClass;
 
-	UHJ_MinimapUI* MinimapUI;
+	UHJMiniMapWidget* MinimapUI;
 };
