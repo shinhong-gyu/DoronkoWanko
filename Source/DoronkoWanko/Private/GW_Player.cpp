@@ -22,6 +22,7 @@
 #include "PlayerAnimInstance.h"
 #include "StaticObject.h"
 #include "HG_EnterInstruction.h"
+#include "HJ_MinimapUI.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -73,6 +74,16 @@ void AGW_Player::BeginPlay()
 	if (Anim)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("ANim"))
+	}
+
+	if (MinimapUIClass)
+	{
+		MinimapUI = CreateWidget<UHJ_MinimapUI>(GetWorld(), MinimapUIClass);
+		if (MinimapUI)
+		{
+			MinimapUI->AddToViewport();
+			MinimapUI->ShowFloor(1);
+		}
 	}
 }
 

@@ -9,6 +9,7 @@
 #include "HJ_TrainWheel.h"
 #include "helmet.h"
 #include "DynamicObject.h"
+#include "HJ_MinimapUI.h"
 #include "GW_Player.generated.h"
 
 UENUM(BlueprintType)
@@ -177,4 +178,10 @@ public:
 
 	// 방이 바뀔 때 마다 LocState를 업데이트 하는 함수
 	void SetLocState(EPlayerRoomState Loc);
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UUserWidget> MinimapUIClass;
+
+	UHJ_MinimapUI* MinimapUI;
 };

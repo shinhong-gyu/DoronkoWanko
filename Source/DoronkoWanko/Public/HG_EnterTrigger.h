@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GW_Player.h"
+#include "HJ_MinimapUI.h"
 #include "HG_EnterTrigger.generated.h"
 
 UCLASS()
@@ -37,4 +38,5 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	EPlayerRoomState RoomSelf;
+	
 };
