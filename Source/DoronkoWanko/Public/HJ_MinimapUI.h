@@ -34,6 +34,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UImage* Image_Five;
 
+	void MiniMapUpdate(int32 StampID);
 
 
 };
