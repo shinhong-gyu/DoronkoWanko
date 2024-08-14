@@ -123,7 +123,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 				s->Decal->SetVisibility(true);
 				GM->StampCount++;
 				auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-				/*Player->MinimapUI->MiniMapUpdate(s->StampID);*/
+				Player->MinimapUI->MiniMapUpdate(s->StampID);
 			}	
 		}
 	}
