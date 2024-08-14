@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DecalInfoStruct.h"
 #include "HG_Splatter.generated.h"
 
 UCLASS()
@@ -38,8 +39,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
-	void SpawnDecalAtLocation(const FVector& Location, const FRotator& Rotation);
-
 	FVector ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
 
 	FVector Velocity;
@@ -62,7 +61,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> NormalArrow;
 	
-	FLinearColor MyColor ;
+	FLinearColor MyColor;
 
 	void SetMyColor(FLinearColor Value);
+
+	FDecalInfo IsDecalInRange(FVector Pos,float Param1,float Param2);
 };

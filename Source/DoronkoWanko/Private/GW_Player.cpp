@@ -233,7 +233,7 @@ void AGW_Player::Shake()
 
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
-		int RandInt = FMath::RandRange(1,2);
+		int RandInt = 1;
 		if (RandInt == 1) {
 			Splatter->SetMyColor(FLinearColor::Red);
 		}
