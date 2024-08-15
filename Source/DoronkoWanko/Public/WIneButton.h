@@ -43,6 +43,12 @@ public:
 	class UArrowComponent* InkArrow;
 
 	UPROPERTY(EditAnywhere)
+	class UArrowComponent* InkArrow2;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> InkFactory;
+
+	UPROPERTY(EditAnywhere)
+	bool bFinal = true;
 
 };

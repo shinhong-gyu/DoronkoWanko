@@ -9,11 +9,14 @@
 // Sets default values
 AWIneButton::AWIneButton()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
 	InkArrow->SetupAttachment(RootComponent);
+
+	InkArrow2 = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow2"));
+	InkArrow2->SetupAttachment(RootComponent);
 
 	Red = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Red"));
 	Red->SetupAttachment(RootComponent);
@@ -43,7 +46,7 @@ void AWIneButton::InteractionWith()
 	Red->SetVisibility(true);
 	MeshComp->SetVisibility(false);
 
-	for (int i = 0; i < 500; i++) {
+	for (int i = 0; i < 600; i++) {
 		Shake();
 	}
 
@@ -53,14 +56,27 @@ void AWIneButton::InteractionWith()
 
 void AWIneButton::Shake()
 {
-	FVector InitialVelocity = FVector(FMath::RandRange(-1200, 1200), FMath::RandRange(-1200, 1200), FMath::RandRange(-600, 1800));
+	FVector InitialVelocity = FVector(FMath::RandRange(-800, 800), FMath::RandRange(-800, 800), FMath::RandRange(-600, 1500));
 
-	FTransform T = InkArrow->GetComponentTransform();
-	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
+	if (bFinal)
+	{
+		FTransform T = InkArrow->GetComponentTransform();
+		auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 
-	if (nullptr != Ink) {
-		Ink->MeshComp->SetVisibility(false);
-		Ink->Initalize(InitialVelocity);
+		if (nullptr != Ink) {
+			Ink->MeshComp->SetVisibility(false);
+			Ink->Initalize(InitialVelocity);
+		}
+	}
+	else
+	{
+		FTransform F = InkArrow2->GetComponentTransform();
+		auto* Ink2 = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, F);
+
+		if (nullptr != Ink2) {
+			Ink2->MeshComp->SetVisibility(false);
+			Ink2->Initalize(InitialVelocity);
+		}
 	}
 }
 

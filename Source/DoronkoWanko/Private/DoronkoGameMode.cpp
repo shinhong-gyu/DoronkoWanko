@@ -164,8 +164,8 @@ void ADoronkoGameMode::SpawnWhaleHat()
 	if (bWhaleHat)
 	{
 		// 고래모자 소환
-		Transform3.SetLocation(FVector(-2245, -2107, 909));
-		Transform3.SetRotation(FQuat(FRotator(0, 0, 0)));
+		Transform3.SetLocation(FVector(-1455, -6400, 940));
+		Transform3.SetRotation(FQuat(FRotator(0, 180, 0)));
 		Transform3.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 
 		GetWorld()->SpawnActor<AHJ_WhaleHat>(HatFactory, Transform3);
@@ -179,7 +179,7 @@ void ADoronkoGameMode::SpawnTrainWheel2()
 	if (bTrainWheel2)
 	{
 		// 기차바퀴 소환(2)
-		Transform4.SetLocation(FVector(-2508, -2443, 885));
+		Transform4.SetLocation(FVector(-2395, -2210, 760));
 		Transform4.SetRotation(FQuat(FRotator(0, 0, 0)));
 		Transform4.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 
@@ -192,8 +192,8 @@ void ADoronkoGameMode::SpawnTrainWheel2()
 void ADoronkoGameMode::SpawnWineButton()
 {
 	// 와인버튼 소환 
-	Transform5.SetLocation(FVector(-2540, -5375, -515));
-	Transform5.SetRotation(FQuat(FRotator(0, 0, 0)));
+	Transform5.SetLocation(FVector(-450, -6530, 115));
+	Transform5.SetRotation(FQuat(FRotator(0, 180, 0)));
 	Transform5.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 	GetWorld()->SpawnActor<AWIneButton>(ButtonFactory, Transform5);
 }
