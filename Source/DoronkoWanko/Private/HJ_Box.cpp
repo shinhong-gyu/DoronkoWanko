@@ -45,7 +45,9 @@ void AHJ_Box::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 	{
 	// ÄÉÀÌÅ©´Â ÄÆ¾À ÂïÀ» ¶§¸¸ Åõ¸íÇÏ°Ô (unvisible, ÀÌÈÄ visible) 
 		this->Destroy();
-		GetWorld()->SpawnActor<AHJ_TrainWheel>(WheelFactory, Vec-FVector(0,0,640), Rot-FRotator(0,0,0));
+		/*GetWorld()->SpawnActor<AHJ_TrainWheel>(WheelFactory, Vec-FVector(0,0,780), Rot-FRotator(0,0,0));*/
+		/*GetWorld()->SpawnActor<AHJ_ElectricFan>(ElectricFanFactory, Vec - FVector(0, 0, 640), Rot - FRotator(0, -90, 0));*/
+		GetWorld()->SpawnActor<AHJ_WhaleHat>(HatFactory, Vec - FVector(0, 0, 780), Rot - FRotator(0, -90, 0));
 	}
 }
 

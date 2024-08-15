@@ -29,7 +29,7 @@ AGW_Player::AGW_Player()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	TargetArmLength = 300.0f;
+	TargetArmLength = 600.0f;
 	ZoomSpeed = 75.0f;
 	MinArmLength = 50.0f;
 	MaxArmLength = 1000.0f;
@@ -104,49 +104,49 @@ void AGW_Player::Tick(float DeltaTime)
 	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
-	if (bHit) {
-		// 바라본 곳에 뭔가 있다.
-		if (LookAtActor == nullptr) {
-			if (OutHit.GetActor() != LookAtActor) {
-				LookAtActor = OutHit.GetActor();
-				UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
-				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-				if (Interface) {
-					Interface->LookAt();
-				}
-			}
-		}
-	}
-	else {
-		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		if (Interface) {
-			Interface->FadeAway();
-			LookAtActor = nullptr;
-		}
-	}
-// 	switch (LocState)
-// 	{
-// 	case EPlayerRoomState::KITCHEN:
-// 		UE_LOG(LogTemp, Warning, TEXT("1"));
-// 		break;
-// 	case EPlayerRoomState::LIVINGROOM:
-// 		UE_LOG(LogTemp, Warning, TEXT("2"));
-// 		break;
-// 	case EPlayerRoomState::BASEMENTLIVINGROOM:
-// 		UE_LOG(LogTemp, Warning, TEXT("3"));
-// 		break;
-// 	case EPlayerRoomState::WINECELLAR:
-// 		UE_LOG(LogTemp, Warning, TEXT("4"));
-// 		break;
-// 	case EPlayerRoomState::NURSERY:
-// 		UE_LOG(LogTemp, Warning, TEXT("5"));
-// 		break;
-// 	default:
-// 		break;
-// 	}
-	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
+//	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
+//	if (bHit) {
+//		// 바라본 곳에 뭔가 있다.
+//		if (LookAtActor == nullptr) {
+//			if (OutHit.GetActor() != LookAtActor) {
+//				LookAtActor = OutHit.GetActor();
+//				UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
+//				UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
+//				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+//				if (Interface) {
+//					Interface->LookAt();
+//				}
+//			}
+//		}
+//	}
+//	else {
+//		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+//		if (Interface) {
+//			Interface->FadeAway();
+//			LookAtActor = nullptr;
+//		}
+//	}
+//// 	switch (LocState)
+//// 	{
+//// 	case EPlayerRoomState::KITCHEN:
+//// 		UE_LOG(LogTemp, Warning, TEXT("1"));
+//// 		break;
+//// 	case EPlayerRoomState::LIVINGROOM:
+//// 		UE_LOG(LogTemp, Warning, TEXT("2"));
+//// 		break;
+//// 	case EPlayerRoomState::BASEMENTLIVINGROOM:
+//// 		UE_LOG(LogTemp, Warning, TEXT("3"));
+//// 		break;
+//// 	case EPlayerRoomState::WINECELLAR:
+//// 		UE_LOG(LogTemp, Warning, TEXT("4"));
+//// 		break;
+//// 	case EPlayerRoomState::NURSERY:
+//// 		UE_LOG(LogTemp, Warning, TEXT("5"));
+//// 		break;
+//// 	default:
+//// 		break;
+//// 	}
+//	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 }
 
 // Called to bind functionality to input
