@@ -67,7 +67,7 @@ void ARoboticVacuum::Tick(float DeltaTime)
 		SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime, true);
 	}
 
-	if (SpawnCheck > 0)
+	if (SpawnCheck>0)
 	{
 		// 페인트에 닿았을 때, 페인트 스폰
 		CurrTime += DeltaTime;
@@ -76,16 +76,17 @@ void ARoboticVacuum::Tick(float DeltaTime)
 		{
 			FTransform T = InkArrow->GetComponentTransform();
 			auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
-
-			if (nullptr != Ink) {
+			if (Ink) {
 				Ink->MeshComp->SetVisibility(false);
 				Ink->Initalize(FVector(0, -50, 0));
-				SpawnTimeCheck++;
+				Ink->SetMyColor(MyColor);
+				Ink->bSpawnedByRV = true;
 			}
 			CurrTime = 0;
 		}
+		SpawnTimeCheck+= DeltaTime;
 		// 10초 이상 지나면 정지 
-		if (SpawnTimeCheck > 50)
+		if (SpawnTimeCheck > 10)
 		{
 			SpawnCheck = 0;	Speed = 0;
 			ColorComp->SetVisibility(false);
@@ -115,6 +116,8 @@ void ARoboticVacuum::NotifyActorBeginOverlap(AActor* OtherActor)
 
 			if (OtherActor->IsA<AHG_Splatter>())
 			{
+				AHG_Splatter* Splatter = Cast<AHG_Splatter>(OtherActor);
+				MyColor = Splatter->MyColor;
 				SpawnCheck++;	StopCheck = 0;
 				ColorComp2->SetVisibility(true);
 			}

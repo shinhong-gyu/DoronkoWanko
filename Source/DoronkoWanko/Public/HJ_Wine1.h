@@ -44,5 +44,6 @@ public:
 	FRotator Rot;
 	int check = 0;
 
+	FLinearColor MyColor = FLinearColor(0.4611f, 0.02f, 0.474f, 1.0f);
 
 };

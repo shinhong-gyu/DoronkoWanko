@@ -11,6 +11,7 @@
 #include "DynamicObject.h"
 #include "HJ_MinimapUI.h"
 #include "HJMiniMapWidget.h"
+#include "DecalInfoStruct.h"
 #include "GW_Player.generated.h"
 
 UENUM(BlueprintType)
@@ -104,8 +105,10 @@ public:
 
 public:
 	AActor* LookAtActor = nullptr;
-	TArray<FColor> ColorArray;
+	TArray<FLinearColor> ColorArray;
 
+	int32 CurIdx = 0;
+	float IdxSetTime = 0.0f;
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Dirt;
 
@@ -185,4 +188,12 @@ public:
 	TSubclassOf<UUserWidget> MinimapUIClass;
 
 	UHJMiniMapWidget* MinimapUI;
+
+	FDecalInfo* IsDecalInRange(FVector Pos, float Param1, float Param2);
+
+	int32 count = 0;
+
+	bool bHitDecal = false;
+
+	FLinearColor RecentColor;
 };

@@ -61,9 +61,12 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> NormalArrow;
 	
-	FLinearColor MyColor = FLinearColor::Yellow;
+	FLinearColor MyColor = FLinearColor();
 
 	void SetMyColor(FLinearColor Value);
 
-	FDecalInfo IsDecalInRange(FVector Pos,float Param1,float Param2);
+	int32 SO = 0;
+	FDecalInfo* IsDecalInRange(FVector Pos,float Param1,float Param2);
+
+	bool bSpawnedByRV = false;
 };

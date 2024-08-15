@@ -49,7 +49,15 @@ void UPlayerAnimInstance::PlayRubMontage()
 	AGW_Player* Player = Cast<AGW_Player>(TryGetPawnOwner());
 	if (Player)
 	{
-		/*Player->GetCharacterMovement()->MaxWalkSpeed = 0.0f;*/ // <><><> 이동문제로 수정 
+		Player->GetCharacterMovement()->MaxWalkSpeed = 0.0f; // <><><> 이동문제로 수정 
+	}
+}
+void UPlayerAnimInstance::AnimNotify_End()
+{
+	AGW_Player* Player = Cast<AGW_Player>(TryGetPawnOwner());
+	if (Player)
+	{
+		Player->GetCharacterMovement()->MaxWalkSpeed = Player->WalkSpeed;
 	}
 }
 // void UPlayerAnimInstance::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)

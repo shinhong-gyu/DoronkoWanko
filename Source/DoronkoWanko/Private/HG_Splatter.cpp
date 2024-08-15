@@ -17,6 +17,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "DecalInfoStruct.h"
 #include "HG_EnterInstruction.h"
+#include "Engine/StaticMesh.h"
 
 // Sets default values
 AHG_Splatter::AHG_Splatter()
@@ -32,9 +33,20 @@ AHG_Splatter::AHG_Splatter()
 	SphereComp->SetGenerateOverlapEvents(true);
 	SphereComp->SetCollisionProfileName(TEXT("Splatter"));
 	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+	//FMath::FRandRange
+	MeshComp->SetRelativeScale3D(FVector(FMath::FRandRange(0.6f,0.9f), FMath::FRandRange(1.0f, 1.1f), FMath::FRandRange(0.3f, 0.4f)));
 
 	Velocity = FVector::ZeroVector;
 	MeshComp->SetReceivesDecals(false);
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/HongGyu/Splatoon/Water_Drop.Water_Drop'"));
+	if (TempMesh.Succeeded()) {
+		MeshComp->SetStaticMesh(TempMesh.Object);
+	}
+	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial11(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Paint_Origin.M_Paint_Origin'"));
+	if (TempMesh.Succeeded()) {
+		MeshComp->SetMaterial(0, TempMaterial11.Object);
+	}
 
 	int32 RandValue = FMath::RandRange(1, 5);
 	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/Splatoon/M_Paint%d.M_Paint%d"), RandValue, RandValue);
@@ -54,6 +66,7 @@ void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AHG_Splatter::OnMyBeginOverlap);
+
 }
 
 // Called every frame
@@ -66,6 +79,18 @@ void AHG_Splatter::Tick(float DeltaTime)
 	// ม฿ทย
 	Velocity += FVector(0, 0, -980.0f) * DeltaTime;
 	UpdataRotation();
+
+	UMaterialInterface* MaterialInterface = MeshComp->GetMaterial(0);
+	if (MaterialInterface) {
+		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(MaterialInterface);
+		if (!DynamicMaterial) {
+			DynamicMaterial = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+		}
+		if (DynamicMaterial) {
+			DynamicMaterial->SetVectorParameterValue("Color", MyColor);
+			MeshComp->SetMaterial(0, DynamicMaterial);
+		}
+	}
 }
 
 void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -75,7 +100,8 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	}
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRoation;
-	FDecalInfo SpawnDeaclInfo, HittedDecalInfo = FDecalInfo();
+	FDecalInfo SpawnDeaclInfo = FDecalInfo();
+	FDecalInfo* HittedDecalInfo;
 	float RandNum = FMath::FRandRange(100.0f, 150.0f);
 	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
 	int32 RanInt = FMath::RandRange(1, 9);
@@ -98,16 +124,21 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (bHit)
 	{
 		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, RandNum, RandNum);
-		if (HittedDecalInfo.DecalComp != nullptr && MyColor == HittedDecalInfo.Color) {
-			HittedDecalInfo.DecalComp->DecalSize += FVector(0.0f, 1.0f, 1.0f);
+		if (bSpawnedByRV == false && HittedDecalInfo != nullptr && MyColor == HittedDecalInfo->Color) {
+			UE_LOG(LogTemp, Warning, TEXT("SpawnedBy = false"));
+			HittedDecalInfo->DecalComp->SetRelativeScale3D(FVector(1.0f, 1.3f, 1.3f));
+
 		}
 		else {
+			UE_LOG(LogTemp, Warning, TEXT("bSpawnedBy = true"));
 			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
 			if (Decal) {
 				UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Decal->GetDecalMaterial(), this);
 				if (DynamicMaterial) {
 					DynamicMaterial->SetVectorParameterValue("Color", MyColor);
 					Decal->SetDecalMaterial(DynamicMaterial);
+					Decal->SetSortOrder(SO);
+					SO++;
 				}
 			}
 			SpawnDeaclInfo.DecalComp = Decal;
@@ -124,7 +155,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 				GM->StampCount++;
 				auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 				Player->MinimapUI->MiniMapUpdate(s->StampID);
-			}	
+			}
 		}
 	}
 }
@@ -167,7 +198,7 @@ void AHG_Splatter::SetMyColor(FLinearColor Value)
 	MyColor = Value;
 }
 
-FDecalInfo AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2)
+FDecalInfo* AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2)
 {
 	FVector Dist;
 	FVector Min = FVector(1000.0f, 1000.0f, 1000.0f);
@@ -186,8 +217,11 @@ FDecalInfo AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2)
 		}
 	}
 	if (RetIdx > 0 && RetIdx < GM->SpawnedDecalArr.Num())
-		return GM->SpawnedDecalArr[RetIdx];
+	{
+		//GM->SpawnedDecalArr[RetIdx].DecalComp->DecalSize += FVector(0.0f, 1000.0f, 1000.0f);
+		return &(GM->SpawnedDecalArr[RetIdx]);
+	}
 	else
-		return FDecalInfo();
+		return nullptr;//FDecalInfo();
 }
 

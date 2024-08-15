@@ -46,7 +46,7 @@ void AHJ_Wine1::SpawnInk()
 		{
 			FVector InitialVelocity = FVector(FMath::RandRange(-10, 10), FMath::RandRange(-10, 10), FMath::RandRange(100, 150));
 			Ink->Initalize(InitialVelocity);
-			Ink->SetMyColor(FColor::Purple);
+			Ink->SetMyColor(MyColor);
 		}
 	}
 

@@ -65,6 +65,7 @@ void AHJ_ElephantHat::SpawnInk()
 	if (nullptr != Ink)
 	{
 		Ink->Initalize(FVector(0, 0, 600) + GW_Player->GetActorForwardVector() * 600);
+		Ink->SetMyColor(MyColor);
 	}
 }
 

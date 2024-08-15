@@ -22,7 +22,9 @@
 #include "PlayerAnimInstance.h"
 #include "StaticObject.h"
 #include "HG_EnterInstruction.h"
-#include "HJ_MinimapUI.h"
+#include "DoronkoGameMode.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialInterface.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -48,12 +50,15 @@ AGW_Player::AGW_Player()
 	AttachedMasterItem = nullptr;
 	AttachedStaticObject = nullptr;
 	OverlappingObject = nullptr;
-// 	bIsDropping = false;
-// 	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
-// 	if (TempAnimInst.Succeeded())
-// 	{
-// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
-// 	}
+	// 	bIsDropping = false;
+	// 	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
+	// 	if (TempAnimInst.Succeeded())
+	// 	{
+	// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
+	// 	}
+
+	ColorArray.SetNum(1);
+	ColorArray[0] = FLinearColor(0.156f, 0.825f, 0.114f);
 }
 
 // Called when the game starts or when spawned
@@ -68,22 +73,21 @@ void AGW_Player::BeginPlay()
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
-		} 
+		}
 	}
 	Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	if (Anim)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("ANim"))
+		UE_LOG(LogTemp, Warning, TEXT("ANim"))
 	}
 
-	if (MinimapUIClass)
-	{
-		MinimapUI = CreateWidget<UHJMiniMapWidget>(GetWorld(), MinimapUIClass);
-		if (MinimapUI)
-		{
-			MinimapUI->AddToViewport();
-			MinimapUI->ShowFloor(1);
-		}
+	RecentColor = ColorArray[0];
+
+	UMaterialInterface* CurMaterial = this->GetMesh()->GetMaterial(0);
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
+	if (DynamicMaterial) {
+		DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+		this->GetMesh()->SetMaterial(0, DynamicMaterial);
 	}
 }
 
@@ -104,14 +108,12 @@ void AGW_Player::Tick(float DeltaTime)
 	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
 		if (LookAtActor == nullptr) {
 			if (OutHit.GetActor() != LookAtActor) {
 				LookAtActor = OutHit.GetActor();
-				UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
 				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 				if (Interface) {
 					Interface->LookAt();
@@ -126,30 +128,25 @@ void AGW_Player::Tick(float DeltaTime)
 			LookAtActor = nullptr;
 		}
 	}
-// 	switch (LocState)
-// 	{
-// 	case EPlayerRoomState::KITCHEN:
-// 		UE_LOG(LogTemp, Warning, TEXT("1"));
-// 		break;
-// 	case EPlayerRoomState::LIVINGROOM:
-// 		UE_LOG(LogTemp, Warning, TEXT("2"));
-// 		break;
-// 	case EPlayerRoomState::BASEMENTLIVINGROOM:
-// 		UE_LOG(LogTemp, Warning, TEXT("3"));
-// 		break;
-// 	case EPlayerRoomState::WINECELLAR:
-// 		UE_LOG(LogTemp, Warning, TEXT("4"));
-// 		break;
-// 	case EPlayerRoomState::NURSERY:
-// 		UE_LOG(LogTemp, Warning, TEXT("5"));
-// 		break;
-// 	default:
-// 		break;
-// 	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
+	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+
+	IdxSetTime += DeltaTime;
+
+	if (IdxSetTime > 0.5) {
+		for (auto c : ColorArray) {
+			UE_LOG(LogTemp, Warning, TEXT("ColorArray : %s"), *c.ToString());
+		}
+		IdxSetTime = 0;
+		if (ColorArray.Num() == 2) {
+			if (CurIdx == 0 && ColorArray[1] != FLinearColor(0.0f, 0.0f, 0.0f, 0.0f)) CurIdx = 1;
+			else if (CurIdx == 1) CurIdx = 0;
+		}
+	}
+
 }
 
-// Called to bind functionality to input
+
 void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -230,8 +227,6 @@ void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value)
 void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-
-
 }
 
 void AGW_Player::Shake()
@@ -244,32 +239,13 @@ void AGW_Player::Shake()
 
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
-		int RandInt = 1;
-		if (RandInt == 1) {
-			Splatter->SetMyColor(FLinearColor::Red);
-		}
-		else {
-			Splatter->SetMyColor(FLinearColor::White);
-		}
-		
+		Splatter->SetMyColor(ColorArray[CurIdx]);
 	}
 
-	
+
 }
 void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
-	FColor NewColor = FColor::MakeRandomColor();
-	ColorArray.Add(NewColor);
-
-// 	if (GEngine)
-// 	{
-// 		// 배열의 모든 항목을 화면에 표시
-// 		for (int32 i = 0; i < ColorArray.Num(); i++)
-// 		{
-// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
-// 		}
-// 	}
 	check(Anim)
 		if (Anim)
 		{
@@ -277,20 +253,86 @@ void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 			UE_LOG(LogTemp, Warning, TEXT("Rub"));
 		}
 
+	FHitResult hitInfo;
+	FCollisionQueryParams params;
+	FCollisionObjectQueryParams QParams;
 
+	QParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+	params.AddIgnoredActor(this);
+
+	FDecalInfo* HittedDecalInfo;
+
+	FVector end = GetActorLocation();
+	end.Z = -100;
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, GetActorLocation(), end, ECC_Visibility, params);
+	if (bHit) {
+		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, 1000.0f, 1000.0f);
+		UE_LOG(LogTemp, Warning, TEXT("bHit : %s"), *hitInfo.GetActor()->GetName());
+		DrawDebugLine(GetWorld(), GetActorLocation(), end, FColor::Green, false, 10, 0, 1);
+		if (HittedDecalInfo != nullptr) {
+			bHitDecal = true;
+			RecentColor = HittedDecalInfo->Color;
+			UE_LOG(LogTemp, Warning, TEXT("HittedDecal"));
+			UE_LOG(LogTemp, Warning, TEXT("Decal Color : %s"), *(HittedDecalInfo->Color.ToString()));
+			if (HittedDecalInfo->Color != ColorArray[0] && count == 0) {
+				ColorArray.SetNum(2);
+			}
+			if (ColorArray.Num() == 2) {
+				if (count % 2 == 0) {
+					ColorArray[0] = HittedDecalInfo->Color;
+				}
+				if (count == 0) {
+					ColorArray[1] = ColorArray[0];
+				}
+				else if (count % 2 == 1) {
+					ColorArray[1] = HittedDecalInfo->Color;
+				}
+				count++;
+			}
+		}
+		else {
+			bHitDecal = false;
+		}
+	}
 }
 
 void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
 {
-	if (DirtPercentage < 100.0f)
+	FString MaterialPath;
+	UMaterialInterface* NewMaterial;
+	if (DirtPercentage < 100.0f && bHitDecal)
 	{
-		DirtPercentage += 5.0f;
+		DirtPercentage += 1.0f;
 		if (DirtPercentage > 100.0f)
 		{
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
 			DirtPercentage = 100.0f;
 		}
-	}
+		else if (DirtPercentage >= 80.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
+		}
+		else if (DirtPercentage >= 60.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
+		}
+		else if (DirtPercentage >= 40.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
+		}
+		else if (DirtPercentage >= 20.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
+		}
+		else {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
+		}
+		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
 
+		UMaterialInterface* CurMaterial = NewMaterial;
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
+		if (DynamicMaterial) {
+			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+			this->GetMesh()->SetMaterial(0, DynamicMaterial);
+		}
+	}
 }
 
 void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
@@ -299,22 +341,48 @@ void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
 
 
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
-{	
-// 	UPlayerAnimInstance* anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+{
 	check(Anim)
-	if (Anim)
+		if (Anim)
+		{
+			Anim->PlaySplashMontage();
+		}
+	FString MaterialPath;
+	UMaterialInterface* NewMaterial;
+	if (DirtPercentage != 0.0f)
 	{
-		Anim->PlaySplashMontage();
-		UE_LOG(LogTemp, Warning, TEXT("splash"));
-	}
-
-
-	if (DirtPercentage > 0.0f)
-	{
-		DirtPercentage -= 0.25f;
+		DirtPercentage -= 6.0f;
+		if (DirtPercentage > 100.0f)
+		{
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
+			DirtPercentage = 100.0f;
+		}
+		else if (DirtPercentage >= 80.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
+		}
+		else if (DirtPercentage >= 60.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
+		}
+		else if (DirtPercentage >= 40.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
+		}
+		else if (DirtPercentage >= 20.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
+		}
+		else {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
+		}
 		if (DirtPercentage < 0.0f)
 		{
 			DirtPercentage = 0.0f;
+		}
+		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
+
+		UMaterialInterface* CurMaterial = NewMaterial;
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
+		if (DynamicMaterial) {
+			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+			this->GetMesh()->SetMaterial(0, DynamicMaterial);
 		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
@@ -356,12 +424,12 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		}
 
 	}
-	
+
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-	
+
 
 	if (AttachedStaticObject != nullptr)
 	{
@@ -389,8 +457,8 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 		dropObject(AttachedMasterItem);
 	}
 	UGameplayStatics::PlaySound2D(GetWorld(), Drop);
-
 }
+
 void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 {
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
@@ -408,12 +476,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedMasterItem = MasterItem;
-// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-// 		LookAtActor = nullptr;
-// 		if (Interface) {
-// 			Interface->FadeAway();
-// 			LookAtActor = nullptr;
-// 		}
+		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		// 		LookAtActor = nullptr;
+		// 		if (Interface) {
+		// 			Interface->FadeAway();
+		// 			LookAtActor = nullptr;
+		// 		}
 	}
 	else if (AStaticObject* StaticicObject = Cast<AStaticObject>(ObjectToAttach))
 	{
@@ -427,12 +495,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedStaticObject = StaticicObject;
-// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-// 		LookAtActor = nullptr;
-// 		if (Interface) {
-// 			Interface->FadeAway();
-// 			LookAtActor = nullptr;
-// 		}
+		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		// 		LookAtActor = nullptr;
+		// 		if (Interface) {
+		// 			Interface->FadeAway();
+		// 			LookAtActor = nullptr;
+		// 		}
 	}
 }
 
@@ -495,7 +563,6 @@ void AGW_Player::HandleMasterItemAttachment(AActor* ObjectToAttach)
 
 void AGW_Player::HandleStaticObjectAttachment(AActor* ObjectToAttach)
 {
-	UE_LOG(LogTemp,Warning,TEXT("1"));
 	// Drop existing DynamicObject if attached
 	if (AttachedStaticObject != nullptr)
 	{
@@ -512,12 +579,10 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	if (AMasterItem* MasterItem = Cast<AMasterItem>(OtherActor))
 	{
 		OverlappingObject = MasterItem;
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *MasterItem->GetName());
 	}
 	else if (AStaticObject* StaticObject = Cast<AStaticObject>(OtherActor))
 	{
 		OverlappingObject = StaticObject;
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *StaticObject->GetName());
 	}
 	// 	else if (ADynamicObject* dObject = Cast<ADynamicObject>(OtherActor))
 	// 	{
@@ -525,6 +590,7 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
 	// 	}
 }
+
 void AGW_Player::SetLocState(EPlayerRoomState Loc)
 {
 	FText TempText;
@@ -544,7 +610,6 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 			EnterWidget->LifeTime = 2.0f;
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("gdgd"));
 			EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), WidgetFactory);
 			EnterWidget->SetText(TempText);
 			EnterWidget->AddToViewport();
@@ -553,78 +618,35 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 	LocState = Loc;
 }
 
-// void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
-// {
-// 	if (OverlappingTrainWheel && !AttachedTrainWheel)
-// 	{
-// 		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
-// 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-// 		OverlappingTrainWheel->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
-// 		OverlappingTrainWheel->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-// 			1.0f / GetMesh()->GetComponentScale().Y,1.0f / GetMesh()->GetComponentScale().Z));
-// 		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(OverlappingTrainWheel->GetRootComponent()))
-// 		{
-// 			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-// 		}
-// 		AttachedTrainWheel = OverlappingTrainWheel;
-// 	}
-// 	if (Overlappinghelmet && !Attachedhelmet)
-// 	{
-// 		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
-// 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-// 		Overlappinghelmet->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
-// 		Overlappinghelmet->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-// 			1.0f / GetMesh()->GetComponentScale().Y,1.0f / GetMesh()->GetComponentScale().Z));
-// 		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Overlappinghelmet->GetRootComponent()))
-// 		{
-// 			HelmetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-// 		}
-// 		Attachedhelmet = Overlappinghelmet;
-// 	}
-// 
-// 
-// }
+FDecalInfo* AGW_Player::IsDecalInRange(FVector Pos, float Param1, float Param2)
+{
+	FVector Dist;
+	FVector Min = FVector(1000.0f, 1000.0f, 1000.0f);
+	int32 RetIdx = -1;
+	ADoronkoGameMode* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM) {
+		for (int i = 0; i < GM->SpawnedDecalArr.Num(); i++) {
+			Dist = Pos - GM->SpawnedDecalArr[i].DecalComp->GetComponentLocation();
+			// 만약 원하는 거리 안에 있으면
+			if (Param1 * Param1 + Param2 * Param2 > Dist.Size() * Dist.Size()) {
+				// 가장 가까운 DecalComp찾기
+				// Min 값 업데이트
+				if (Min.Size() >= Dist.Size()) {
+					Min = Dist;
+					RetIdx = i;
+				}
+			}
+		}
+		if (RetIdx > 0 && RetIdx < GM->SpawnedDecalArr.Num())
+		{
+			return &(GM->SpawnedDecalArr[RetIdx]);
+		}
+		else
+			return nullptr;//FDecalInfo();
+	}
+	else return nullptr;
+}
 
-// void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
-// {
-// 	if (AttachedTrainWheel)
-// 	{
-// 		AttachedTrainWheel->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-// 		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(AttachedTrainWheel->GetRootComponent()))
-// 		{
-// 			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-// 			TrainWheelComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-// 		}
-// 		AttachedTrainWheel = nullptr;
-// 		OverlappingTrainWheel = nullptr;
-// 	}
-// 	else if (Attachedhelmet)
-// 	{
-// 		Attachedhelmet->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-// 		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Attachedhelmet->GetRootComponent()))
-// 		{
-// 			HelmetComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-// 			HelmetComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-// 		}
-// 
-// 		Attachedhelmet = nullptr;
-// 		Overlappinghelmet = nullptr;
-// 	}
-// }
-
-// void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-// {
-// // 	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
-// // 	{
-// // 		OverlappingTrainWheel = TrainWheel;
-// // 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
-// // 	}
-// // 	else
-// 	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
-// 	{
-// 		OverlappingTrainWheel = TrainWheel;
-// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
-// 	}
 
 
 
