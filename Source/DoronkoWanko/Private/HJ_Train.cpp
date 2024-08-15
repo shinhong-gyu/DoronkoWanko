@@ -146,14 +146,6 @@ void AHJ_Train::NotifyActorBeginOverlap(AActor* OtherActor)
 
 void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
-	//UE_LOG(LogTemp, Warning, TEXT("12 %s"),*OtherActor->GetClass()->GetName());
-	//if (OtherActor->IsA<AHJ_TrainWheel>())
-	//{
-	//	AbleInteract = true;
-	//	// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
-	//	OtherActor->Destroy();
-	//}
 }
 
 
@@ -163,7 +155,6 @@ void AHJ_Train::InteractionWith()
 	{
 	WheelCheck += 1;
 	// 열차 바퀴를 파괴하는 함수 필요 
-	/*CurrentWheel->Destroy();*/
 	auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	if (Player) {
 		if (Player->AttachedStaticObject && Player->AttachedStaticObject->IsA<AHJ_TrainWheel>()) {

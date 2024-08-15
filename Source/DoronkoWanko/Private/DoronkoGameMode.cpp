@@ -147,7 +147,7 @@ void ADoronkoGameMode::SpawnTrainWheel()
 	if (bTrainWheel1)
 	{
 		// 기차바퀴 소환
-		Transform2.SetLocation(FVector(-1935, -2348, 877));
+		Transform2.SetLocation(FVector(-1575, -5565, -570));
 		Transform2.SetRotation(FQuat(FRotator(0, 0, 0)));
 		Transform2.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 
