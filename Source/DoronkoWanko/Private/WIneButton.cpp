@@ -41,7 +41,7 @@ void AWIneButton::Tick(float DeltaTime)
 void AWIneButton::InteractionWith()
 {
 	Red->SetVisibility(true);
-	MeshComp->SetVisibility(true);
+	MeshComp->SetVisibility(false);
 
 	for (int i = 0; i < 500; i++) {
 		Shake();

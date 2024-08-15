@@ -30,11 +30,8 @@ public:
 	FTimerHandle BGMHandler;
 
 	// Á¡¼ö UI 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int32 GameScore = 0; // º¯°æ ÇÊ¿ä 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
-	float MaxScore ;
-	UFUNCTION(BlueprintCallable)
+	int32 GameScore =7300; // º¯°æ ÇÊ¿ä 
+
 	void SetScore(int32 Point);
 
 	void UpdataScoreBoard();
@@ -42,7 +39,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UHG_ScoreBoard> ScoreBoardFactory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	class UHG_ScoreBoard* ScoreBoard;
 
 	// ¼±Ç³±â ¼ÒÈ¯ 
@@ -101,6 +98,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> UIFactory;
 
+	// ¾ËÆÄ ÄÆ¾À À§Á¬ 
 	UPROPERTY()
 	class UWBP_Doronko_Lv1* Lv1UI;
 
@@ -121,6 +119,31 @@ public:
 
 	UPROPERTY()
 	class UWBP_Doronko_Lv4* Lv4UI;
+
+	// º£Å¸ ÄÆ¾À À§Á¬ 
+	UPROPERTY()
+	class UWBP_Doronko_CLv1* CLv1UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC1;
+
+	UPROPERTY()
+	class UWBP_Doronko_CLv2* CLv2UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC2;
+
+	UPROPERTY()
+	class UWBP_Doronko_CLv3* CLv3UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC3;
+
+	UPROPERTY()
+	class UWBP_Doronko_CLv4* CLv4UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC4;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USoundBase* itemSFX;

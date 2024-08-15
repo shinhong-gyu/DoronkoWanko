@@ -5,6 +5,10 @@
 #include "HG_ScoreBoard.h"
 #include "HJ_ElectricFan.h"
 #include "Kismet/GameplayStatics.h"
+#include "WBP_Doronko_CLv1.h"
+#include "WBP_Doronko_CLv2.h"
+#include "WBP_Doronko_CLv3.h"
+#include "WBP_Doronko_CLv4.h"
 #include "WBP_Doronko_Lv1.h"
 #include "WBP_Doronko_Lv2.h"
 #include "WBP_Doronko_Lv3.h"
@@ -33,7 +37,21 @@ void ADoronkoGameMode::BeginPlay()
 
 	Lv4UI = Cast<UWBP_Doronko_Lv4>(CreateWidget(GetWorld(), UIFactory4));
 	Lv4UI->AddToViewport();
-	MaxScore = 9000.0;
+
+	// º£Å¸ ÄÆ¾À ½ÃÄö½º 
+	CLv1UI = Cast<UWBP_Doronko_CLv1>(CreateWidget(GetWorld(), UIFactoryC1));
+	CLv1UI->AddToViewport();
+
+	CLv2UI = Cast<UWBP_Doronko_CLv2>(CreateWidget(GetWorld(), UIFactoryC2));
+	CLv2UI->AddToViewport();
+
+	CLv3UI = Cast<UWBP_Doronko_CLv3>(CreateWidget(GetWorld(), UIFactoryC3));
+	CLv3UI->AddToViewport();
+
+
+	CLv4UI = Cast<UWBP_Doronko_CLv4>(CreateWidget(GetWorld(), UIFactoryC4));
+	CLv4UI->AddToViewport();
+
 }
 
 void ADoronkoGameMode::PlayBGM()
@@ -81,13 +99,13 @@ void ADoronkoGameMode::SetScore(int32 Point)
 
 	if (GameScore > 7500 && GameScore < 7510)
 	{	// Lv.4 ±âÂ÷¹ÙÄû ¼ÒÈ¯ & ÄÆ¾À ¿µ»ó Ãß°¡ Àç»ý¹æÁö 
-		if (countLv3 == 0) {
+		if (countLv4 == 0) {
 			// Lv.3 °í·¡¸ðÀÚ ¼ÒÈ¯ 
 			SpawnWhaleHat();
-			bLv3 = true;
+			bLv4 = true;
 			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
-		countLv3++;
+		countLv4++;
 		// Lv.4 ±âÂ÷¹ÙÄû(2) ¼ÒÈ¯ 
 		SpawnTrainWheel2();
 	}
