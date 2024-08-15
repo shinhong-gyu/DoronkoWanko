@@ -5,6 +5,7 @@
 #include "HG_ScoreBoard.h"
 #include "HJ_ElectricFan.h"
 #include "Kismet/GameplayStatics.h"
+#include "WBP_Doronko_CLv1.h"
 #include "WBP_Doronko_Lv1.h"
 #include "WBP_Doronko_Lv2.h"
 #include "WBP_Doronko_Lv3.h"
@@ -33,6 +34,10 @@ void ADoronkoGameMode::BeginPlay()
 
 	Lv4UI = Cast<UWBP_Doronko_Lv4>(CreateWidget(GetWorld(), UIFactory4));
 	Lv4UI->AddToViewport();
+
+	// º£Å¸ ÄÆ¾À ½ÃÄö½º 
+	CLv1UI = Cast<UWBP_Doronko_CLv1>(CreateWidget(GetWorld(), UIFactoryC1));
+	CLv1UI->AddToViewport();
 
 }
 

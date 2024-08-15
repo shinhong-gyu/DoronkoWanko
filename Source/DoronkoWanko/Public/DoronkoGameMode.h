@@ -30,7 +30,7 @@ public:
 	FTimerHandle BGMHandler;
 
 	// Á¡¼ö UI 
-	int32 GameScore = 0; // º¯°æ ÇÊ¿ä 
+	int32 GameScore =800; // º¯°æ ÇÊ¿ä 
 
 	void SetScore(int32 Point);
 
@@ -98,6 +98,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> UIFactory;
 
+	// ¾ËÆÄ ÄÆ¾À À§Á¬ 
 	UPROPERTY()
 	class UWBP_Doronko_Lv1* Lv1UI;
 
@@ -118,6 +119,13 @@ public:
 
 	UPROPERTY()
 	class UWBP_Doronko_Lv4* Lv4UI;
+
+	// º£Å¸ ÄÆ¾À À§Á¬ 
+	UPROPERTY()
+	class UWBP_Doronko_CLv1* CLv1UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USoundBase* itemSFX;
