@@ -17,6 +17,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "DecalInfoStruct.h"
 #include "HG_EnterInstruction.h"
+#include "Engine/StaticMesh.h"
 
 // Sets default values
 AHG_Splatter::AHG_Splatter()
@@ -32,9 +33,18 @@ AHG_Splatter::AHG_Splatter()
 	SphereComp->SetGenerateOverlapEvents(true);
 	SphereComp->SetCollisionProfileName(TEXT("Splatter"));
 	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+	//FMath::FRandRange
+	MeshComp->SetRelativeScale3D(FVector(FMath::FRandRange(0.6f,0.9f), FMath::FRandRange(1.0f, 1.1f), FMath::FRandRange(0.3f, 0.4f)));
 
 	Velocity = FVector::ZeroVector;
 	MeshComp->SetReceivesDecals(false);
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/HongGyu/Splatoon/Water_Drop.Water_Drop'"));
+	if (TempMesh.Succeeded()) {
+		MeshComp->SetStaticMesh(TempMesh.Object);
+	}
+
+
 
 	int32 RandValue = FMath::RandRange(1, 5);
 	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/Splatoon/M_Paint%d.M_Paint%d"), RandValue, RandValue);
@@ -99,11 +109,13 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (bHit)
 	{
 		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, RandNum, RandNum);
-		if (HittedDecalInfo != nullptr && MyColor == HittedDecalInfo->Color) {
-			HittedDecalInfo->DecalComp->SetRelativeScale3D(FVector(1.0f, 1.1f, 1.1f));
+		if (bSpawnedByRV == false && HittedDecalInfo != nullptr && MyColor == HittedDecalInfo->Color) {
+			UE_LOG(LogTemp, Warning, TEXT("SpawnedBy = false"));
+			HittedDecalInfo->DecalComp->SetRelativeScale3D(FVector(1.0f, 1.3f, 1.3f));
 
 		}
 		else {
+			UE_LOG(LogTemp, Warning, TEXT("bSpawnedBy = true"));
 			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
 			if (Decal) {
 				UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Decal->GetDecalMaterial(), this);

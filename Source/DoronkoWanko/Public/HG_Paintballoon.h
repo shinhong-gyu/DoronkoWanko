@@ -33,4 +33,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> SplatterFactory;
 
+	FLinearColor RandColor;
+
 };

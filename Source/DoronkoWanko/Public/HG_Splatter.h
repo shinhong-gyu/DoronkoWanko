@@ -67,4 +67,6 @@ public:
 
 	int32 SO = 0;
 	FDecalInfo* IsDecalInRange(FVector Pos,float Param1,float Param2);
+
+	bool bSpawnedByRV = false;
 };

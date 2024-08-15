@@ -46,5 +46,5 @@ public:
 
 	AGW_Player* GW_Player;
 
-
+	FLinearColor MyColor = FLinearColor(0.3f,0.0f,0.453f,1.0f);
 };

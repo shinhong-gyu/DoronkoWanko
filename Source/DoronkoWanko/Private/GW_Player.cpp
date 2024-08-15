@@ -23,6 +23,8 @@
 #include "StaticObject.h"
 #include "HG_EnterInstruction.h"
 #include "DoronkoGameMode.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialInterface.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -55,9 +57,8 @@ AGW_Player::AGW_Player()
 	// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
 	// 	}
 
-	ColorArray.SetNum(2);
-	ColorArray[0] = FLinearColor();
-	ColorArray[1] = FLinearColor();
+	ColorArray.SetNum(1);
+	ColorArray[0] = FLinearColor(0.156f, 0.825f, 0.114f);
 }
 
 // Called when the game starts or when spawned
@@ -78,6 +79,15 @@ void AGW_Player::BeginPlay()
 	if (Anim)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ANim"))
+	}
+
+	RecentColor = ColorArray[0];
+
+	UMaterialInterface* CurMaterial = this->GetMesh()->GetMaterial(0);
+	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
+	if (DynamicMaterial) {
+		DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+		this->GetMesh()->SetMaterial(0, DynamicMaterial);
 	}
 }
 
@@ -122,11 +132,18 @@ void AGW_Player::Tick(float DeltaTime)
 	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
 
 	IdxSetTime += DeltaTime;
-	if (IdxSetTime > 1) {
+
+	if (IdxSetTime > 0.5) {
+		for (auto c : ColorArray) {
+			UE_LOG(LogTemp, Warning, TEXT("ColorArray : %s"), *c.ToString());
+		}
 		IdxSetTime = 0;
-		if (CurIdx == 0 && ColorArray[1] != FLinearColor()) CurIdx = 1;
-		else if (CurIdx == 1 && ColorArray[0] != FLinearColor()) CurIdx = 0;
+		if (ColorArray.Num() == 2) {
+			if (CurIdx == 0 && ColorArray[1] != FLinearColor(0.0f, 0.0f, 0.0f, 0.0f)) CurIdx = 1;
+			else if (CurIdx == 1) CurIdx = 0;
+		}
 	}
+
 }
 
 
@@ -247,46 +264,75 @@ void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 	FDecalInfo* HittedDecalInfo;
 
 	FVector end = GetActorLocation();
-	end.Z= -100;
+	end.Z = -100;
 	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, GetActorLocation(), end, ECC_Visibility, params);
 	if (bHit) {
 		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, 1000.0f, 1000.0f);
-		UE_LOG(LogTemp, Warning, TEXT("bHit : %s"),*hitInfo.GetActor()->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("bHit : %s"), *hitInfo.GetActor()->GetName());
 		DrawDebugLine(GetWorld(), GetActorLocation(), end, FColor::Green, false, 10, 0, 1);
 		if (HittedDecalInfo != nullptr) {
+			bHitDecal = true;
+			RecentColor = HittedDecalInfo->Color;
 			UE_LOG(LogTemp, Warning, TEXT("HittedDecal"));
 			UE_LOG(LogTemp, Warning, TEXT("Decal Color : %s"), *(HittedDecalInfo->Color.ToString()));
-			if (count % 2 == 0) {
-				ColorArray[0] = HittedDecalInfo->Color;
+			if (HittedDecalInfo->Color != ColorArray[0] && count == 0) {
+				ColorArray.SetNum(2);
 			}
-			else if(count%2 == 1){
-				ColorArray[1] = HittedDecalInfo->Color;
-			}
-			count++;
-			for (auto a : ColorArray) {
-				UE_LOG(LogTemp, Warning, TEXT("Currnet Array %s"), *(a.ToString()));
+			if (ColorArray.Num() == 2) {
+				if (count % 2 == 0) {
+					ColorArray[0] = HittedDecalInfo->Color;
+				}
+				if (count == 0) {
+					ColorArray[1] = ColorArray[0];
+				}
+				else if (count % 2 == 1) {
+					ColorArray[1] = HittedDecalInfo->Color;
+				}
+				count++;
 			}
 		}
-	}
-	else
-	{
-		// 히트되지 않은 경우
-		UE_LOG(LogTemp, Warning, TEXT("No HittedDecal"));
-		DrawDebugLine(GetWorld(), GetActorLocation(), end, FColor::Red, false, 10, 0, 1);
+		else {
+			bHitDecal = false;
+		}
 	}
 }
 
 void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
 {
-	if (DirtPercentage < 100.0f)
+	FString MaterialPath;
+	UMaterialInterface* NewMaterial;
+	if (DirtPercentage < 100.0f && bHitDecal)
 	{
-		DirtPercentage += 5.0f;
+		DirtPercentage += 1.0f;
 		if (DirtPercentage > 100.0f)
 		{
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
 			DirtPercentage = 100.0f;
 		}
-	}
+		else if (DirtPercentage >= 80.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
+		}
+		else if (DirtPercentage >= 60.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
+		}
+		else if (DirtPercentage >= 40.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
+		}
+		else if (DirtPercentage >= 20.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
+		}
+		else {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
+		}
+		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
 
+		UMaterialInterface* CurMaterial = NewMaterial;
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
+		if (DynamicMaterial) {
+			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+			this->GetMesh()->SetMaterial(0, DynamicMaterial);
+		}
+	}
 }
 
 void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
@@ -301,14 +347,42 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 		{
 			Anim->PlaySplashMontage();
 		}
-
-	if (DirtPercentage > 0.0f)
+	FString MaterialPath;
+	UMaterialInterface* NewMaterial;
+	if (DirtPercentage != 0.0f)
 	{
 		DirtPercentage -= 6.0f;
+		if (DirtPercentage > 100.0f)
+		{
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
+			DirtPercentage = 100.0f;
+		}
+		else if (DirtPercentage >= 80.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
+		}
+		else if (DirtPercentage >= 60.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
+		}
+		else if (DirtPercentage >= 40.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
+		}
+		else if (DirtPercentage >= 20.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
+		}
+		else {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
+		}
 		if (DirtPercentage < 0.0f)
 		{
 			DirtPercentage = 0.0f;
-			ColorArray.Init(FLinearColor(), 2);
+		}
+		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
+
+		UMaterialInterface* CurMaterial = NewMaterial;
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
+		if (DynamicMaterial) {
+			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+			this->GetMesh()->SetMaterial(0, DynamicMaterial);
 		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
@@ -489,7 +563,6 @@ void AGW_Player::HandleMasterItemAttachment(AActor* ObjectToAttach)
 
 void AGW_Player::HandleStaticObjectAttachment(AActor* ObjectToAttach)
 {
-	UE_LOG(LogTemp, Warning, TEXT("1"));
 	// Drop existing DynamicObject if attached
 	if (AttachedStaticObject != nullptr)
 	{
@@ -506,12 +579,10 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	if (AMasterItem* MasterItem = Cast<AMasterItem>(OtherActor))
 	{
 		OverlappingObject = MasterItem;
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *MasterItem->GetName());
 	}
 	else if (AStaticObject* StaticObject = Cast<AStaticObject>(OtherActor))
 	{
 		OverlappingObject = StaticObject;
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *StaticObject->GetName());
 	}
 	// 	else if (ADynamicObject* dObject = Cast<ADynamicObject>(OtherActor))
 	// 	{
@@ -539,7 +610,6 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 			EnterWidget->LifeTime = 2.0f;
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("gdgd"));
 			EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), WidgetFactory);
 			EnterWidget->SetText(TempText);
 			EnterWidget->AddToViewport();
@@ -576,6 +646,7 @@ FDecalInfo* AGW_Player::IsDecalInRange(FVector Pos, float Param1, float Param2)
 	}
 	else return nullptr;
 }
+
 
 
 
