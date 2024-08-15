@@ -294,7 +294,6 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 	if (Anim)
 	{
 		Anim->PlaySplashMontage();
-		UE_LOG(LogTemp, Warning, TEXT("splash"));
 	}
 
 

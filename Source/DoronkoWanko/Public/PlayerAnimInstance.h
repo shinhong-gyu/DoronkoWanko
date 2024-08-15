@@ -42,5 +42,7 @@ public:
 
 	void PlayRubMontage();
 
+	UFUNCTION()
+	void AnimNotify_End();
 
 };
