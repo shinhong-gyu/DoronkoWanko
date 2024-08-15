@@ -8,6 +8,8 @@
 #include "HJ_TrainWheel.h"
 #include "HJ_WhaleHat.h"
 #include "WIneButton.h"
+#include "Components/DecalComponent.h"
+#include "DecalInfoStruct.h"
 #include "DoronkoGameMode.generated.h"
 
 /**
@@ -122,4 +124,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USoundBase* itemSFX;
+
+public:
+
+	TArray<FDecalInfo> SpawnedDecalArr;
 };

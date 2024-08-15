@@ -22,6 +22,7 @@
 #include "PlayerAnimInstance.h"
 #include "StaticObject.h"
 #include "HG_EnterInstruction.h"
+#include "HJ_MinimapUI.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -73,6 +74,16 @@ void AGW_Player::BeginPlay()
 	if (Anim)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("ANim"))
+	}
+
+	if (MinimapUIClass)
+	{
+		MinimapUI = CreateWidget<UHJMiniMapWidget>(GetWorld(), MinimapUIClass);
+		if (MinimapUI)
+		{
+			MinimapUI->AddToViewport();
+			MinimapUI->ShowFloor(1);
+		}
 	}
 }
 
@@ -233,7 +244,7 @@ void AGW_Player::Shake()
 
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
-		int RandInt = FMath::RandRange(1,2);
+		int RandInt = 1;
 		if (RandInt == 1) {
 			Splatter->SetMyColor(FLinearColor::Red);
 		}
