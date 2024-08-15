@@ -32,7 +32,7 @@ AGW_Player::AGW_Player()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	TargetArmLength = 600.0f;
+	TargetArmLength = 300.0f;
 	ZoomSpeed = 75.0f;
 	MinArmLength = 50.0f;
 	MaxArmLength = 1000.0f;
