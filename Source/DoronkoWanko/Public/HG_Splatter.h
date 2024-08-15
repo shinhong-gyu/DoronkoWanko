@@ -65,5 +65,5 @@ public:
 
 	void SetMyColor(FLinearColor Value);
 
-	FDecalInfo IsDecalInRange(FVector Pos,float Param1,float Param2);
+	FDecalInfo* IsDecalInRange(FVector Pos,float Param1,float Param2);
 };
