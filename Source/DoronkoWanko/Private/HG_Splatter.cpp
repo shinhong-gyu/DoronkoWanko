@@ -43,8 +43,10 @@ AHG_Splatter::AHG_Splatter()
 	if (TempMesh.Succeeded()) {
 		MeshComp->SetStaticMesh(TempMesh.Object);
 	}
-
-
+	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial11(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Paint_Origin.M_Paint_Origin'"));
+	if (TempMesh.Succeeded()) {
+		MeshComp->SetMaterial(0, TempMaterial11.Object);
+	}
 
 	int32 RandValue = FMath::RandRange(1, 5);
 	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/Splatoon/M_Paint%d.M_Paint%d"), RandValue, RandValue);
@@ -64,6 +66,7 @@ void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AHG_Splatter::OnMyBeginOverlap);
+
 }
 
 // Called every frame
@@ -76,6 +79,18 @@ void AHG_Splatter::Tick(float DeltaTime)
 	// ม฿ทย
 	Velocity += FVector(0, 0, -980.0f) * DeltaTime;
 	UpdataRotation();
+
+	UMaterialInterface* MaterialInterface = MeshComp->GetMaterial(0);
+	if (MaterialInterface) {
+		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(MaterialInterface);
+		if (!DynamicMaterial) {
+			DynamicMaterial = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+		}
+		if (DynamicMaterial) {
+			DynamicMaterial->SetVectorParameterValue("Color", MyColor);
+			MeshComp->SetMaterial(0, DynamicMaterial);
+		}
+	}
 }
 
 void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
