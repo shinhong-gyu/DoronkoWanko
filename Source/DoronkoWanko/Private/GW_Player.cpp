@@ -54,6 +54,10 @@ AGW_Player::AGW_Player()
 	// 	{
 	// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
 	// 	}
+
+	ColorArray.SetNum(2);
+	ColorArray[0] = FLinearColor();
+	ColorArray[1] = FLinearColor();
 }
 
 // Called when the game starts or when spawned
@@ -114,32 +118,18 @@ void AGW_Player::Tick(float DeltaTime)
 			LookAtActor = nullptr;
 		}
 	}
-	// 	switch (LocState)
-	// 	{
-	// 	case EPlayerRoomState::KITCHEN:
-	// 		UE_LOG(LogTemp, Warning, TEXT("1"));
-	// 		break;
-	// 	case EPlayerRoomState::LIVINGROOM:
-	// 		UE_LOG(LogTemp, Warning, TEXT("2"));
-	// 		break;
-	// 	case EPlayerRoomState::BASEMENTLIVINGROOM:
-	// 		UE_LOG(LogTemp, Warning, TEXT("3"));
-	// 		break;
-	// 	case EPlayerRoomState::WINECELLAR:
-	// 		UE_LOG(LogTemp, Warning, TEXT("4"));
-	// 		break;
-	// 	case EPlayerRoomState::NURSERY:
-	// 		UE_LOG(LogTemp, Warning, TEXT("5"));
-	// 		break;
-	// 	default:
-	// 		break;
-	// 	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
 	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
-	UE_LOG(LogTemp, Warning, TEXT("%d"), GM->StampCount);
+
+	IdxSetTime += DeltaTime;
+	if (IdxSetTime > 1) {
+		IdxSetTime = 0;
+		if (CurIdx == 0 && ColorArray[1] != FLinearColor()) CurIdx = 1;
+		else if (CurIdx == 1 && ColorArray[0] != FLinearColor()) CurIdx = 0;
+	}
 }
 
-// Called to bind functionality to input
+
 void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -220,8 +210,6 @@ void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value)
 void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-
-
 }
 
 void AGW_Player::Shake()
@@ -234,38 +222,58 @@ void AGW_Player::Shake()
 
 	if (Splatter) {
 		Splatter->Initalize(InitialVelocity);
-		int RandInt = 1;
-		if (RandInt == 1) {
-			Splatter->SetMyColor(FLinearColor::Red);
-		}
-		else {
-			Splatter->SetMyColor(FLinearColor::White);
-		}
-
+		Splatter->SetMyColor(ColorArray[CurIdx]);
 	}
 
 
 }
 void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
-	FColor NewColor = FColor::MakeRandomColor();
-	ColorArray.Add(NewColor);
-
-	// 	if (GEngine)
-	// 	{
-	// 		// 배열의 모든 항목을 화면에 표시
-	// 		for (int32 i = 0; i < ColorArray.Num(); i++)
-	// 		{
-	// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-	// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
-	// 		}
-	// 	}
 	check(Anim)
 		if (Anim)
 		{
 			Anim->PlayRubMontage();
 			UE_LOG(LogTemp, Warning, TEXT("Rub"));
 		}
+
+	FHitResult hitInfo;
+	FCollisionQueryParams params;
+	FCollisionObjectQueryParams QParams;
+
+	QParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+	params.AddIgnoredActor(this);
+
+	FDecalInfo* HittedDecalInfo;
+
+	FVector end = GetActorLocation();
+	end.Z= -100;
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, GetActorLocation(), end, ECC_Visibility, params);
+	if (bHit) {
+		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, 1000.0f, 1000.0f);
+		UE_LOG(LogTemp, Warning, TEXT("bHit : %s"),*hitInfo.GetActor()->GetName());
+		DrawDebugLine(GetWorld(), GetActorLocation(), end, FColor::Green, false, 10, 0, 1);
+		if (HittedDecalInfo != nullptr) {
+			UE_LOG(LogTemp, Warning, TEXT("HittedDecal"));
+			UE_LOG(LogTemp, Warning, TEXT("Decal Color : %s"), *(HittedDecalInfo->Color.ToString()));
+			if (count % 2 == 0) {
+				ColorArray[0] = HittedDecalInfo->Color;
+			}
+			else if(count%2 == 1){
+				ColorArray[1] = HittedDecalInfo->Color;
+			}
+			count++;
+			for (auto a : ColorArray) {
+				UE_LOG(LogTemp, Warning, TEXT("Currnet Array %s"), *(a.ToString()));
+			}
+		}
+	}
+	else
+	{
+		// 히트되지 않은 경우
+		UE_LOG(LogTemp, Warning, TEXT("No HittedDecal"));
+		DrawDebugLine(GetWorld(), GetActorLocation(), end, FColor::Red, false, 10, 0, 1);
+	}
 }
 
 void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
@@ -288,20 +296,19 @@ void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
 
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 {
-	// 	UPlayerAnimInstance* anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	check(Anim)
 		if (Anim)
 		{
 			Anim->PlaySplashMontage();
 		}
 
-
 	if (DirtPercentage > 0.0f)
 	{
-		DirtPercentage -= 0.25f;
+		DirtPercentage -= 6.0f;
 		if (DirtPercentage < 0.0f)
 		{
 			DirtPercentage = 0.0f;
+			ColorArray.Init(FLinearColor(), 2);
 		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
@@ -376,8 +383,8 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 		dropObject(AttachedMasterItem);
 	}
 	UGameplayStatics::PlaySound2D(GetWorld(), Drop);
-
 }
+
 void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 {
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
@@ -512,6 +519,7 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *dObject->GetName());
 	// 	}
 }
+
 void AGW_Player::SetLocState(EPlayerRoomState Loc)
 {
 	FText TempText;
@@ -540,78 +548,34 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 	LocState = Loc;
 }
 
-// void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
-// {
-// 	if (OverlappingTrainWheel && !AttachedTrainWheel)
-// 	{
-// 		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
-// 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-// 		OverlappingTrainWheel->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
-// 		OverlappingTrainWheel->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-// 			1.0f / GetMesh()->GetComponentScale().Y,1.0f / GetMesh()->GetComponentScale().Z));
-// 		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(OverlappingTrainWheel->GetRootComponent()))
-// 		{
-// 			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-// 		}
-// 		AttachedTrainWheel = OverlappingTrainWheel;
-// 	}
-// 	if (Overlappinghelmet && !Attachedhelmet)
-// 	{
-// 		// OverlappingTrainWheel을 플레이어의 특정 소켓에 부착
-// 		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-// 		Overlappinghelmet->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
-// 		Overlappinghelmet->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-// 			1.0f / GetMesh()->GetComponentScale().Y,1.0f / GetMesh()->GetComponentScale().Z));
-// 		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Overlappinghelmet->GetRootComponent()))
-// 		{
-// 			HelmetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-// 		}
-// 		Attachedhelmet = Overlappinghelmet;
-// 	}
-// 
-// 
-// }
-
-// void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
-// {
-// 	if (AttachedTrainWheel)
-// 	{
-// 		AttachedTrainWheel->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-// 		if (UPrimitiveComponent* TrainWheelComp = Cast<UPrimitiveComponent>(AttachedTrainWheel->GetRootComponent()))
-// 		{
-// 			TrainWheelComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-// 			TrainWheelComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-// 		}
-// 		AttachedTrainWheel = nullptr;
-// 		OverlappingTrainWheel = nullptr;
-// 	}
-// 	else if (Attachedhelmet)
-// 	{
-// 		Attachedhelmet->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-// 		if (UPrimitiveComponent* HelmetComp = Cast<UPrimitiveComponent>(Attachedhelmet->GetRootComponent()))
-// 		{
-// 			HelmetComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-// 			HelmetComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-// 		}
-// 
-// 		Attachedhelmet = nullptr;
-// 		Overlappinghelmet = nullptr;
-// 	}
-// }
-
-// void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-// {
-// // 	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
-// // 	{
-// // 		OverlappingTrainWheel = TrainWheel;
-// // 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
-// // 	}
-// // 	else
-// 	if (AHJ_TrainWheel* TrainWheel = Cast<AHJ_TrainWheel>(OtherActor))
-// 	{
-// 		OverlappingTrainWheel = TrainWheel;
-// 		UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *TrainWheel->GetName());
-// 	}
+FDecalInfo* AGW_Player::IsDecalInRange(FVector Pos, float Param1, float Param2)
+{
+	FVector Dist;
+	FVector Min = FVector(1000.0f, 1000.0f, 1000.0f);
+	int32 RetIdx = -1;
+	ADoronkoGameMode* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM) {
+		for (int i = 0; i < GM->SpawnedDecalArr.Num(); i++) {
+			Dist = Pos - GM->SpawnedDecalArr[i].DecalComp->GetComponentLocation();
+			// 만약 원하는 거리 안에 있으면
+			if (Param1 * Param1 + Param2 * Param2 > Dist.Size() * Dist.Size()) {
+				// 가장 가까운 DecalComp찾기
+				// Min 값 업데이트
+				if (Min.Size() >= Dist.Size()) {
+					Min = Dist;
+					RetIdx = i;
+				}
+			}
+		}
+		if (RetIdx > 0 && RetIdx < GM->SpawnedDecalArr.Num())
+		{
+			return &(GM->SpawnedDecalArr[RetIdx]);
+		}
+		else
+			return nullptr;//FDecalInfo();
+	}
+	else return nullptr;
+}
 
 
 
