@@ -30,8 +30,11 @@ public:
 	FTimerHandle BGMHandler;
 
 	// 점수 UI 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 GameScore = 0; // 변경 필요 
-
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	float MaxScore ;
+	UFUNCTION(BlueprintCallable)
 	void SetScore(int32 Point);
 
 	void UpdataScoreBoard();
@@ -39,7 +42,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UHG_ScoreBoard> ScoreBoardFactory;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UHG_ScoreBoard* ScoreBoard;
 
 	// 선풍기 소환 

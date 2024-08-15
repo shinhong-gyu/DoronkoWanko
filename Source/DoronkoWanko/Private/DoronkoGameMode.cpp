@@ -33,7 +33,7 @@ void ADoronkoGameMode::BeginPlay()
 
 	Lv4UI = Cast<UWBP_Doronko_Lv4>(CreateWidget(GetWorld(), UIFactory4));
 	Lv4UI->AddToViewport();
-
+	MaxScore = 9000.0;
 }
 
 void ADoronkoGameMode::PlayBGM()

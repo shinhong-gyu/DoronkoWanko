@@ -22,7 +22,7 @@
 #include "PlayerAnimInstance.h"
 #include "StaticObject.h"
 #include "HG_EnterInstruction.h"
-#include "DoronkoGameMode.h"
+#include "HJ_MinimapUI.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -75,6 +75,16 @@ void AGW_Player::BeginPlay()
 	{
 		UE_LOG(LogTemp,Warning,TEXT("ANim"))
 	}
+
+	if (MinimapUIClass)
+	{
+		MinimapUI = CreateWidget<UHJMiniMapWidget>(GetWorld(), MinimapUIClass);
+		if (MinimapUI)
+		{
+			MinimapUI->AddToViewport();
+			MinimapUI->ShowFloor(1);
+		}
+	}
 }
 
 // Called every frame
@@ -94,12 +104,14 @@ void AGW_Player::Tick(float DeltaTime)
 	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
 		if (LookAtActor == nullptr) {
 			if (OutHit.GetActor() != LookAtActor) {
 				LookAtActor = OutHit.GetActor();
+				UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
 				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 				if (Interface) {
 					Interface->LookAt();
@@ -135,8 +147,6 @@ void AGW_Player::Tick(float DeltaTime)
 // 		break;
 // 	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
-	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
-	UE_LOG(LogTemp,Warning,TEXT("%d"),GM->StampCount);
 }
 
 // Called to bind functionality to input
