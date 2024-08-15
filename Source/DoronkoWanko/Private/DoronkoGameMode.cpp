@@ -52,6 +52,9 @@ void ADoronkoGameMode::BeginPlay()
 	CLv4UI = Cast<UWBP_Doronko_CLv4>(CreateWidget(GetWorld(), UIFactoryC4));
 	CLv4UI->AddToViewport();
 
+	CLv5UI = Cast<UWBP_Doronko_CLv5>(CreateWidget(GetWorld(), UIFactoryC5));
+	CLv5UI->AddToViewport();
+
 }
 
 void ADoronkoGameMode::PlayBGM()
@@ -100,21 +103,25 @@ void ADoronkoGameMode::SetScore(int32 Point)
 	if (GameScore > 7500 && GameScore < 7510)
 	{	// Lv.4 기차바퀴 소환 & 컷씬 영상 추가 재생방지 
 		if (countLv4 == 0) {
-			// Lv.3 고래모자 소환 
-			SpawnWhaleHat();
+			
+			SpawnTrainWheel2();
 			bLv4 = true;
 			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv4++;
 		// Lv.4 기차바퀴(2) 소환 
-		SpawnTrainWheel2();
 	}
 
 	/*if (GameScore > 10000 && GameScore < 10010)*/ // 테스트 후 복구 예정 
 	if (GameScore >= 9000 && GameScore < 9010)
 	{
-		// Lv.5 와인버튼 소환 
-		SpawnWineButton();
+		if (countLv5 == 0) {
+			// Lv.5 와인버튼 소환 
+			SpawnWineButton();
+			bLv5 = true;
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
+		}
+		countLv5++;
 	}
 }
 

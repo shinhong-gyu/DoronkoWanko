@@ -10,6 +10,7 @@
 #include "WIneButton.h"
 #include "Components/DecalComponent.h"
 #include "DecalInfoStruct.h"
+#include "WBP_Doronko_CLv5.h"
 #include "DoronkoGameMode.generated.h"
 
 /**
@@ -30,7 +31,7 @@ public:
 	FTimerHandle BGMHandler;
 
 	// 점수 UI 
-	int32 GameScore =7300; // 변경 필요 
+	int32 GameScore =600; // 변경 필요 
 
 	void SetScore(int32 Point);
 
@@ -84,6 +85,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLv4 = false;
 	int countLv4 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bLv5 = false;
+	int countLv5 = 0;
 
 	int StampCount = 0;
 
@@ -144,6 +149,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> UIFactoryC4;
+
+	UPROPERTY()
+	class UWBP_Doronko_CLv5* CLv5UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USoundBase* itemSFX;
