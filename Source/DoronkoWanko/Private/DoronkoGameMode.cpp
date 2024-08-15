@@ -55,6 +55,8 @@ void ADoronkoGameMode::BeginPlay()
 	CLv5UI = Cast<UWBP_Doronko_CLv5>(CreateWidget(GetWorld(), UIFactoryC5));
 	CLv5UI->AddToViewport();
 
+	MaxScore = 9000.0f;
+
 }
 
 void ADoronkoGameMode::PlayBGM()

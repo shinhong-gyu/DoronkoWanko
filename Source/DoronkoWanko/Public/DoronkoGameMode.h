@@ -31,7 +31,11 @@ public:
 	FTimerHandle BGMHandler;
 
 	// 점수 UI 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int32 GameScore =3300; // 변경 필요 
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float MaxScore;
 
 	void SetScore(int32 Point);
 
