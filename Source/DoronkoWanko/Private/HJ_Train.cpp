@@ -98,13 +98,14 @@ void AHJ_Train::Tick(float DeltaTime)
 		if (CurrTime > MakeTime)
 		{
 			// 물감 스폰하기 (정수리에서 Ink 가 Spawn 되도록)
-
+			FLinearColor RandColor = FLinearColor::MakeRandomColor();
 			FTransform T = InkArrow->GetComponentTransform();
 			auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
 
 			if (nullptr != Ink) {
 				Ink->MeshComp->SetVisibility(false);
 				Ink->Initalize(FVector(-100, 0, 0));
+				Ink->SetMyColor(RandColor);
 			}
 			CurrTime = 0;
 		}

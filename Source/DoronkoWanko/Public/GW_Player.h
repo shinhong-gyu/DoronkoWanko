@@ -196,4 +196,5 @@ public:
 	bool bHitDecal = false;
 
 	FLinearColor RecentColor;
+
 };

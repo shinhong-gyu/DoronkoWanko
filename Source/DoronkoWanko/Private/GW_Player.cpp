@@ -25,6 +25,7 @@
 #include "DoronkoGameMode.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInterface.h"
+#include "HJMiniMapWidget.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -65,6 +66,9 @@ AGW_Player::AGW_Player()
 void AGW_Player::BeginPlay()
 {
 	Super::BeginPlay();
+
+	MinimapUI = Cast<UHJMiniMapWidget>(CreateWidget(GetWorld(), MinimapUIClass));
+	if(MinimapUI)	MinimapUI->AddToViewport();
 
 	auto* pc = Cast<APlayerController>(Controller);
 	if (pc)
@@ -269,7 +273,6 @@ void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 	if (bHit) {
 		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, 1000.0f, 1000.0f);
 		UE_LOG(LogTemp, Warning, TEXT("bHit : %s"), *hitInfo.GetActor()->GetName());
-		DrawDebugLine(GetWorld(), GetActorLocation(), end, FColor::Green, false, 10, 0, 1);
 		if (HittedDecalInfo != nullptr) {
 			bHitDecal = true;
 			RecentColor = HittedDecalInfo->Color;

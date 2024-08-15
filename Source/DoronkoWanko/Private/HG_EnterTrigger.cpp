@@ -6,6 +6,7 @@
 #include "HG_EnterInstruction.h"
 #include "Components/BoxComponent.h"
 #include "GW_Player.h"
+#include "HJMiniMapWidget.h"
 
 // Sets default values
 AHG_EnterTrigger::AHG_EnterTrigger()
