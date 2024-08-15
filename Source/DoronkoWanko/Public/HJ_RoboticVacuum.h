@@ -82,4 +82,7 @@ public:
 	// 没家扁 累悼 家府 
 	UPROPERTY(EditAnywhere)
 	class USoundBase* VacuumSFX;
+
+
+	FLinearColor MyColor;
 };

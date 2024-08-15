@@ -67,6 +67,7 @@ void AHJ_WhaleHat::SpawnInk()
 
 	if (nullptr != Ink) {
 		Ink->Initalize(InitialVelocity);
+		Ink->SetMyColor(MyColor);
 	}
 }
 

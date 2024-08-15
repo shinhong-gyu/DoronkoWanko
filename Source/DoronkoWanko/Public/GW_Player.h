@@ -191,5 +191,9 @@ public:
 
 	FDecalInfo* IsDecalInRange(FVector Pos, float Param1, float Param2);
 
-	int count = 0;
+	int32 count = 0;
+
+	bool bHitDecal = false;
+
+	FLinearColor RecentColor;
 };
