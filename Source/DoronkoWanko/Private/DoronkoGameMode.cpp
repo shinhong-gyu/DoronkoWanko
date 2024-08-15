@@ -133,7 +133,7 @@ void ADoronkoGameMode::UpdataScoreBoard()
 void ADoronkoGameMode::SpawnWingFan()
 {
 	// º±«≥±‚ º“»Ø 
-	Transform1.SetLocation(FVector(-675, 338, 292));
+	Transform1.SetLocation(FVector(-790, 170, 165));
 	Transform1.SetRotation(FQuat(FRotator(0, 180, 0)));
 	Transform1.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 

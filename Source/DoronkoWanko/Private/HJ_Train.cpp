@@ -57,7 +57,7 @@ void AHJ_Train::BeginPlay()
 	// 기차 바퀴 캐스트
 	CurrentWheel = Cast<AHJ_TrainWheel>(UGameplayStatics::GetActorOfClass(GetWorld(), WheelFactory));
 
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this,&AHJ_Train::OnOverlapBegin);
+	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AHJ_Train::OnOverlapBegin);
 }
 
 // Called every frame
@@ -83,7 +83,7 @@ void AHJ_Train::Tick(float DeltaTime)
 		float Y = Radius * FMath::Sin(CurrentAngle);
 		float Z = GetActorLocation().Z;
 
-		SetActorLocation(FVector(X - 1650.f, Y - 4300.f, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
+		SetActorLocation(FVector(X - 1850.f, Y - 4400.f, Z)); // 위치 정해지면 FVector(X,Y,Z) 더해주기 
 
 		CurrentRotationAngel += RotationSpeed * DeltaTime;
 		if (CurrentRotationAngel > 360.0f)
@@ -128,13 +128,13 @@ void AHJ_Train::NotifyActorBeginOverlap(AActor* OtherActor)
 		auto* Player = Cast<AGW_Player>(OtherActor);
 		if (Player) {
 			if (Player->AttachedStaticObject && Player->AttachedStaticObject->IsA<AHJ_TrainWheel>()) {
-				Player->AttachedStaticObject->Destroy();
+				AbleInteract = true;
 			}
 		}
 		UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
 	}
-	 //바퀴가 함께 충돌할 때만 상호작용 가능 
-	/*UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));*/
+	//바퀴가 함께 충돌할 때만 상호작용 가능 
+   /*UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));*/
 
 // 	if (OtherActor->IsA<AHJ_TrainWheel>())
 // 	{
@@ -146,7 +146,7 @@ void AHJ_Train::NotifyActorBeginOverlap(AActor* OtherActor)
 
 void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
+
 	//UE_LOG(LogTemp, Warning, TEXT("12 %s"),*OtherActor->GetClass()->GetName());
 	//if (OtherActor->IsA<AHJ_TrainWheel>())
 	//{
@@ -159,13 +159,20 @@ void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Othe
 
 void AHJ_Train::InteractionWith()
 {
-	//if (AbleInteract)
-	//{
-		WheelCheck += 1;
-		// 열차 바퀴를 파괴하는 함수 필요 
-		/*CurrentWheel->Destroy();*/
-		AbleInteract = false;
-	/*}*/
+	if (AbleInteract)
+	{
+	WheelCheck += 1;
+	// 열차 바퀴를 파괴하는 함수 필요 
+	/*CurrentWheel->Destroy();*/
+	auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	if (Player) {
+		if (Player->AttachedStaticObject && Player->AttachedStaticObject->IsA<AHJ_TrainWheel>()) {
+			Player->AttachedStaticObject->Destroy();
+			AbleInteract = false;
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
+	}
 }
 
 void AHJ_Train::ItemDrop()
