@@ -100,8 +100,8 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, RandNum, RandNum);
 		if (HittedDecalInfo != nullptr && MyColor == HittedDecalInfo->Color) {
-			HittedDecalInfo->DecalComp->SetRelativeScale3D(FVector(1.0f, 1.1f, 1.1f));// += FVector(0.0f, 5.0f, 5.0f);
-			
+			HittedDecalInfo->DecalComp->SetRelativeScale3D(FVector(1.0f, 1.1f, 1.1f));
+
 		}
 		else {
 			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
@@ -110,6 +110,8 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 				if (DynamicMaterial) {
 					DynamicMaterial->SetVectorParameterValue("Color", MyColor);
 					Decal->SetDecalMaterial(DynamicMaterial);
+					Decal->SetSortOrder(SO);
+					SO++;
 				}
 			}
 			SpawnDeaclInfo.DecalComp = Decal;
@@ -126,7 +128,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 				GM->StampCount++;
 				auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 				Player->MinimapUI->MiniMapUpdate(s->StampID);
-			}	
+			}
 		}
 	}
 }
@@ -191,7 +193,7 @@ FDecalInfo* AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2
 	{
 		//GM->SpawnedDecalArr[RetIdx].DecalComp->DecalSize += FVector(0.0f, 1000.0f, 1000.0f);
 		return &(GM->SpawnedDecalArr[RetIdx]);
-		}
+	}
 	else
 		return nullptr;//FDecalInfo();
 }
