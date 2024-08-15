@@ -22,7 +22,7 @@
 #include "PlayerAnimInstance.h"
 #include "StaticObject.h"
 #include "HG_EnterInstruction.h"
-#include "HJ_MinimapUI.h"
+#include "DoronkoGameMode.h"
 
 // Sets default values
 AGW_Player::AGW_Player()
@@ -48,12 +48,12 @@ AGW_Player::AGW_Player()
 	AttachedMasterItem = nullptr;
 	AttachedStaticObject = nullptr;
 	OverlappingObject = nullptr;
-// 	bIsDropping = false;
-// 	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
-// 	if (TempAnimInst.Succeeded())
-// 	{
-// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
-// 	}
+	// 	bIsDropping = false;
+	// 	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
+	// 	if (TempAnimInst.Succeeded())
+	// 	{
+	// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
+	// 	}
 }
 
 // Called when the game starts or when spawned
@@ -68,22 +68,12 @@ void AGW_Player::BeginPlay()
 		if (subSys)
 		{
 			subSys->AddMappingContext(IMC_Player, 0);
-		} 
+		}
 	}
 	Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	if (Anim)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("ANim"))
-	}
-
-	if (MinimapUIClass)
-	{
-		MinimapUI = CreateWidget<UHJMiniMapWidget>(GetWorld(), MinimapUIClass);
-		if (MinimapUI)
-		{
-			MinimapUI->AddToViewport();
-			MinimapUI->ShowFloor(1);
-		}
+		UE_LOG(LogTemp, Warning, TEXT("ANim"))
 	}
 }
 
@@ -104,14 +94,12 @@ void AGW_Player::Tick(float DeltaTime)
 	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true);
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.
 		if (LookAtActor == nullptr) {
 			if (OutHit.GetActor() != LookAtActor) {
 				LookAtActor = OutHit.GetActor();
-				UE_LOG(LogTemp, Warning, TEXT("LookAt : %s"), *LookAtActor->GetClass()->GetName());
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *OutHit.GetActor()->GetClass()->GetName());
 				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
 				if (Interface) {
 					Interface->LookAt();
@@ -126,27 +114,29 @@ void AGW_Player::Tick(float DeltaTime)
 			LookAtActor = nullptr;
 		}
 	}
-// 	switch (LocState)
-// 	{
-// 	case EPlayerRoomState::KITCHEN:
-// 		UE_LOG(LogTemp, Warning, TEXT("1"));
-// 		break;
-// 	case EPlayerRoomState::LIVINGROOM:
-// 		UE_LOG(LogTemp, Warning, TEXT("2"));
-// 		break;
-// 	case EPlayerRoomState::BASEMENTLIVINGROOM:
-// 		UE_LOG(LogTemp, Warning, TEXT("3"));
-// 		break;
-// 	case EPlayerRoomState::WINECELLAR:
-// 		UE_LOG(LogTemp, Warning, TEXT("4"));
-// 		break;
-// 	case EPlayerRoomState::NURSERY:
-// 		UE_LOG(LogTemp, Warning, TEXT("5"));
-// 		break;
-// 	default:
-// 		break;
-// 	}
+	// 	switch (LocState)
+	// 	{
+	// 	case EPlayerRoomState::KITCHEN:
+	// 		UE_LOG(LogTemp, Warning, TEXT("1"));
+	// 		break;
+	// 	case EPlayerRoomState::LIVINGROOM:
+	// 		UE_LOG(LogTemp, Warning, TEXT("2"));
+	// 		break;
+	// 	case EPlayerRoomState::BASEMENTLIVINGROOM:
+	// 		UE_LOG(LogTemp, Warning, TEXT("3"));
+	// 		break;
+	// 	case EPlayerRoomState::WINECELLAR:
+	// 		UE_LOG(LogTemp, Warning, TEXT("4"));
+	// 		break;
+	// 	case EPlayerRoomState::NURSERY:
+	// 		UE_LOG(LogTemp, Warning, TEXT("5"));
+	// 		break;
+	// 	default:
+	// 		break;
+	// 	}
 	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
+	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+	UE_LOG(LogTemp, Warning, TEXT("%d"), GM->StampCount);
 }
 
 // Called to bind functionality to input
@@ -251,33 +241,31 @@ void AGW_Player::Shake()
 		else {
 			Splatter->SetMyColor(FLinearColor::White);
 		}
-		
+
 	}
 
-	
+
 }
 void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
 	FColor NewColor = FColor::MakeRandomColor();
 	ColorArray.Add(NewColor);
 
-// 	if (GEngine)
-// 	{
-// 		// 배열의 모든 항목을 화면에 표시
-// 		for (int32 i = 0; i < ColorArray.Num(); i++)
-// 		{
-// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
-// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
-// 		}
-// 	}
+	// 	if (GEngine)
+	// 	{
+	// 		// 배열의 모든 항목을 화면에 표시
+	// 		for (int32 i = 0; i < ColorArray.Num(); i++)
+	// 		{
+	// 			FString Message = FString::Printf(TEXT("Color[%d]: %s"), i, *ColorArray[i].ToString());
+	// 			GEngine->AddOnScreenDebugMessage(-1, 5.f, ColorArray[i], Message);
+	// 		}
+	// 	}
 	check(Anim)
 		if (Anim)
 		{
 			Anim->PlayRubMontage();
 			UE_LOG(LogTemp, Warning, TEXT("Rub"));
 		}
-
-
 }
 
 void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
@@ -299,13 +287,13 @@ void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
 
 
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
-{	
-// 	UPlayerAnimInstance* anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+{
+	// 	UPlayerAnimInstance* anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	check(Anim)
-	if (Anim)
-	{
-		Anim->PlaySplashMontage();
-	}
+		if (Anim)
+		{
+			Anim->PlaySplashMontage();
+		}
 
 
 	if (DirtPercentage > 0.0f)
@@ -355,12 +343,12 @@ void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 		}
 
 	}
-	
+
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-	
+
 
 	if (AttachedStaticObject != nullptr)
 	{
@@ -407,12 +395,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedMasterItem = MasterItem;
-// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-// 		LookAtActor = nullptr;
-// 		if (Interface) {
-// 			Interface->FadeAway();
-// 			LookAtActor = nullptr;
-// 		}
+		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		// 		LookAtActor = nullptr;
+		// 		if (Interface) {
+		// 			Interface->FadeAway();
+		// 			LookAtActor = nullptr;
+		// 		}
 	}
 	else if (AStaticObject* StaticicObject = Cast<AStaticObject>(ObjectToAttach))
 	{
@@ -426,12 +414,12 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedStaticObject = StaticicObject;
-// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-// 		LookAtActor = nullptr;
-// 		if (Interface) {
-// 			Interface->FadeAway();
-// 			LookAtActor = nullptr;
-// 		}
+		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
+		// 		LookAtActor = nullptr;
+		// 		if (Interface) {
+		// 			Interface->FadeAway();
+		// 			LookAtActor = nullptr;
+		// 		}
 	}
 }
 
@@ -494,7 +482,7 @@ void AGW_Player::HandleMasterItemAttachment(AActor* ObjectToAttach)
 
 void AGW_Player::HandleStaticObjectAttachment(AActor* ObjectToAttach)
 {
-	UE_LOG(LogTemp,Warning,TEXT("1"));
+	UE_LOG(LogTemp, Warning, TEXT("1"));
 	// Drop existing DynamicObject if attached
 	if (AttachedStaticObject != nullptr)
 	{
