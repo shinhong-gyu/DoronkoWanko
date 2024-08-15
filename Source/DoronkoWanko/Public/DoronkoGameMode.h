@@ -30,7 +30,7 @@ public:
 	FTimerHandle BGMHandler;
 
 	// 점수 UI 
-	int32 GameScore =800; // 변경 필요 
+	int32 GameScore =7300; // 변경 필요 
 
 	void SetScore(int32 Point);
 
@@ -126,6 +126,24 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> UIFactoryC1;
+
+	UPROPERTY()
+	class UWBP_Doronko_CLv2* CLv2UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC2;
+
+	UPROPERTY()
+	class UWBP_Doronko_CLv3* CLv3UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC3;
+
+	UPROPERTY()
+	class UWBP_Doronko_CLv4* CLv4UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> UIFactoryC4;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USoundBase* itemSFX;
