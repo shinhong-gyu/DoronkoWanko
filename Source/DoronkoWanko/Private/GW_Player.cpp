@@ -106,12 +106,14 @@ void AGW_Player::Tick(float DeltaTime)
 	Direction.Normalize();
 	AddMovementInput(Direction, 1);
 	Direction = FVector::ZeroVector;
+
 	FHitResult OutHit;
 	FVector Start = GetActorLocation() - FVector(0, 0, -36.666f);
 	FVector End = Start + GetActorForwardVector() * 100;
 	ETraceTypeQuery TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
+
 	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
 	if (bHit) {
 		// 바라본 곳에 뭔가 있다.

@@ -65,6 +65,7 @@ AHG_Splatter::AHG_Splatter()
 void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AHG_Splatter::OnMyBeginOverlap);
 
 }
@@ -76,7 +77,7 @@ void AHG_Splatter::Tick(float DeltaTime)
 	FVector NewLocation = GetActorLocation() + (Velocity * DeltaTime);
 	SetActorLocation(NewLocation);
 
-	// Áß·Â
+	// ï¿½ß·ï¿½
 	Velocity += FVector(0, 0, -980.0f) * DeltaTime;
 	UpdataRotation();
 
@@ -206,10 +207,10 @@ FDecalInfo* AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2
 	ADoronkoGameMode* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
 	for (int i = 0; i < GM->SpawnedDecalArr.Num(); i++) {
 		Dist = Pos - GM->SpawnedDecalArr[i].DecalComp->GetComponentLocation();
-		// ¸¸¾à ¿øÇÏ´Â °Å¸® ¾È¿¡ ÀÖÀ¸¸é
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Å¸ï¿½ ï¿½È¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		if ((Param1 / 2) * (Param1 / 2) + (Param2 / 2) * (Param2 / 2) > Dist.Size() * Dist.Size()) {
-			// °¡Àå °¡±î¿î DecalCompÃ£±â
-			// Min °ª ¾÷µ¥ÀÌÆ®
+			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ DecalCompÃ£ï¿½ï¿½
+			// Min ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 			if (Min.Size() >= Dist.Size()) {
 				Min = Dist;
 				RetIdx = i;
