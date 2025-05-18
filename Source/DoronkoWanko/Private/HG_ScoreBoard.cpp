@@ -6,5 +6,6 @@
 
 void UHG_ScoreBoard::SetText(int32 value)
 {
+	// 업데이트
 	Score->SetText(FText::AsNumber(value));
 }

@@ -37,9 +37,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UPlayerAnimInstance::PlaySplashMontage()
 {
-
-Montage_Play(SplashMontage);
-		
+	Montage_Play(SplashMontage);
 }
 
 void UPlayerAnimInstance::PlayRubMontage()
@@ -58,6 +56,40 @@ void UPlayerAnimInstance::AnimNotify_End()
 	if (Player)
 	{
 		Player->GetCharacterMovement()->MaxWalkSpeed = Player->WalkSpeed;
+	}
+}
+void UPlayerAnimInstance::AnimNotify_rubEnd()
+{
+	AGW_Player* Player = Cast<AGW_Player>(TryGetPawnOwner());
+	if (Player)
+	{
+		if (Player->bRubbing)
+		{
+			Montage_JumpToSection(TEXT("rub"),RubMontage);
+
+		}
+		else
+		{
+			Montage_JumpToSection(TEXT("wakeup"),RubMontage);
+
+		}
+	}
+}
+void UPlayerAnimInstance::AnimNotify_SplashEnd()
+{
+	AGW_Player* Player = Cast<AGW_Player>(TryGetPawnOwner());
+	if (Player)
+	{
+		if (Player->bShaking)
+		{
+			Montage_JumpToSection(TEXT("Splash"), SplashMontage);
+
+		}
+		else
+		{
+			Montage_JumpToSection(TEXT("SplashEnd"), SplashMontage);
+
+		}
 	}
 }
 // void UPlayerAnimInstance::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)

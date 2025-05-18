@@ -17,11 +17,11 @@
 UENUM(BlueprintType)
 enum class EPlayerRoomState : uint8
 {
-   KITCHEN,
-   LIVINGROOM,
-   BASEMENTLIVINGROOM,
-   WINECELLAR,
-   NURSERY,
+	KITCHEN,
+	LIVINGROOM,
+	BASEMENTLIVINGROOM,
+	WINECELLAR,
+	NURSERY,
 };
 
 
@@ -104,6 +104,7 @@ public:
 	float WalkSpeed = 500.0f;
 
 public:
+
 	AActor* LookAtActor = nullptr;
 	TArray<FLinearColor> ColorArray;
 
@@ -117,11 +118,15 @@ public:
 
 	void OnMyActionDirtEnd(const FInputActionValue& Value);
 
+	void OnMyActionSplashEnd(const FInputActionValue& Value);
+
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Splash;
 
 	void OnMyActionSplash(const FInputActionValue& Value);
+
+	void OnMyActionSplashOngoing(const FInputActionValue& Value);
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_Interaction;
@@ -145,7 +150,7 @@ public:
 	UPROPERTY()
 	class AActor* OverlappingObject;
 
-
+	float SplashDelay = 0.0f;
 
 
 	void dropObject(AActor* ObjectToDrop);
@@ -178,12 +183,12 @@ public:
 	class UHG_EnterInstruction* EnterWidget = nullptr;
 	// 플레이어가 현재 위치한 방
 	UPROPERTY(EditAnywhere)
-	EPlayerRoomState LocState = EPlayerRoomState::LIVINGROOM;
+	EPlayerRoomState PlayerRoomState;
 
 	// 방이 바뀔 때 마다 LocState를 업데이트 하는 함수
 	void SetLocState(EPlayerRoomState Loc);
 
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UUserWidget> MinimapUIClass;
 
@@ -197,4 +202,6 @@ public:
 
 	FLinearColor RecentColor;
 
+	uint8 bRubbing: 1;
+	uint8 bShaking: 1;
 };

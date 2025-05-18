@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -22,21 +22,23 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	// 플레이어가 방에 들어갈 때 발생할 일을 처리하는 함수
+	void EnterTriggered();
 
-	virtual void EnterTriggered();
-
+	// 충돌체
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComp;
+	TObjectPtr<class UBoxComponent> BoxComp;
 
+	// 트리거가 나타내는 방의 이름을 저장하는 변수
 	UPROPERTY(EditAnywhere)
 	FText RoomName;
 
+	// 플레이어가 Collision을 발생시켰을 때 호출될 함수
 	UFUNCTION()
 	void OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	// 현재 플레이어가 위치한 방의 정보를 저장하는 변수 
 	UPROPERTY(EditAnywhere)
-	EPlayerRoomState RoomSelf;
+	EPlayerRoomState CurrentRoomState;
 	
 };

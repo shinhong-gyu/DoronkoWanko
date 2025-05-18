@@ -45,4 +45,9 @@ public:
 	UFUNCTION()
 	void AnimNotify_End();
 
+	UFUNCTION()
+	void AnimNotify_rubEnd();
+
+	UFUNCTION()
+	void AnimNotify_SplashEnd();
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "DoronkoGameMode.h"
@@ -19,14 +19,14 @@ void ADoronkoGameMode::BeginPlay()
 	Super::BeginPlay();
 	PlayBGM();
 
-	ScoreBoard = Cast<UHG_ScoreBoard>(CreateWidget(GetWorld(), ScoreBoardFactory, FName("ScoreBoard")));
+	ScoreBoard = Cast<UHG_ScoreBoard>(CreateWidget(GetWorld(), ScoreBoardClass, FName("ScoreBoard")));
 	if (nullptr != ScoreBoard) {
 		ScoreBoard->AddToViewport();
 	}
 
-	//// ½ÃÄö½º UI¸¦ »ı¼ºÇÏ°í 
+	//// ì‹œí€€ìŠ¤ UIë¥¼ ìƒì„±í•˜ê³  
 	Lv1UI = Cast<UWBP_Doronko_Lv1>(CreateWidget(GetWorld(), UIFactory));
-	//// È­¸é¿¡ º¸ÀÌ°Ô ÇÏ°í½Í´Ù 
+	//// í™”ë©´ì— ë³´ì´ê²Œ í•˜ê³ ì‹¶ë‹¤ 
 	Lv1UI->AddToViewport();
 
 	Lv2UI = Cast<UWBP_Doronko_Lv2>(CreateWidget(GetWorld(), UIFactory2));
@@ -38,7 +38,7 @@ void ADoronkoGameMode::BeginPlay()
 	Lv4UI = Cast<UWBP_Doronko_Lv4>(CreateWidget(GetWorld(), UIFactory4));
 	Lv4UI->AddToViewport();
 
-	// º£Å¸ ÄÆ¾À ½ÃÄö½º 
+	// ë² íƒ€ ì»·ì”¬ ì‹œí€€ìŠ¤ 
 	CLv1UI = Cast<UWBP_Doronko_CLv1>(CreateWidget(GetWorld(), UIFactoryC1));
 	CLv1UI->AddToViewport();
 
@@ -62,31 +62,31 @@ void ADoronkoGameMode::BeginPlay()
 void ADoronkoGameMode::PlayBGM()
 {
 	UGameplayStatics::PlaySound2D(GetWorld(), BGM);
-	//	BGM »ç¿îµå ±æÀÌ¸¸Å­ Å¸ÀÌ¸Ó ¹İº¹¼³Á¤ 
+	//	BGM ì‚¬ìš´ë“œ ê¸¸ì´ë§Œí¼ íƒ€ì´ë¨¸ ë°˜ë³µì„¤ì • 
 	float Duration = BGM->GetDuration();
 	GetWorldTimerManager().SetTimer(BGMHandler, this, &ADoronkoGameMode::PlayBGM, Duration, false);
 }
 
-void ADoronkoGameMode::SetScore(int32 Point)
+void ADoronkoGameMode::AddScore(int32 Point)
 {
 	GameScore += Point;
 	if (GameScore >= 1200 && GameScore < 1210)
-	{	// Lv.1 ¼±Ç³±â ¼ÒÈ¯ & ÄÆ¾À ¿µ»ó Ãß°¡ Àç»ı¹æÁö 
+	{	// Lv.1 ì„ í’ê¸° ì†Œí™˜ & ì»·ì”¬ ì˜ìƒ ì¶”ê°€ ì¬ìƒë°©ì§€ 
 		if (countLv1 == 0) {
 			SpawnWingFan();
 			bLv1 = true;
-			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
+			UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
 		}
 		countLv1++;
 	}
 
 	if (GameScore > 3600 && GameScore < 3610)
-	{	// ÄÆ¾À ¿µ»ó Ãß°¡ Àç»ı¹æÁö 
+	{	// ì»·ì”¬ ì˜ìƒ ì¶”ê°€ ì¬ìƒë°©ì§€ 
 		if (countLv2 == 0) {
-		// Lv.2 ±âÂ÷¹ÙÄû ¼ÒÈ¯ 
+		// Lv.2 ê¸°ì°¨ë°”í€´ ì†Œí™˜ 
 		SpawnTrainWheel();
 		bLv2 = true;
-		UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
+		UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
 		}
 		countLv2++;
 	}
@@ -94,34 +94,34 @@ void ADoronkoGameMode::SetScore(int32 Point)
 	if (GameScore > 5000 && GameScore < 5010)
 	{ 
 		if (countLv3 == 0) {
-			// Lv.3 °í·¡¸ğÀÚ ¼ÒÈ¯ 
+			// Lv.3 ê³ ë˜ëª¨ì ì†Œí™˜ 
 			SpawnWhaleHat();
 			bLv3 = true;
-			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
+			UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
 		}
 		countLv3++;
 	}
 
 	if (GameScore > 7500 && GameScore < 7510)
-	{	// Lv.4 ±âÂ÷¹ÙÄû ¼ÒÈ¯ & ÄÆ¾À ¿µ»ó Ãß°¡ Àç»ı¹æÁö 
+	{	// Lv.4 ê¸°ì°¨ë°”í€´ ì†Œí™˜ & ì»·ì”¬ ì˜ìƒ ì¶”ê°€ ì¬ìƒë°©ì§€ 
 		if (countLv4 == 0) {
 			
 			SpawnTrainWheel2();
 			bLv4 = true;
-			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
+			UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
 		}
 		countLv4++;
-		// Lv.4 ±âÂ÷¹ÙÄû(2) ¼ÒÈ¯ 
+		// Lv.4 ê¸°ì°¨ë°”í€´(2) ì†Œí™˜ 
 	}
 
-	/*if (GameScore > 10000 && GameScore < 10010)*/ // Å×½ºÆ® ÈÄ º¹±¸ ¿¹Á¤ 
+	/*if (GameScore > 10000 && GameScore < 10010)*/ // í…ŒìŠ¤íŠ¸ í›„ ë³µêµ¬ ì˜ˆì • 
 	if (GameScore >= 9000 && GameScore < 9010)
 	{
 		if (countLv5 == 0) {
-			// Lv.5 ¿ÍÀÎ¹öÆ° ¼ÒÈ¯ 
+			// Lv.5 ì™€ì¸ë²„íŠ¼ ì†Œí™˜ 
 			SpawnWineButton();
 			bLv5 = true;
-			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
+			UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
 		}
 		countLv5++;
 	}
@@ -134,28 +134,28 @@ void ADoronkoGameMode::UpdataScoreBoard()
 
 void ADoronkoGameMode::SpawnWingFan()
 {
-	// ¼±Ç³±â ¼ÒÈ¯ 
-	Transform1.SetLocation(FVector(-790, 170, 165));
-	Transform1.SetRotation(FQuat(FRotator(0, 180, 0)));
-	Transform1.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+	// ì„ í’ê¸° ì†Œí™˜ 
+	FanSpawnTransform.SetLocation(FVector(-790, 170, 165));
+	FanSpawnTransform.SetRotation(FQuat(FRotator(0, 180, 0)));
+	FanSpawnTransform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 
-	GetWorld()->SpawnActor<AHJ_ElectricFan>(ElectricFanFactory, Transform1);
+	GetWorld()->SpawnActor<AHJ_ElectricFan>(ElectricFanClass, FanSpawnTransform);
 
-	// ·¹º§ ÀÛ¾÷ ¿Ï·áµÇ¸é ÄÆ¾À Ãß°¡ ÇÊ¿ä 
+	// ë ˆë²¨ ì‘ì—… ì™„ë£Œë˜ë©´ ì»·ì”¬ ì¶”ê°€ í•„ìš” 
 }
 
 void ADoronkoGameMode::SpawnTrainWheel()
 {
 	if (bTrainWheel1)
 	{
-		// ±âÂ÷¹ÙÄû ¼ÒÈ¯
+		// ê¸°ì°¨ë°”í€´ ì†Œí™˜
 		Transform2.SetLocation(FVector(-1575, -5565, -570));
 		Transform2.SetRotation(FQuat(FRotator(0, 0, 0)));
 		Transform2.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 
 		GetWorld()->SpawnActor<AHJ_TrainWheel>(WheelFactory, Transform2);
 	}
-	// Player°¡ ¹°¾î°¡¸é, Ãß°¡ Spawn ¹æÁö 
+	// Playerê°€ ë¬¼ì–´ê°€ë©´, ì¶”ê°€ Spawn ë°©ì§€ 
 	bTrainWheel1 = false;
 }
 
@@ -163,14 +163,14 @@ void ADoronkoGameMode::SpawnWhaleHat()
 {
 	if (bWhaleHat)
 	{
-		// °í·¡¸ğÀÚ ¼ÒÈ¯
+		// ê³ ë˜ëª¨ì ì†Œí™˜
 		Transform3.SetLocation(FVector(-1455, -6400, 940));
 		Transform3.SetRotation(FQuat(FRotator(0, 180, 0)));
 		Transform3.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 
 		GetWorld()->SpawnActor<AHJ_WhaleHat>(HatFactory, Transform3);
 	}
-	// Player°¡ ¹°¾î°¡¸é, Ãß°¡ Spawn ¹æÁö 
+	// Playerê°€ ë¬¼ì–´ê°€ë©´, ì¶”ê°€ Spawn ë°©ì§€ 
 	bWhaleHat = false;
 }
 
@@ -178,20 +178,20 @@ void ADoronkoGameMode::SpawnTrainWheel2()
 {
 	if (bTrainWheel2)
 	{
-		// ±âÂ÷¹ÙÄû ¼ÒÈ¯(2)
+		// ê¸°ì°¨ë°”í€´ ì†Œí™˜(2)
 		Transform4.SetLocation(FVector(-2395, -2210, 760));
 		Transform4.SetRotation(FQuat(FRotator(0, 0, 0)));
 		Transform4.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 
 		GetWorld()->SpawnActor<AHJ_TrainWheel>(WheelFactory, Transform4);
 	}
-	// Player°¡ ¹°¾î°¡¸é, Ãß°¡ Spawn ¹æÁö 
+	// Playerê°€ ë¬¼ì–´ê°€ë©´, ì¶”ê°€ Spawn ë°©ì§€ 
 	bTrainWheel2 = false;
 }
 
 void ADoronkoGameMode::SpawnWineButton()
 {
-	// ¿ÍÀÎ¹öÆ° ¼ÒÈ¯ 
+	// ì™€ì¸ë²„íŠ¼ ì†Œí™˜ 
 	Transform5.SetLocation(FVector(-450, -6530, 115));
 	Transform5.SetRotation(FQuat(FRotator(0, 180, 0)));
 	Transform5.SetScale3D(FVector(1.0f, 1.0f, 1.0f));

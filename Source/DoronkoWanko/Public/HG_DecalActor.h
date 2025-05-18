@@ -34,7 +34,8 @@ public:
 
 	FColor color = FColor::Green;
 
-	UDecalComponent* GetDecal() const {
+	UDecalComponent* GetDecal() const 
+	{
 		return Decal;
 	}
 };

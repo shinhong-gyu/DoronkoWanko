@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,62 +11,78 @@ UCLASS()
 class DORONKOWANKO_API AHG_Splatter : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AHG_Splatter();
-
-private:
-	
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// 충돌 함수
+	UFUNCTION()
+	void OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	// 물감이 스폰됐을 때 속력을 초기화하는 함수
+	void Initalize(FVector initVeloccity);
+
+	// Splatter Section
+private:
+	// 충돌체
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComp;
-	
+
+	// 물방울 매시
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(EditAnywhere)
-    TSubclassOf<class AHG_DecalActor> DecalClass;
-
-	UPROPERTY(EditAnywhere)
-	class UProjectileMovementComponent* ProjectileMovementComponent;
-
-	FVector ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
-
-	FVector Velocity;
-
-	UPROPERTY(EditAnywhere)
-	class UMaterial* SelectedMaterial;
-
- 	UFUNCTION()
- 	void OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	void Initalize(FVector initVeloccity);
-
-	void UpdataRotation();
-
-	TArray<class AHG_MissonStamp*> IsStampInRange(FVector Pos ,float Param1,float Param2);
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class AHG_MissonStamp> StampFactory;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class AActor> NormalArrow;
-	
+	// 물방울 색
 	FLinearColor MyColor = FLinearColor();
 
+	// 물방울의 색을 설정하는 함수
 	void SetMyColor(FLinearColor Value);
 
-	int32 SO = 0;
-	FDecalInfo* IsDecalInRange(FVector Pos,float Param1,float Param2);
-
+	// 로봇 청소기에 의해 스폰되었는지 여부
 	bool bSpawnedByRV = false;
+
+	// Decal Section
+private:
+	// 데칼이 생성될 방향을 결정하기 위한 함수 (정사영)
+	const FVector& ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
+
+	// 물방울이 충돌했을 때 범위 안에 데칼이 있는지 확인하고 해당 데칼의 정보를 반환하는 함수.
+	FDecalInfo* IsDecalInRange(FVector Pos, float Param1, float Param2);
+
+	// 데칼 생성을 위한 TSubClassOf (팩토리 패턴)
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AHG_DecalActor> DecalClass;
+
+	// 데칼이 스폰될 때 사용할 머터리얼 (물감 모양)
+	UPROPERTY(EditAnywhere)
+	class UMaterial* SelectedDecalMaterial;
+
+	// 데칼이 생성될 때 SortOrder 값을 설정하기 위한 변수
+	int32 SortOrder = 0;
+
+	// Physics Section
+private:
+	// 변위
+	FVector Velocity;
+
+	// 물감이 Velocity 방향으로 날아가며 회전하도록 하는 함수
+	void UpdataRotation();
+
+	// Stamp Section
+public:
+	// 물방울이 충돌한 위치에서 일정 범위 내에 스팸프가 있는지 확인하고 범위 내에 있는 스팸프들을 반환하는 함수.
+	TArray<class AHG_MissonStamp*> IsStampInRange(FVector Pos, float Param1, float Param2);
+
+	// 스팸프를 찾기 위한 스팸프 클래스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AHG_MissonStamp> StampClass;
 };

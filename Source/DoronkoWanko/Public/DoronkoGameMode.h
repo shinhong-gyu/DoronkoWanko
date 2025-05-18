@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -26,66 +26,82 @@ public:
 
 	// BGM
 	UPROPERTY(EditAnywhere)
-	class USoundBase* BGM;
+	TObjectPtr<class USoundBase> BGM;
+
+	// BGM ì¬ìƒ í•¨ìˆ˜
 	void PlayBGM();
+
+	// BGMì„ ë°˜ë³µì‹œí‚¤ê¸° ìœ„í•œ TimerHandle
 	FTimerHandle BGMHandler;
 
-	// Á¡¼ö UI 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int32 GameScore =8950; // º¯°æ ÇÊ¿ä 
+	// ì ìˆ˜ UI 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 GameScore = 0; // ë³€ê²½ í•„ìš” 
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	// ìµœëŒ€ ì ìˆ˜
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaxScore;
 
-	void SetScore(int32 Point);
+	// ì ìˆ˜ ì„¸íŒ…í•˜ëŠ” í•¨ìˆ˜
+	void AddScore(int32 Point);
 
+	// UI ì—…ë°ì´íŠ¸ í•¨ìˆ˜
 	void UpdataScoreBoard();
 
+	// ScoreBoardë¥¼ ìƒì„±í•˜ê¸° ìœ„í•œ ìŠ¤ì½”ì–´ë³´ë“œ í´ë˜ìŠ¤
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UHG_ScoreBoard> ScoreBoardFactory;
+	TSubclassOf<class UHG_ScoreBoard> ScoreBoardClass;
 
+
+	// ìƒì„±í•œ ìŠ¤ì½”ì–´ë³´ë“œë¥¼ ì €ì¥í•˜ê¸°ìœ„í•œ ë³€ìˆ˜
 	UPROPERTY(EditAnywhere)
-	class UHG_ScoreBoard* ScoreBoard;
+	TObjectPtr<UHG_ScoreBoard> ScoreBoard;
 
-	// ¼±Ç³±â ¼ÒÈ¯ 
+	// ì„ í’ê¸° ì†Œí™˜ í•¨ìˆ˜
 	void SpawnWingFan();
 
+	// ì„ í’ê¸°ë¥¼ ìƒì„±í•˜ê¸° ìœ„í•œ ì„ í’ê¸° í´ë˜ìŠ¤
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AHJ_ElectricFan> ElectricFanFactory;
-	FTransform Transform1;
+	TSubclassOf<class AHJ_ElectricFan> ElectricFanClass;
+
+	// ì„ í’ê¸° ì†Œí™˜ì„ ìœ„í•œ íŠ¸ëœìŠ¤í¼
+	FTransform FanSpawnTransform;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLv1 = false;
+
 	int countLv1 = 0;
 
-	// ¿­Â÷ ¹ÙÄû ¼ÒÈ¯ 
+	// ì—´ì°¨ ë°”í€´ ì†Œí™˜ 
 	void SpawnTrainWheel();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AHJ_TrainWheel> WheelFactory;
 	FTransform Transform2;
-	// Ãß°¡ ½ºÆù ¹æÁö 
+	// ì¶”ê°€ ìŠ¤í° ë°©ì§€ 
 	bool bTrainWheel1 = true;
-	// Ãß°¡ ÄÆ½Å Àç»ı¹æÁö 
+
+	// ì¶”ê°€ ì»·ì‹  ì¬ìƒë°©ì§€ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLv2 = false;
 	int countLv2 = 0;
 
-	// °í·¡ ¸ğÀÚ ¼ÒÈ¯ 
+	// ê³ ë˜ ëª¨ì ì†Œí™˜ 
 	void SpawnWhaleHat();
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHJ_WhaleHat> HatFactory;
 	FTransform Transform3;
 	bool bWhaleHat = true;
-	// Ãß°¡ ÄÆ½Å Àç»ı¹æÁö 
+	// ì¶”ê°€ ì»·ì‹  ì¬ìƒë°©ì§€ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLv3 = false;
 	int countLv3 = 0;
 
-	// ¿­Â÷ ¹ÙÄû ¼ÒÈ¯ 
+	// ì—´ì°¨ ë°”í€´ ì†Œí™˜ 
 	void SpawnTrainWheel2();
 	FTransform Transform4;
 	bool bTrainWheel2 = true;
-	// Ãß°¡ ÄÆ½Å Àç»ı¹æÁö 
+	// ì¶”ê°€ ì»·ì‹  ì¬ìƒë°©ì§€ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLv4 = false;
 	int countLv4 = 0;
@@ -96,18 +112,18 @@ public:
 
 	int StampCount = 0;
 
-	// ¿ÍÀÎ¹öÆ° ¼ÒÈ¯ 
+	// ì™€ì¸ë²„íŠ¼ ì†Œí™˜ 
 	void SpawnWineButton();
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AWIneButton> ButtonFactory;
 	FTransform Transform5;
 
 
-	// ½ÃÄö½º UI ¼ÒÈ¯ 
+	// ì‹œí€€ìŠ¤ UI ì†Œí™˜ 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> UIFactory;
 
-	// ¾ËÆÄ ÄÆ¾À À§Á¬ 
+	// ì•ŒíŒŒ ì»·ì”¬ ìœ„ì ¯ 
 	UPROPERTY()
 	class UWBP_Doronko_Lv1* Lv1UI;
 
@@ -129,7 +145,7 @@ public:
 	UPROPERTY()
 	class UWBP_Doronko_Lv4* Lv4UI;
 
-	// º£Å¸ ÄÆ¾À À§Á¬ 
+	// ë² íƒ€ ì»·ì”¬ ìœ„ì ¯ 
 	UPROPERTY()
 	class UWBP_Doronko_CLv1* CLv1UI;
 
@@ -161,9 +177,8 @@ public:
 	TSubclassOf<class UUserWidget> UIFactoryC5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class USoundBase* itemSFX;
+	class USoundBase* ItemSFX;
 
 public:
-
 	TArray<FDecalInfo> SpawnedDecalArr;
 };

@@ -24,10 +24,13 @@ class DORONKOWANKO_API II_Interaction
 public:
 	// E 가 눌렸을 때 할 행동
 	virtual void InteractionWith() = 0;
+	
 	// Player 가 아이템을 바라보고 있을 때
 	virtual void LookAt() = 0;
+	
 	// Player 가 아이템을 보다 다른 곳을 바라볼 때
 	virtual void FadeAway() = 0;
+
 	// 아이템 놓기
 	virtual void ItemDrop() = 0;
 };

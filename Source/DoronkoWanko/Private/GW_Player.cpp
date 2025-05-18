@@ -37,6 +37,8 @@ AGW_Player::AGW_Player()
 	MinArmLength = 50.0f;
 	MaxArmLength = 1000.0f;
 	DirtPercentage = 20.0f;
+	bRubbing = false;
+	bShaking = false;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -51,15 +53,11 @@ AGW_Player::AGW_Player()
 	AttachedMasterItem = nullptr;
 	AttachedStaticObject = nullptr;
 	OverlappingObject = nullptr;
-	// 	bIsDropping = false;
-	// 	ConstructorHelpers::FClassFinder<UPlayerAnimInstance> TempAnimInst(TEXT("'/Game/GyeongWon/Bp/ABP_Player.ABP_Player_C'"));
-	// 	if (TempAnimInst.Succeeded())
-	// 	{
-	// 		GetMesh()->SetAnimInstanceClass(TempAnimInst.Class);
-	// 	}
 
 	ColorArray.SetNum(1);
 	ColorArray[0] = FLinearColor(0.156f, 0.825f, 0.114f);
+
+	PlayerRoomState = EPlayerRoomState::LIVINGROOM;
 }
 
 // Called when the game starts or when spawned
@@ -68,7 +66,7 @@ void AGW_Player::BeginPlay()
 	Super::BeginPlay();
 
 	MinimapUI = Cast<UHJMiniMapWidget>(CreateWidget(GetWorld(), MinimapUIClass));
-	if(MinimapUI)	MinimapUI->AddToViewport();
+	if (MinimapUI)	MinimapUI->AddToViewport();
 
 	auto* pc = Cast<APlayerController>(Controller);
 	if (pc)
@@ -79,16 +77,14 @@ void AGW_Player::BeginPlay()
 			subSys->AddMappingContext(IMC_Player, 0);
 		}
 	}
+
 	Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	if (Anim)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ANim"))
-	}
 
 	RecentColor = ColorArray[0];
 
 	UMaterialInterface* CurMaterial = this->GetMesh()->GetMaterial(0);
 	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
+
 	if (DynamicMaterial) {
 		DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
 		this->GetMesh()->SetMaterial(0, DynamicMaterial);
@@ -150,6 +146,10 @@ void AGW_Player::Tick(float DeltaTime)
 		}
 	}
 
+	if (bShaking)
+	{
+		SplashDelay+=DeltaTime;
+	}
 }
 
 
@@ -170,12 +170,15 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDashCompleted);
 		input->BindAction(IA_Interaction, ETriggerEvent::Started, this, &AGW_Player::OnMyActionInteraction);
 		input->BindAction(IA_Drop, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDrop);
+
 		input->BindAction(IA_Splash, ETriggerEvent::Started, this, &AGW_Player::OnMyActionSplash);
+		input->BindAction(IA_Splash, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionSplashOngoing);
+		input->BindAction(IA_Splash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionSplashEnd);
+
 		input->BindAction(IA_Dirt, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDirtStart);
 		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirtOngoing);
 		input->BindAction(IA_Dirt, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionDirtEnd);
 	}
-
 }
 
 void AGW_Player::OnMyActionMove(const FInputActionValue& Value)
@@ -252,12 +255,15 @@ void AGW_Player::Shake()
 }
 void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
-	check(Anim)
-		if (Anim)
-		{
-			Anim->PlayRubMontage();
-			UE_LOG(LogTemp, Warning, TEXT("Rub"));
-		}
+	check(Anim);
+
+	bRubbing = true;
+
+	if (Anim)
+	{
+		Anim->PlayRubMontage();
+		UE_LOG(LogTemp, Warning, TEXT("Rub"));
+	}
 
 	FHitResult hitInfo;
 	FCollisionQueryParams params;
@@ -342,18 +348,28 @@ void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
 
 void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
 {
+	bRubbing = false;
 }
 
+void AGW_Player::OnMyActionSplashEnd(const FInputActionValue& Value)
+{
+	bShaking = false;
+	SplashDelay = 0.0f;
+}
 
 void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 {
-	check(Anim)
-		if (Anim)
-		{
-			Anim->PlaySplashMontage();
-		}
+	check(Anim);
+	bShaking = true;
+
+	if (Anim)
+	{
+		Anim->PlaySplashMontage();
+	}
+
 	FString MaterialPath;
 	UMaterialInterface* NewMaterial;
+
 	if (DirtPercentage != 0.0f)
 	{
 		DirtPercentage -= 6.0f;
@@ -385,19 +401,82 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 
 		UMaterialInterface* CurMaterial = NewMaterial;
 		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
-		if (DynamicMaterial) {
+		if (DynamicMaterial) 
+		{
 			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
 			this->GetMesh()->SetMaterial(0, DynamicMaterial);
 		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
-		for (int i = 0; i < NumberOfSplatter; i++) {
+		for (int i = 0; i < NumberOfSplatter; i++) 
+		{
 			Shake();
 		}
 	}
 	else return;
 
 
+}
+void AGW_Player::OnMyActionSplashOngoing(const FInputActionValue& Value)
+{
+	if (SplashDelay < 0.5f)
+	{
+		return;
+	}
+
+	check(Anim);
+	bShaking = true;
+
+	FString MaterialPath;
+	UMaterialInterface* NewMaterial;
+
+	if (DirtPercentage != 0.0f)
+	{
+		DirtPercentage -= 6.0f;
+		if (DirtPercentage > 100.0f)
+		{
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
+			DirtPercentage = 100.0f;
+		}
+		else if (DirtPercentage >= 80.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
+		}
+		else if (DirtPercentage >= 60.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
+		}
+		else if (DirtPercentage >= 40.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
+		}
+		else if (DirtPercentage >= 20.0f) {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
+		}
+		else {
+			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
+		}
+		if (DirtPercentage < 0.0f)
+		{
+			DirtPercentage = 0.0f;
+		}
+
+		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
+
+		UMaterialInterface* CurMaterial = NewMaterial;
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
+		if (DynamicMaterial) 
+		{
+			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+			this->GetMesh()->SetMaterial(0, DynamicMaterial);
+		}
+
+		int NumberOfSplatter = FMath::RandRange(3, 5);
+		for (int i = 0; i < NumberOfSplatter; i++) 
+		{
+			Shake();
+			SplashDelay = 0.0f;
+		}
+	}
+
+	else return;
 }
 
 void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
@@ -620,7 +699,7 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 			EnterWidget->AddToViewport();
 		}
 	}
-	LocState = Loc;
+	PlayerRoomState = Loc;
 }
 
 FDecalInfo* AGW_Player::IsDecalInRange(FVector Pos, float Param1, float Param2)

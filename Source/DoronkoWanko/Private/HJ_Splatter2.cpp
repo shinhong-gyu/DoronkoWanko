@@ -67,7 +67,7 @@ void AHJ_Splatter2::SpawnDecalAtLocation(const FVector& Location, const FRotator
 		AHG_DecalActor* Decal = GetWorld()->SpawnActor<AHG_DecalActor>(DecalClass, Location, Rotation);
 		auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
 		int32 RandNum = FMath::RandRange(1, 9);
-		GM->SetScore(RandNum);
+		GM->AddScore(RandNum);
 		GM->UpdataScoreBoard();
 		if (nullptr != Decal) {
 			UDecalComponent* DecalComp = Decal->GetDecal();
@@ -87,7 +87,7 @@ void AHJ_Splatter2::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	float RandNum = FMath::FRandRange(100.0f, 150.0f);
 	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
 	int32 RanInt = FMath::RandRange(1, 9);
-	GM->SetScore(RanInt);
+	GM->AddScore(RanInt);
 	GM->UpdataScoreBoard();
 	FVector end = SpawnLocation + Velocity.GetSafeNormal() * 10000;
 	FHitResult hitInfo;
