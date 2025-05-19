@@ -41,54 +41,72 @@ void AHG_EnterTrigger::EnterTriggered()
 	// 플레이어를 가져와서 
 	auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 
-	// 플레이어가 nullptr이 아닐 때
-	if (Player) 
+	// 플레이어가 nullptr 이 아닐 때
+	if (Player)
 	{
-		// 플레이어의 현재 방 상태를 확인하
-		if (CurrentRoomState != Player->PlayerRoomState) 
+		// EnterTrigger가 갖는 방 정보와 플레이어의 현재 위치한 방이 같지 않으면서
+		if (CurrentRoomState != Player->PlayerRoomState)
 		{
+			// 플레이어의 EnterWidget이 생성되지 않은 상태라면
 			if (Player->EnterWidget == nullptr)
 			{
+				// 플레이어의 방 위치 정보를 업데이트
 				Player->SetLocState(CurrentRoomState);
+
+				// 플레이어의 EnterWidget을 생성
 				Player->EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), Player->WidgetFactory);
-				if (Player->EnterWidget) 
+
+				// EnterWidget이 생성되었다면
+				if (Player->EnterWidget)
 				{
+					// 화면에 EnterWidget을 팝업시키고
 					Player->EnterWidget->AddToViewport();
+
+					// EnterWidget의 방 이름 텍스트를 Trigger가 갖고있는 RoomName으로 설정
 					Player->EnterWidget->SetText(RoomName);
 				}
 			}
+
+			// 만약 이미 EnterWidget이 생성되어있다면
 			else
 			{
+				// 기존의 EnterWidget을 제거하고
 				Player->EnterWidget->RemoveFromParent();
 				Player->EnterWidget = nullptr;
+
+				// Trigger 로직을 다시 실행
 				EnterTriggered();
 			}
 		}
 	}
-	switch (CurrentRoomState)
+
+	// 플레리어의 미니맵이 유효하다면
+	if (Player->MinimapUI)
 	{
-	case EPlayerRoomState::KITCHEN:
-		Player->MinimapUI->ShowFloor(1);
-		break;
-	case EPlayerRoomState::LIVINGROOM:
-		Player->MinimapUI->ShowFloor(1);
-		break;
-	case EPlayerRoomState::BASEMENTLIVINGROOM:
-		Player->MinimapUI->ShowFloor(0);
-		break;
-	case EPlayerRoomState::WINECELLAR:
-		Player->MinimapUI->ShowFloor(0);
-		break;
-	case EPlayerRoomState::NURSERY:
-		Player->MinimapUI->ShowFloor(2);
-		break;
+		// 현재 어느 방에 위치해 있는지에 따라서 미니맵 변경
+		switch (CurrentRoomState)
+		{
+		case EPlayerRoomState::KITCHEN:
+		case EPlayerRoomState::LIVINGROOM:
+			Player->MinimapUI->ShowFloor(1);
+			break;
+		case EPlayerRoomState::BASEMENTLIVINGROOM:
+		case EPlayerRoomState::WINECELLAR:
+			Player->MinimapUI->ShowFloor(0);
+			break;
+		case EPlayerRoomState::NURSERY:
+			Player->MinimapUI->ShowFloor(2);
+			break;
+		}
 	}
 }
 
 void AHG_EnterTrigger::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA<AGW_Player>()) 
+	// 만약 충돌한 액터가 플레이어라면
+	if (OtherActor->IsA<AGW_Player>())
 	{
+		// Trigger 로직 실행
 		EnterTriggered();
 	}
 }

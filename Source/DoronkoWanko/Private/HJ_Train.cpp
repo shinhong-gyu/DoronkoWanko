@@ -56,8 +56,6 @@ void AHJ_Train::BeginPlay()
 
 	// 기차 바퀴 캐스트
 	CurrentWheel = Cast<AHJ_TrainWheel>(UGameplayStatics::GetActorOfClass(GetWorld(), WheelFactory));
-
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AHJ_Train::OnOverlapBegin);
 }
 
 // Called every frame

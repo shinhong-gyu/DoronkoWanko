@@ -31,8 +31,6 @@ public:
 	// 물감이 스폰됐을 때 속력을 초기화하는 함수
 	void Initalize(FVector initVeloccity);
 
-	// Splatter Section
-private:
 	// 충돌체
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComp;
@@ -41,23 +39,36 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
 
-	// 물방울 색
-	FLinearColor MyColor = FLinearColor();
-
+	// Splatter Section	
+public:
 	// 물방울의 색을 설정하는 함수
 	void SetMyColor(FLinearColor Value);
+
+	FORCEINLINE FLinearColor GetMyColor() const { return MyColor; }
+
+	//  bSpawnedByRV Getter/Setter
+	FORCEINLINE void SetSpawnedByRV(bool Value) { bSpawnedByRV = Value; }
+
+	FORCEINLINE bool GetSpawnedByRV() const { return bSpawnedByRV; }
+
+
+private:
+
+	// 물방울 색
+	FLinearColor MyColor = FLinearColor();
 
 	// 로봇 청소기에 의해 스폰되었는지 여부
 	bool bSpawnedByRV = false;
 
 	// Decal Section
-private:
+public:
 	// 데칼이 생성될 방향을 결정하기 위한 함수 (정사영)
-	const FVector& ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
+	FVector ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
 
 	// 물방울이 충돌했을 때 범위 안에 데칼이 있는지 확인하고 해당 데칼의 정보를 반환하는 함수.
 	FDecalInfo* IsDecalInRange(FVector Pos, float Param1, float Param2);
 
+private:
 	// 데칼 생성을 위한 TSubClassOf (팩토리 패턴)
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_DecalActor> DecalClass;
@@ -70,12 +81,13 @@ private:
 	int32 SortOrder = 0;
 
 	// Physics Section
+public:
+	// 물감이 Velocity 방향으로 날아가며 회전하도록 하는 함수
+	void UpdataRotation();
+
 private:
 	// 변위
 	FVector Velocity;
-
-	// 물감이 Velocity 방향으로 날아가며 회전하도록 하는 함수
-	void UpdataRotation();
 
 	// Stamp Section
 public:

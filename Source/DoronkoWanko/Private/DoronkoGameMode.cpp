@@ -24,9 +24,10 @@ void ADoronkoGameMode::BeginPlay()
 		ScoreBoard->AddToViewport();
 	}
 
-	//// 시퀀스 UI를 생성하고 
+	// 시퀀스 UI를 생성하고 
 	Lv1UI = Cast<UWBP_Doronko_Lv1>(CreateWidget(GetWorld(), UIFactory));
-	//// 화면에 보이게 하고싶다 
+
+	// 화면에 보이게 하고싶다 
 	Lv1UI->AddToViewport();
 
 	Lv2UI = Cast<UWBP_Doronko_Lv2>(CreateWidget(GetWorld(), UIFactory2));
@@ -129,6 +130,7 @@ void ADoronkoGameMode::AddScore(int32 Point)
 
 void ADoronkoGameMode::UpdataScoreBoard()
 {
+	// 점수 업데이트
 	ScoreBoard->SetText(GameScore);
 }
 

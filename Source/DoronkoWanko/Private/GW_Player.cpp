@@ -246,7 +246,8 @@ void AGW_Player::Shake()
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 	auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
 
-	if (Splatter) {
+	if (Splatter) 
+	{
 		Splatter->Initalize(InitialVelocity);
 		Splatter->SetMyColor(ColorArray[CurIdx]);
 	}

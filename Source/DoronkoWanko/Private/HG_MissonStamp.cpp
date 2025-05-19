@@ -10,23 +10,34 @@ AHG_MissonStamp::AHG_MissonStamp()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// 데칼 컴포넌트 생성
 	Decal = CreateDefaultSubobject<UDecalComponent>(TEXT("Decal"));
+
+	// 루트로 설정
 	SetRootComponent(Decal);
-	int RandNum = FMath::RandRange(0, 1);
-	if (RandNum == 0) {
-		static ConstructorHelpers::FObjectFinder<UMaterial> FindMaterial1(TEXT("/Script/Engine.Material'/Game/HongGyu/M_MissonStamp1.M_MissonStamp1''"));
-		if (FindMaterial1.Succeeded()) {
-			DecalMaterial = FindMaterial1.Object;
-		}
+
+	// 데칼 머터리얼을 랜덤으로 설정하기 위한 난수 생성
+	int RandNum = FMath::RandRange(1, 2);
+
+	// 난수에 따른 데칼 머터리얼 경로명
+	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/M_MissonStamp%d.M_MissonStamp%d"), RandNum, RandNum);
+
+
+	// 데칼 머터리얼 애셋 로드
+	static ConstructorHelpers::FObjectFinder<UMaterial> FindMaterial(*MaterialPath);
+	if (FindMaterial.Succeeded())
+	{
+		DecalMaterial = FindMaterial.Object;
 	}
-	else {
-		static ConstructorHelpers::FObjectFinder<UMaterial> FindMaterial1(TEXT("/Script/Engine.Material'/Game/HongGyu/M_MissonStamp1.M_MissonStamp2''"));
-		if (FindMaterial1.Succeeded()) {
-			DecalMaterial = FindMaterial1.Object;
-		}
-	}
+
+	// 데칼 컴포넌트의 머터리얼 설정
 	Decal->SetMaterial(0, DecalMaterial);
+
+	// 크기 설정
 	Decal->DecalSize = FVector(32.0f, 32.0f, 32.0f);
+
+	// zOrder 1로 설정
 	Decal->SetSortOrder(1);
 }
 
@@ -35,6 +46,7 @@ void AHG_MissonStamp::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 시작했을 땐 보이지 않도록 설정
 	Decal->SetVisibility(false);
 }
 

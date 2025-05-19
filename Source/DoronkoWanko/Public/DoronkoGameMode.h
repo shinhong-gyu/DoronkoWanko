@@ -53,7 +53,7 @@ public:
 	TSubclassOf<class UHG_ScoreBoard> ScoreBoardClass;
 
 
-	// 생성한 스코어보드를 저장하기위한 변수
+	// 생성한 스코어보드를 저장하기 위한 변수
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UHG_ScoreBoard> ScoreBoard;
 
@@ -145,6 +145,8 @@ public:
 	UPROPERTY()
 	class UWBP_Doronko_Lv4* Lv4UI;
 
+
+	// CutScene Section
 	// 베타 컷씬 위젯 
 	UPROPERTY()
 	class UWBP_Doronko_CLv1* CLv1UI;
@@ -175,9 +177,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> UIFactoryC5;
+	// CutScene Section
 
+	// 아이템 스폰 Sound
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class USoundBase* ItemSFX;
+	TObjectPtr<USoundBase> ItemSFX;
 
 public:
 	TArray<FDecalInfo> SpawnedDecalArr;

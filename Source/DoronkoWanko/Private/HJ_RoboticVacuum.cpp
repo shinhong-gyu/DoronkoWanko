@@ -76,11 +76,12 @@ void ARoboticVacuum::Tick(float DeltaTime)
 		{
 			FTransform T = InkArrow->GetComponentTransform();
 			auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
-			if (Ink) {
+			if (Ink) 
+			{
 				Ink->MeshComp->SetVisibility(false);
 				Ink->Initalize(FVector(0, -50, 0));
 				Ink->SetMyColor(MyColor);
-				Ink->bSpawnedByRV = true;
+				Ink->SetSpawnedByRV(true);
 			}
 			CurrTime = 0;
 		}
@@ -117,8 +118,9 @@ void ARoboticVacuum::NotifyActorBeginOverlap(AActor* OtherActor)
 			if (OtherActor->IsA<AHG_Splatter>())
 			{
 				AHG_Splatter* Splatter = Cast<AHG_Splatter>(OtherActor);
-				MyColor = Splatter->MyColor;
-				SpawnCheck++;	StopCheck = 0;
+				MyColor = Splatter->GetMyColor();
+				SpawnCheck++;	
+				StopCheck = 0;
 				ColorComp2->SetVisibility(true);
 			}
 		}

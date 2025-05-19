@@ -107,9 +107,9 @@ void AHG_Splatter::Tick(float DeltaTime)
 
 	// 매시의 머터리얼 가져오기
 	UMaterialInterface* MaterialInterface = MeshComp->GetMaterial(0);
-	
+
 	// 만약 MaterialInterface이 nullptr이 아니라면
-	if (MaterialInterface) 
+	if (MaterialInterface)
 	{
 		// 다이나믹 머터리얼을 생성하기 위해 머터리얼 인터페이스를 형변환
 		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(MaterialInterface);
@@ -122,7 +122,7 @@ void AHG_Splatter::Tick(float DeltaTime)
 		}
 
 		// 만약 다이나믹 머터리얼이 제대로 생성되었다면
-		if (DynamicMaterial) 
+		if (DynamicMaterial)
 		{
 			// 다이나믹 머터리얼에 색을 설정하고
 			DynamicMaterial->SetVectorParameterValue("Color", MyColor);
@@ -145,7 +145,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	FDecalInfo SpawnDeaclInfo = FDecalInfo();
 
 	// 물방울이 충돌을 일으켰을 때 충돌 근처에 있는 데칼의 정보를 저장하는 변수
-	TObjectPtr<FDecalInfo> HittedDecalInfo;
+	FDecalInfo* HittedDecalInfo;
 
 	// 임의의 범위를 생성하기 위한 난수
 	float RandNum = FMath::FRandRange(100.0f, 150.0f);
@@ -260,7 +260,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 }
 
 
-const FVector& AHG_Splatter::ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal)
+FVector AHG_Splatter::ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal)
 {
 	// 정사영 계산, Vector의 수직 성분 제거
 	return Vector - FVector::DotProduct(Vector, PlaneNormal) * PlaneNormal;
@@ -296,16 +296,21 @@ TArray<AHG_MissonStamp*> AHG_Splatter::IsStampInRange(FVector Pos, float Param1,
 
 	// 레벨에 있는 모든 스탬프를 가져옴
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StampClass, StampArray);
-	for (auto Stemp : StampArray)
+
+	UE_LOG(LogTemp, Error, TEXT("%d"), StampArray.Num());
+
+	// 찾은 스탬프들을 순회하면서
+	for (auto Stamp : StampArray)
 	{
 		// 거리 계산
-		FVector Dist = Pos - (Stemp->GetActorLocation());
+		FVector Dist = Pos - (Stamp->GetActorLocation());
 
 		// 만약 스탬프의 위치와 물방울의 위치 사이의 거리가 Param1, Param2보다 작다면
 		if ((Param1 / 2) * (Param1 / 2) + (Param2 / 2) * (Param2 / 2) > Dist.Size() * Dist.Size())
 		{
+			UE_LOG(LogTemp, Error, TEXT("%s"), *Stamp->GetName());
 			// 스탬프를 Result에 추가
-			Result.Emplace(Cast<AHG_MissonStamp>(Stemp));
+			Result.Emplace(Cast<AHG_MissonStamp>(Stamp));
 		}
 	}
 
@@ -337,15 +342,15 @@ FDecalInfo* AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2
 	if (GM)
 	{
 		// GameMode의 SpawnedDecalArr를 순회하면서
-		for (int i = 0; i < GM->SpawnedDecalArr.Num(); i++) 
+		for (int i = 0; i < GM->SpawnedDecalArr.Num(); i++)
 		{
 			// Pos에서 데칼으로의 벡터 계산
 			Dist = Pos - GM->SpawnedDecalArr[i].DecalComp->GetComponentLocation();
 			// 만약 계산한 Dist를 반지름으로 하는 원이 Param1, Param2을 두 반지름으로 하는 타원 안에 있다면
-			if ((Param1 / 2) * (Param1 / 2) + (Param2 / 2) * (Param2 / 2) > Dist.Size() * Dist.Size()) 
+			if ((Param1 / 2) * (Param1 / 2) + (Param2 / 2) * (Param2 / 2) > Dist.Size() * Dist.Size())
 			{
 				// 만약 현재 저장되어있는 최소 거리보다 현재 계산한 거리가 더 작다면
-				if (Min.Size() >= Dist.Size()) 
+				if (Min.Size() >= Dist.Size())
 				{
 					// 최소 거리 값을 갱신하고
 					Min = Dist;

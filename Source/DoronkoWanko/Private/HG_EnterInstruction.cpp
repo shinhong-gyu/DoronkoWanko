@@ -10,15 +10,23 @@
 void UHG_EnterInstruction::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	// 생명주기 감소
 	LifeTime -= InDeltaTime;
+
+	// 만약 생명주기가 0보다 작거나 같아지면
 	if (LifeTime <= 0) {
+		// UI 제거
 		RemoveFromParent();
 	}
+
+	// 찾은 스탬프 개수에 따라 이미지 위젯들의 알파값 설정
 	SetImageAlpha();
 }
 
 void UHG_EnterInstruction::SetText(FText Name)
 {
+	// 방 이름 설정
 	RoomName->SetText(Name);
 }
 
@@ -30,7 +38,6 @@ void UHG_EnterInstruction::SetImageAlpha()
 		switch (GM->StampCount)
 		{
 		case 1:
-			UE_LOG(LogTemp, Warning, TEXT("1"));
 			StampProgress1->SetBrushTintColor(TempColor);
 			break;
 
