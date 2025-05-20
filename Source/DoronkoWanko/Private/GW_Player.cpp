@@ -66,7 +66,12 @@ void AGW_Player::BeginPlay()
 	Super::BeginPlay();
 
 	MinimapUI = Cast<UHJMiniMapWidget>(CreateWidget(GetWorld(), MinimapUIClass));
-	if (MinimapUI)	MinimapUI->AddToViewport();
+
+	if (MinimapUI)
+	{
+		MinimapUI->AddToViewport();
+		MinimapUI->ShowFloor(1);
+	}
 
 	auto* pc = Cast<APlayerController>(Controller);
 	if (pc)
@@ -148,7 +153,7 @@ void AGW_Player::Tick(float DeltaTime)
 
 	if (bShaking)
 	{
-		SplashDelay+=DeltaTime;
+		SplashDelay += DeltaTime;
 	}
 }
 
@@ -246,7 +251,7 @@ void AGW_Player::Shake()
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 	auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
 
-	if (Splatter) 
+	if (Splatter)
 	{
 		Splatter->Initalize(InitialVelocity);
 		Splatter->SetMyColor(ColorArray[CurIdx]);
@@ -280,17 +285,25 @@ void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 	end.Z = -100;
 	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, GetActorLocation(), end, ECC_Visibility, params);
 	if (bHit) {
+
 		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, 1000.0f, 1000.0f);
+
 		UE_LOG(LogTemp, Warning, TEXT("bHit : %s"), *hitInfo.GetActor()->GetName());
-		if (HittedDecalInfo != nullptr) {
+		if (HittedDecalInfo != nullptr)
+		{
 			bHitDecal = true;
 			RecentColor = HittedDecalInfo->Color;
+
 			UE_LOG(LogTemp, Warning, TEXT("HittedDecal"));
 			UE_LOG(LogTemp, Warning, TEXT("Decal Color : %s"), *(HittedDecalInfo->Color.ToString()));
-			if (HittedDecalInfo->Color != ColorArray[0] && count == 0) {
+
+			if (HittedDecalInfo->Color != ColorArray[0] && count == 0)
+			{
 				ColorArray.SetNum(2);
 			}
-			if (ColorArray.Num() == 2) {
+
+			if (ColorArray.Num() == 2)
+			{
 				if (count % 2 == 0) {
 					ColorArray[0] = HittedDecalInfo->Color;
 				}
@@ -402,14 +415,14 @@ void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
 
 		UMaterialInterface* CurMaterial = NewMaterial;
 		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
-		if (DynamicMaterial) 
+		if (DynamicMaterial)
 		{
 			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
 			this->GetMesh()->SetMaterial(0, DynamicMaterial);
 		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
-		for (int i = 0; i < NumberOfSplatter; i++) 
+		for (int i = 0; i < NumberOfSplatter; i++)
 		{
 			Shake();
 		}
@@ -463,14 +476,14 @@ void AGW_Player::OnMyActionSplashOngoing(const FInputActionValue& Value)
 
 		UMaterialInterface* CurMaterial = NewMaterial;
 		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
-		if (DynamicMaterial) 
+		if (DynamicMaterial)
 		{
 			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
 			this->GetMesh()->SetMaterial(0, DynamicMaterial);
 		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
-		for (int i = 0; i < NumberOfSplatter; i++) 
+		for (int i = 0; i < NumberOfSplatter; i++)
 		{
 			Shake();
 			SplashDelay = 0.0f;
@@ -678,7 +691,10 @@ void AGW_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 void AGW_Player::SetLocState(EPlayerRoomState Loc)
 {
+	if (PlayerRoomState == Loc) return;
+
 	FText TempText;
+
 	switch (Loc)
 	{
 	case EPlayerRoomState::KITCHEN:   TempText = FText::FromString(TEXT("Kitchen"));   break;
@@ -689,12 +705,15 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 	default:
 		break;
 	}
-	if (EnterWidget) {
-		if (EnterWidget->LifeTime > 0) {
+	if (EnterWidget)
+	{
+		if (EnterWidget->LifeTime > 0)
+		{
 			EnterWidget->SetText(TempText);
 			EnterWidget->LifeTime = 2.0f;
 		}
-		else {
+		else
+		{
 			EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), WidgetFactory);
 			EnterWidget->SetText(TempText);
 			EnterWidget->AddToViewport();
@@ -703,33 +722,54 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 	PlayerRoomState = Loc;
 }
 
-FDecalInfo* AGW_Player::IsDecalInRange(FVector Pos, float Param1, float Param2)
+FDecalInfo* AGW_Player::IsDecalInRange(FVector Pos, float DetectRadius)
 {
+	// 거리 벡터
 	FVector Dist;
+
+	// 가장 가까운 데칼을 찾기 위한 변수
 	FVector Min = FVector(1000.0f, 1000.0f, 1000.0f);
-	int32 RetIdx = -1;
+
+	// 반환할 데칼 인덱스
+	int32 ReturnIndex = -1;
+
+	// GameMode 가져오기
 	ADoronkoGameMode* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
-	if (GM) {
-		for (int i = 0; i < GM->SpawnedDecalArr.Num(); i++) {
+
+	// GameMode가 존재한다면
+	if (GM)
+	{
+		// GameMode의 SpawnedDecalArr를 순회하면서
+		for (int i = 0; i < GM->SpawnedDecalArr.Num(); i++)
+		{
+			// Pos 에서 데칼으로의 벡터 계산
 			Dist = Pos - GM->SpawnedDecalArr[i].DecalComp->GetComponentLocation();
-			// 만약 원하는 거리 안에 있으면
-			if (Param1 * Param1 + Param2 * Param2 > Dist.Size() * Dist.Size()) {
-				// 가장 가까운 DecalComp찾기
-				// Min 값 업데이트
-				if (Min.Size() >= Dist.Size()) {
+
+			// 만약 계산한 Dist 를 반지름으로 하는 원이 DetectRadius 를 반지름으로하는 원 안에 있다면 (원하는 거리 안에 있다면)
+			if (DetectRadius > Dist.Size())
+			{
+				// 만약 현재 저장되어있는 최소 거리보다 현재 계산한 거리가 더 작다면
+				if (Min.Size() >= Dist.Size())
+				{
+					// 최소 거리 값을 갱신하고
 					Min = Dist;
-					RetIdx = i;
+
+					// 반환 인덱스를 최소 거리에 있는 데칼의 인덱스로 업데이트
+					ReturnIndex = i;
 				}
 			}
 		}
-		if (RetIdx > 0 && RetIdx < GM->SpawnedDecalArr.Num())
+
+		// 만약 찾은 데칼의 인덱스가 0보다 크고 SpawnedDecalArr의 개수보다 작다면
+		if (ReturnIndex > 0 && ReturnIndex < GM->SpawnedDecalArr.Num())
 		{
-			return &(GM->SpawnedDecalArr[RetIdx]);
+			// 찾은 데칼의 정보를 반환
+			return &(GM->SpawnedDecalArr[ReturnIndex]);
 		}
-		else
-			return nullptr;//FDecalInfo();
 	}
-	else return nullptr;
+	// GM을 가져오는데 실패하거나 찾은 데칼이 없다면
+	return nullptr;
+
 }
 
 

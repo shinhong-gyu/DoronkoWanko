@@ -194,7 +194,7 @@ public:
 
 	UHJMiniMapWidget* MinimapUI;
 
-	FDecalInfo* IsDecalInRange(FVector Pos, float Param1, float Param2);
+	FDecalInfo* IsDecalInRange(FVector Pos, float DetectRadius);
 
 	int32 count = 0;
 

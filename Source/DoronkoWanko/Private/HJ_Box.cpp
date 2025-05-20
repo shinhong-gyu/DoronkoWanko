@@ -44,11 +44,11 @@ void AHJ_Box::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitive
 	if (OtherActor->IsA<AGW_Player>())
 	{
 	// ÄÉÀÌÅ©´Â ÄÆ¾À ÂïÀ» ¶§¸¸ Åõ¸íÇÏ°Ô (unvisible, ÀÌÈÄ visible) 
-		this->Destroy();
+		//this->Destroy();
 		/*GetWorld()->SpawnActor<AHJ_TrainWheel>(WheelFactory, Vec-FVector(0,0,780), Rot-FRotator(0,0,0));*/
 		/*GetWorld()->SpawnActor<AHJ_ElectricFan>(ElectricFanFactory, Vec - FVector(0, 0, 640), Rot - FRotator(0, -90, 0));*/
 		/*GetWorld()->SpawnActor<AHJ_WhaleHat>(HatFactory, Vec - FVector(0, 0, 780), Rot - FRotator(0, -90, 0));*/
-		GetWorld()->SpawnActor<AWIneButton>(ButtonFactory, Vec - FVector(-65, 0, -80), Rot - FRotator(0, 0, 0));
+		//GetWorld()->SpawnActor<AWIneButton>(ButtonFactory, Vec - FVector(-65, 0, -80), Rot - FRotator(0, 0, 0));
 
 	}
 }

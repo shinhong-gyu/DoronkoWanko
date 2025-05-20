@@ -157,7 +157,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	int32 RandScore = FMath::RandRange(1, 9);
 
 	// 점수 업데이트
-	GM->AddScore(RandScore);
+	GM->SetScore(RandScore);
 
 	// UI 업데이트
 	GM->UpdataScoreBoard();
@@ -237,6 +237,13 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		// StampArray를 순회하면서
 		for (auto Stamp : StampArray)
 		{
+
+			// 만약 Stamp가 nullptr이라면
+			if (Stamp == nullptr)
+			{
+				continue;
+			}
+
 			// Stamp의 Decal이 보이지 않는 상태라면
 			if (Stamp->Decal->GetVisibleFlag() == false)
 			{
@@ -355,7 +362,7 @@ FDecalInfo* AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2
 					// 최소 거리 값을 갱신하고
 					Min = Dist;
 
-					// 최소 거리에 있는 데칼의 인덱스로 반환 인덱스를 업데이트
+					// 반환 인덱스를 최소 거리에 있는 데칼의 인덱스로 업데이트
 					ReturnIndex = i;
 				}
 			}

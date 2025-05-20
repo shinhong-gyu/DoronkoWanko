@@ -7,6 +7,9 @@
 #include "HJ_FanWing.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
+#include "HG_Splatter.h"
+#include "HJ_Splatter2.h"
+#include "GW_Player.h"
 
 // Sets default values
 AHJ_FanWingSplatter::AHJ_FanWingSplatter()
@@ -49,17 +52,20 @@ void AHJ_FanWingSplatter::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor->IsA<AHG_Splatter>())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HitSplatter"));
-		OtherActor->Destroy();  
+		AGW_Player* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+		MyColor = Player->ColorArray[Player->CurIdx];
+
 		// 물감 스폰하기 (선풍기 바람 앞쪽으로 튀어나가게) 
 		FTransform T = InkArrow->GetComponentTransform();
-		auto* Ink = GetWorld()->SpawnActor<AHJ_Splatter2>(InkFactory, T);
 		FVector RandomInitial = FVector(FMath::RandRange(-100, 100), FMath::RandRange(-100, 100), FMath::RandRange(800, 1200));
+		auto* Ink = GetWorld()->SpawnActor<AHJ_Splatter2>(InkFactory, T);
 
-		if (nullptr != Ink)
+		if (Ink)
 		{
+			Ink->SetMyColor(MyColor);
 			Ink->Initalize(RandomInitial + FVector(HJ_Fan->GetActorRightVector() * -1000));
 		}
+		OtherActor->Destroy();
 	}
 }
 

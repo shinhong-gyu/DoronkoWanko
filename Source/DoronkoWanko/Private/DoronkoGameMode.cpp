@@ -19,15 +19,17 @@ void ADoronkoGameMode::BeginPlay()
 	Super::BeginPlay();
 	PlayBGM();
 
-	ScoreBoard = Cast<UHG_ScoreBoard>(CreateWidget(GetWorld(), ScoreBoardClass, FName("ScoreBoard")));
-	if (nullptr != ScoreBoard) {
+	ScoreBoard = Cast<UHG_ScoreBoard>(CreateWidget(GetWorld(), ScoreBoardFactory, FName("ScoreBoard")));
+
+
+	if (nullptr != ScoreBoard) 
+	{
 		ScoreBoard->AddToViewport();
 	}
 
-	// 시퀀스 UI를 생성하고 
+	//// 시퀀스 UI를 생성하고 
 	Lv1UI = Cast<UWBP_Doronko_Lv1>(CreateWidget(GetWorld(), UIFactory));
-
-	// 화면에 보이게 하고싶다 
+	//// 화면에 보이게 하고싶다 
 	Lv1UI->AddToViewport();
 
 	Lv2UI = Cast<UWBP_Doronko_Lv2>(CreateWidget(GetWorld(), UIFactory2));
@@ -68,7 +70,7 @@ void ADoronkoGameMode::PlayBGM()
 	GetWorldTimerManager().SetTimer(BGMHandler, this, &ADoronkoGameMode::PlayBGM, Duration, false);
 }
 
-void ADoronkoGameMode::AddScore(int32 Point)
+void ADoronkoGameMode::SetScore(int32 Point)
 {
 	GameScore += Point;
 	if (GameScore >= 1200 && GameScore < 1210)
@@ -76,7 +78,7 @@ void ADoronkoGameMode::AddScore(int32 Point)
 		if (countLv1 == 0) {
 			SpawnWingFan();
 			bLv1 = true;
-			UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv1++;
 	}
@@ -84,21 +86,21 @@ void ADoronkoGameMode::AddScore(int32 Point)
 	if (GameScore > 3600 && GameScore < 3610)
 	{	// 컷씬 영상 추가 재생방지 
 		if (countLv2 == 0) {
-		// Lv.2 기차바퀴 소환 
-		SpawnTrainWheel();
-		bLv2 = true;
-		UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
+			// Lv.2 기차바퀴 소환 
+			SpawnTrainWheel();
+			bLv2 = true;
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv2++;
 	}
 
 	if (GameScore > 5000 && GameScore < 5010)
-	{ 
+	{
 		if (countLv3 == 0) {
 			// Lv.3 고래모자 소환 
 			SpawnWhaleHat();
 			bLv3 = true;
-			UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv3++;
 	}
@@ -106,10 +108,10 @@ void ADoronkoGameMode::AddScore(int32 Point)
 	if (GameScore > 7500 && GameScore < 7510)
 	{	// Lv.4 기차바퀴 소환 & 컷씬 영상 추가 재생방지 
 		if (countLv4 == 0) {
-			
+
 			SpawnTrainWheel2();
 			bLv4 = true;
-			UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv4++;
 		// Lv.4 기차바퀴(2) 소환 
@@ -122,7 +124,7 @@ void ADoronkoGameMode::AddScore(int32 Point)
 			// Lv.5 와인버튼 소환 
 			SpawnWineButton();
 			bLv5 = true;
-			UGameplayStatics::PlaySound2D(GetWorld(), ItemSFX);
+			UGameplayStatics::PlaySound2D(GetWorld(), itemSFX);
 		}
 		countLv5++;
 	}
@@ -130,18 +132,18 @@ void ADoronkoGameMode::AddScore(int32 Point)
 
 void ADoronkoGameMode::UpdataScoreBoard()
 {
-	// 점수 업데이트
+
 	ScoreBoard->SetText(GameScore);
 }
 
 void ADoronkoGameMode::SpawnWingFan()
 {
 	// 선풍기 소환 
-	FanSpawnTransform.SetLocation(FVector(-790, 170, 165));
-	FanSpawnTransform.SetRotation(FQuat(FRotator(0, 180, 0)));
-	FanSpawnTransform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+	Transform1.SetLocation(FVector(-790, 170, 165));
+	Transform1.SetRotation(FQuat(FRotator(0, 180, 0)));
+	Transform1.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 
-	GetWorld()->SpawnActor<AHJ_ElectricFan>(ElectricFanClass, FanSpawnTransform);
+	GetWorld()->SpawnActor<AHJ_ElectricFan>(ElectricFanFactory, Transform1);
 
 	// 레벨 작업 완료되면 컷씬 추가 필요 
 }
@@ -194,7 +196,7 @@ void ADoronkoGameMode::SpawnTrainWheel2()
 void ADoronkoGameMode::SpawnWineButton()
 {
 	// 와인버튼 소환 
-	Transform5.SetLocation(FVector(-450, -6530, 115));
+	Transform5.SetLocation(FVector(-450, -6530, 50));
 	Transform5.SetRotation(FQuat(FRotator(0, 180, 0)));
 	Transform5.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 	GetWorld()->SpawnActor<AWIneButton>(ButtonFactory, Transform5);

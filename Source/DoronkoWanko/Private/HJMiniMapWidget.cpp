@@ -113,14 +113,14 @@ void UHJMiniMapWidget::ShowFloor(int32 Floor)
 		}
 		else
 		{
-		zaZOrder = 0;
-		zbZOrder = 0;
-		zcZOrder = 0;
-		zdZOrder = 2;
-		zeZOrder = 0;
-		zfZOrder = 0;
-		zgZOrder = 0;
-		zhZOrder = 0;
+			zaZOrder = 0;
+			zbZOrder = 0;
+			zcZOrder = 0;
+			zdZOrder = 2;
+			zeZOrder = 0;
+			zfZOrder = 0;
+			zgZOrder = 0;
+			zhZOrder = 0;
 		}
 		break;
 

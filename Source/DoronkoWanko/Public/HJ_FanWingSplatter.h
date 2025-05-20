@@ -5,9 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GW_Player.h"
-#include "HG_Splatter.h"
 #include "HJ_FanWing.h"
-#include "HJ_Splatter2.h"
 #include "HJ_FanWingSplatter.generated.h"
 
 UCLASS()
@@ -41,11 +39,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHJ_Splatter2> InkFactory;
 
+	FLinearColor MyColor;
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHJ_FanWing> HJ_FanWing;
 
+	UPROPERTY()
 	AHJ_FanWing* HJ_Fan;
 
+
+	UPROPERTY()
 	AGW_Player* GW_Player;
 
 };

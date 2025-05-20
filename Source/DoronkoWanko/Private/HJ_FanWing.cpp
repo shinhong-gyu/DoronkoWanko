@@ -20,7 +20,7 @@ AHJ_FanWing::AHJ_FanWing()
     CurrentRotationAngel = 0.0f;
 
     // 困连 巩备 积己 
-    InteractionText = FText::FromString(TEXT("INTERACTION"));
+    InteractionText = FText::FromString(TEXT("Interaction"));
 }
 
 // Called when the game starts or when spawned
@@ -44,10 +44,9 @@ void AHJ_FanWing::Tick(float DeltaTime)
         }
 
         FRotator WingRotation = FRotator(CurrentRotationAngel, 0.0f, 0.0f);
+     
         BoxComp->SetRelativeRotation(WingRotation);
     }
-
-
 }
 
 void AHJ_FanWing::InteractionWith()
