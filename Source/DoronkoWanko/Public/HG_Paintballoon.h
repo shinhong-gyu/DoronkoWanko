@@ -24,15 +24,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// InteractionWith 함수 오버라이드
 	UFUNCTION()
-	virtual void InteractionWith();
+	virtual void InteractionWith() override;
 
-	UPROPERTY(EditAnywhere)
+	// 페인트 공의 색
 	FLinearColor MyColor;
 
+	// 팩토리 패턴
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> SplatterFactory;
-
-	FLinearColor RandColor;
-
 };

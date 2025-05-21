@@ -66,7 +66,6 @@ void UPlayerAnimInstance::AnimNotify_rubEnd()
 		if (Player->bRubbing)
 		{
 			Montage_JumpToSection(TEXT("rub"),RubMontage);
-
 		}
 		else
 		{

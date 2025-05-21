@@ -48,22 +48,22 @@ void AHG_EnterTrigger::EnterTriggered()
 		if (CurrentRoomState != Player->PlayerRoomState)
 		{
 			// 플레이어의 EnterWidget이 생성되지 않은 상태라면
-			if (Player->EnterWidget == nullptr)
+			if (Player->EnterInstructionUI == nullptr)
 			{
 				// 플레이어의 방 위치 정보를 업데이트
 				Player->SetLocState(CurrentRoomState);
 
 				// 플레이어의 EnterWidget을 생성
-				Player->EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), Player->WidgetFactory);
+				Player->EnterInstructionUI = CreateWidget<UHG_EnterInstruction>(GetWorld(), Player->EnterInstructionUIClass);
 
 				// EnterWidget이 생성되었다면
-				if (Player->EnterWidget)
+				if (Player->EnterInstructionUI)
 				{
 					// 화면에 EnterWidget을 팝업시키고
-					Player->EnterWidget->AddToViewport();
+					Player->EnterInstructionUI->AddToViewport();
 
 					// EnterWidget의 방 이름 텍스트를 Trigger가 갖고있는 RoomName으로 설정
-					Player->EnterWidget->SetText(RoomName);
+					Player->EnterInstructionUI->SetText(RoomName);
 				}
 			}
 
@@ -71,8 +71,8 @@ void AHG_EnterTrigger::EnterTriggered()
 			else
 			{
 				// 기존의 EnterWidget을 제거하고
-				Player->EnterWidget->RemoveFromParent();
-				Player->EnterWidget = nullptr;
+				Player->EnterInstructionUI->RemoveFromParent();
+				Player->EnterInstructionUI = nullptr;
 
 				// Trigger 로직을 다시 실행
 				EnterTriggered();

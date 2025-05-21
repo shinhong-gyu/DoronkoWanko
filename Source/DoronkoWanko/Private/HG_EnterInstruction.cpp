@@ -15,7 +15,8 @@ void UHG_EnterInstruction::NativeTick(const FGeometry& MyGeometry, float InDelta
 	LifeTime -= InDeltaTime;
 
 	// 만약 생명주기가 0보다 작거나 같아지면
-	if (LifeTime <= 0) {
+	if (LifeTime <= 0) 
+	{
 		// UI 제거
 		RemoveFromParent();
 	}
@@ -33,8 +34,11 @@ void UHG_EnterInstruction::SetText(FText Name)
 void UHG_EnterInstruction::SetImageAlpha()
 {
 	FSlateColor TempColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
-	if (nullptr != GM) {
+
+	if (nullptr != GM) 
+	{
 		switch (GM->StampCount)
 		{
 		case 1:
@@ -45,21 +49,17 @@ void UHG_EnterInstruction::SetImageAlpha()
 			StampProgress1->SetBrushTintColor(TempColor);
 			StampProgress2->SetBrushTintColor(TempColor);
 			break;
-
 		case 3:
-
 			StampProgress1->SetBrushTintColor(TempColor);
 			StampProgress2->SetBrushTintColor(TempColor);
 			StampProgress3->SetBrushTintColor(TempColor);
 			break;
-
 		case 4:	
 			StampProgress1->SetBrushTintColor(TempColor);
 			StampProgress2->SetBrushTintColor(TempColor);
 			StampProgress3->SetBrushTintColor(TempColor);
 			StampProgress4->SetBrushTintColor(TempColor);
 			break;
-
 		case 5:
 			StampProgress1->SetBrushTintColor(TempColor);
 			StampProgress2->SetBrushTintColor(TempColor);

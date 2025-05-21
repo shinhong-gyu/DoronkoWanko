@@ -39,6 +39,7 @@ AGW_Player::AGW_Player()
 	DirtPercentage = 20.0f;
 	bRubbing = false;
 	bShaking = false;
+	bHitDecal = false;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -65,34 +66,53 @@ void AGW_Player::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 미니맵 UI 생성
 	MinimapUI = Cast<UHJMiniMapWidget>(CreateWidget(GetWorld(), MinimapUIClass));
 
+	// 미니맵 UI가 생성에 성공했다면
 	if (MinimapUI)
 	{
+		// 화면에 추가하고
 		MinimapUI->AddToViewport();
+
+		// 1층 미니맵으로 초기화
 		MinimapUI->ShowFloor(1);
 	}
 
-	auto* pc = Cast<APlayerController>(Controller);
-	if (pc)
+	// EnhancedInput
+	APlayerController* PC = Cast<APlayerController>(Controller);
+
+	if (PC)
 	{
-		UEnhancedInputLocalPlayerSubsystem* subSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
-		if (subSys)
+		UEnhancedInputLocalPlayerSubsystem* SubSys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+		if (SubSys)
 		{
-			subSys->AddMappingContext(IMC_Player, 0);
+			SubSys->AddMappingContext(IMC_Player, 0);
 		}
+
+		PC->SetInputMode(FInputModeGameOnly());
 	}
 
+	// 애님 인스턴스 저장
 	Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
-	RecentColor = ColorArray[0];
+	// 플레이어의 0번 머터리얼을 저장
+	UMaterialInterface* CurMaterial = GetMesh()->GetMaterial(0);
 
-	UMaterialInterface* CurMaterial = this->GetMesh()->GetMaterial(0);
+	// 플레이어의 0번 머터리얼을 다이나믹 머터리얼로 생성
 	UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
 
-	if (DynamicMaterial) {
+	// 생성에 성공했다면
+	if (DynamicMaterial)
+	{
+		// ColorArray에 있는 0번째 인덱스를 몸의 색으로 설정
+		RecentColor = ColorArray[0];
+
+		// DynamicMaterial의 Color 파라미터를 RecentColor로 설정
 		DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
-		this->GetMesh()->SetMaterial(0, DynamicMaterial);
+
+		// DynamicMaterial을 0번 머터리얼로 설정
+		GetMesh()->SetMaterial(0, DynamicMaterial);
 	}
 }
 
@@ -101,13 +121,16 @@ void AGW_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FTransform ttt = FTransform(GetControlRotation());
-	Direction = ttt.TransformVector(Direction);
+	// 움직임
+	FTransform Transfrom = FTransform(GetControlRotation());
+	Direction = Transfrom.TransformVector(Direction);
 	Direction.Z = 0;
 	Direction.Normalize();
 	AddMovementInput(Direction, 1);
 	Direction = FVector::ZeroVector;
 
+	// @Author : 신홍규
+	// LineTrace 파라미터 선언
 	FHitResult OutHit;
 	FVector Start = GetActorLocation() - FVector(0, 0, -36.666f);
 	FVector End = Start + GetActorForwardVector() * 100;
@@ -115,45 +138,91 @@ void AGW_Player::Tick(float DeltaTime)
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
 
+	// LineTrace
 	bool bHit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), Start, End, 150.0f, TraceChannel, false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
-	if (bHit) {
-		// 바라본 곳에 뭔가 있다.
-		if (LookAtActor == nullptr) {
-			if (OutHit.GetActor() != LookAtActor) {
-				LookAtActor = OutHit.GetActor();
-				II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-				if (Interface) {
-					Interface->LookAt();
-				}
+
+	// LineTrace에 맞은게 있다면
+	if (bHit)
+	{
+		// LookAtActor가 Null이라면 (바라보고 있던 액터가 없다면)
+		if (LookAtActor == nullptr)
+		{
+			// LineTrace에 맞은 액터를 LookAtActor로 설정
+			LookAtActor = OutHit.GetActor();
+
+			// 바라보고 있는 액터가 Interaction 인터페이스를 구현했는지 확인
+			II_Interaction* Interactable = Cast<II_Interaction>(LookAtActor);
+
+			// 구현했다면
+			if (nullptr != Interactable)
+			{
+				// 바라볼 때의 동작 실행
+				Interactable->LookAt();
+			}
+			// 아니라면
+			else
+			{
+				// LookAtActor를 비운다
+				LookAtActor = nullptr;
+			}
+
+		}
+	}
+	// 아무것도 맞지 않았다면
+	else
+	{
+		// 만약 이전 Tick에서 LookAtActor가 있었다면
+		if (nullptr != LookAtActor)
+		{
+			// LookAtActor가 Interaction 인터페이스를 구현했는지 확인
+			II_Interaction* Interactable = Cast<II_Interaction>(LookAtActor);
+
+			// 구현했다면
+			if (Interactable)
+			{
+				// 오브젝트를 바라보다 다른 곳을 바라볼 때의 동작 실행
+				Interactable->FadeAway();
+
+				// LookAtActor를 비운다.
+				LookAtActor = nullptr;
 			}
 		}
 	}
-	else {
-		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		if (Interface) {
-			Interface->FadeAway();
-			LookAtActor = nullptr;
-		}
-	}
-	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
-	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
 
+	// TargetArmLength를 줌 기능으로 조작했다면 변경된 TargetArmLength까지 보간
+	SpringArmComp->TargetArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, ZoomSpeed);
+
+	// @Author : 신홍규
+	// CurIdx를 지속적으로 바꿔주도록 하는 로직
 	IdxSetTime += DeltaTime;
 
-	if (IdxSetTime > 0.5) {
-		for (auto c : ColorArray) {
-			UE_LOG(LogTemp, Warning, TEXT("ColorArray : %s"), *c.ToString());
-		}
+	// 일정시간이 지나면
+	if (IdxSetTime > 0.5)
+	{
+		// IdxSetTime를 0으로 초기화
 		IdxSetTime = 0;
-		if (ColorArray.Num() == 2) {
-			if (CurIdx == 0 && ColorArray[1] != FLinearColor(0.0f, 0.0f, 0.0f, 0.0f)) CurIdx = 1;
-			else if (CurIdx == 1) CurIdx = 0;
+
+		// 만약 ColorArray에 2개의 색이 들어있는 상태라면
+		if (ColorArray.Num() == 2)
+		{
+			// CurIdx를 번갈아가면서 Shake할때의 물방울 색 결정
+
+			if (CurIdx == 0 && ColorArray[1] != FLinearColor(0.0f, 0.0f, 0.0f, 0.0f))
+			{
+				CurIdx = 1;
+			}
+			else if (CurIdx == 1)
+			{
+				CurIdx = 0;
+			}
 		}
 	}
 
+	// @Author : 신홍규
+	// 흔드는 중이라면 일정 딜레이를 주어 물방울을 스폰하도록 제어
 	if (bShaking)
 	{
-		SplashDelay += DeltaTime;
+		ShakeDelay += DeltaTime;
 	}
 }
 
@@ -176,9 +245,9 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		input->BindAction(IA_Interaction, ETriggerEvent::Started, this, &AGW_Player::OnMyActionInteraction);
 		input->BindAction(IA_Drop, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDrop);
 
-		input->BindAction(IA_Splash, ETriggerEvent::Started, this, &AGW_Player::OnMyActionSplash);
-		input->BindAction(IA_Splash, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionSplashOngoing);
-		input->BindAction(IA_Splash, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionSplashEnd);
+		input->BindAction(IA_Shake, ETriggerEvent::Started, this, &AGW_Player::OnMyActionShake);
+		input->BindAction(IA_Shake, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionShakeOngoing);
+		input->BindAction(IA_Shake, ETriggerEvent::Completed, this, &AGW_Player::OnMyActionShakeEnd);
 
 		input->BindAction(IA_Dirt, ETriggerEvent::Started, this, &AGW_Player::OnMyActionDirtStart);
 		input->BindAction(IA_Dirt, ETriggerEvent::Triggered, this, &AGW_Player::OnMyActionDirtOngoing);
@@ -188,7 +257,6 @@ void AGW_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AGW_Player::OnMyActionMove(const FInputActionValue& Value)
 {
-
 	{
 		FVector2D v = Value.Get<FVector2D>();
 		Direction.X = v.X;
@@ -219,20 +287,6 @@ void AGW_Player::OnMyActionZoom(const FInputActionValue& Value)
 	SpringArmComp->TargetArmLength = TargetArmLength;
 }
 
-// void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value, ETriggerEvent TriggerEvent)
-// {
-// 	if (TriggerEvent == ETriggerEvent::Started)
-// 	{
-// 		// 대시가 시작될 때 실행되는 코드
-// 		GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
-// 	}
-// 	else if (TriggerEvent == ETriggerEvent::Completed)
-// 	{
-// 		// 대시가 완료될 때 실행되는 코드
-// 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-// 	}
-// }
-
 void AGW_Player::OnMyActionDashOngoing(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
@@ -243,120 +297,184 @@ void AGW_Player::OnMyActionDashCompleted(const FInputActionValue& Value)
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
+// @Author : 신홍규
 void AGW_Player::Shake()
 {
+	// 랜덤으로 물방울의 초기 속도 생성
 	FVector InitialVelocity = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), FMath::RandRange(300, 600));
 
+	// 스폰 트랜스폼
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRotation = FRotator::ZeroRotator;
-	auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
 
+	// 물방울 액터(AHG_Splatter) 생성
+	AHG_Splatter* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, SpawnLocation, SpawnRotation);
+
+	// 생성에 성공했다면
 	if (Splatter)
 	{
+		// 속도를 초기화하고
 		Splatter->Initalize(InitialVelocity);
+		// 색깔도 설정
 		Splatter->SetMyColor(ColorArray[CurIdx]);
 	}
-
-
 }
+
+// @Author : 신홍규
 void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 {
-	check(Anim);
+	// Anim이 유효한지 체크
+	ensure(Anim);
 
+	// Rub 플래그를 true로 변경
 	bRubbing = true;
 
+	// Rub 애니메이션 몽타주 재생
 	if (Anim)
 	{
 		Anim->PlayRubMontage();
-		UE_LOG(LogTemp, Warning, TEXT("Rub"));
 	}
 
-	FHitResult hitInfo;
-	FCollisionQueryParams params;
-	FCollisionObjectQueryParams QParams;
 
+	// LineTrace를 사용하여 바닥에 있는 데칼을 찾기 위한 파라미터 설정
+	FVector Start = GetActorLocation();
+	FVector End = GetActorLocation();
+	// z방향으로 1m만큼 라인트레이스를 발사하도록 파라미터 설정
+	End.Z = -100.0f;
+
+	FHitResult HitInfo;
+	FCollisionQueryParams Params;
+	FCollisionObjectQueryParams QParams;
 	QParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 	QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
-	params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(this);
 
+	// LineTrace의 충돌 지점 근처에 있는 데칼을 저장하기 위한 변수
 	FDecalInfo* HittedDecalInfo;
 
-	FVector end = GetActorLocation();
-	end.Z = -100;
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, GetActorLocation(), end, ECC_Visibility, params);
-	if (bHit) {
 
-		HittedDecalInfo = IsDecalInRange(hitInfo.ImpactPoint, 1000.0f, 1000.0f);
+	// LineTrace를 사용하여 바닥에 있는 데칼을 찾기
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitInfo, Start, End, ECC_Visibility, Params);
 
-		UE_LOG(LogTemp, Warning, TEXT("bHit : %s"), *hitInfo.GetActor()->GetName());
+	// LineTrace가 성공적으로 충돌한 경우
+	if (bHit)
+	{
+		// 충돌 지점 근처에 있는 데칼 정보를 가져오기
+		HittedDecalInfo = IsDecalInRange(HitInfo.ImpactPoint, 1000.0f);
+
+		// 라인트레이스의 충돌 지점 근처에 데칼이 있었다면
 		if (HittedDecalInfo != nullptr)
 		{
+			// 플래그 변경
 			bHitDecal = true;
+
+			// 라인트레이스에 맞은 데칼의 색을 현재의 색으로 설정
 			RecentColor = HittedDecalInfo->Color;
 
-			UE_LOG(LogTemp, Warning, TEXT("HittedDecal"));
-			UE_LOG(LogTemp, Warning, TEXT("Decal Color : %s"), *(HittedDecalInfo->Color.ToString()));
-
-			if (HittedDecalInfo->Color != ColorArray[0] && count == 0)
+			// HittedDecalInfo 의 색이 현재 색과 다르면서 Count가 0이라면(첫 실행이라면)
+			if (HittedDecalInfo->Color != ColorArray[0] && Count == 0)
 			{
+				// ColorArray의 크기를 2로 설정
 				ColorArray.SetNum(2);
 			}
 
+			// ColorArray에 2개의 색이 채워진 상태라면
 			if (ColorArray.Num() == 2)
 			{
-				if (count % 2 == 0) {
+				// 첫 실행이라면
+// 				if (Count == 0)
+// 				{
+// 					ColorArray[1] = ColorArray[0];
+// 				}
+
+				// Count가 짝수일 땐
+				if (Count % 2 == 0)
+				{
+					// ColorArray 0번 인덱스를 데칼의 색으로 만들고
 					ColorArray[0] = HittedDecalInfo->Color;
 				}
-				if (count == 0) {
-					ColorArray[1] = ColorArray[0];
-				}
-				else if (count % 2 == 1) {
+				else if (Count % 2 == 1)
+				{
 					ColorArray[1] = HittedDecalInfo->Color;
 				}
-				count++;
+
+
+				Count++;
 			}
 		}
-		else {
+		// 없었다면
+		else
+		{
+			// 플래그를 false로 변경
 			bHitDecal = false;
 		}
 	}
 }
 
+// @Author : 신홍규
 void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
 {
+	// 머터리얼의 경로를 저장할 변수
 	FString MaterialPath;
+
+	// 머터리얼을 로드해서 저장할 변수
 	UMaterialInterface* NewMaterial;
-	if (DirtPercentage < 100.0f && bHitDecal)
+
+	// 만약 Rub를 실행했는데 아래쪽에 데칼이 있었다면
+	if (bHitDecal)
 	{
-		DirtPercentage += 1.0f;
-		if (DirtPercentage > 100.0f)
+		// 1번의 호출 당 0.5%씩 증가 DirtPercentage 0~100 사이 값으로 조정
+		DirtPercentage = FMath::Clamp(DirtPercentage + 0.5f, 0.0f, 100.0f);
+
+		// DirtPercentage 별로 설정할 강아지 몸 머터리얼 경로 지정
+		if (DirtPercentage == 100.0f)
 		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
-			DirtPercentage = 100.0f;
 		}
-		else if (DirtPercentage >= 80.0f) {
+		else if (DirtPercentage >= 80.0f)
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
 		}
-		else if (DirtPercentage >= 60.0f) {
+		else if (DirtPercentage >= 60.0f)
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
 		}
-		else if (DirtPercentage >= 40.0f) {
+		else if (DirtPercentage >= 40.0f)
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
 		}
-		else if (DirtPercentage >= 20.0f) {
+		else if (DirtPercentage >= 20.0f)
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
 		}
-		else {
+		else
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
 		}
+
+		// 지정된 경로명을 통해 머터리얼 로드
 		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
 
-		UMaterialInterface* CurMaterial = NewMaterial;
-		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
-		if (DynamicMaterial) {
-			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
-			this->GetMesh()->SetMaterial(0, DynamicMaterial);
+		// 로드에 성공했다면
+		if (NewMaterial)
+		{
+			// NewMaterial를 다이나믹 머터리얼로 만들고
+			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(NewMaterial, this);
+
+			// 다이나믹 머터리얼을 생성하는데 성공했다면
+			if (DynamicMaterial)
+			{
+				// ColorArray의 0번 인덱스를 RecentColor로 설정하고
+				RecentColor = ColorArray[0];
+
+				// 다이나믹 머터리얼의 Color 파라미터를 RecentColor로 설정
+				DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+
+				// DynamicMaterial을 플레이어 메시의 0번 머터리얼로 설정
+				GetMesh()->SetMaterial(0, DynamicMaterial);
+			}
 		}
+
 	}
 }
 
@@ -365,170 +483,155 @@ void AGW_Player::OnMyActionDirtEnd(const FInputActionValue& Value)
 	bRubbing = false;
 }
 
-void AGW_Player::OnMyActionSplashEnd(const FInputActionValue& Value)
+void AGW_Player::OnMyActionShakeEnd(const FInputActionValue& Value)
 {
 	bShaking = false;
-	SplashDelay = 0.0f;
+	ShakeDelay = 0.0f;
 }
 
-void AGW_Player::OnMyActionSplash(const FInputActionValue& Value)
+// @Author : 신홍규
+void AGW_Player::OnMyActionShake(const FInputActionValue& Value)
 {
-	check(Anim);
+	// 플래그 변경
 	bShaking = true;
 
+	ensure(Anim);
+
+	// Anim이 있을 때만 애니메이션 재생
 	if (Anim)
 	{
 		Anim->PlaySplashMontage();
 	}
 
-	FString MaterialPath;
-	UMaterialInterface* NewMaterial;
-
-	if (DirtPercentage != 0.0f)
-	{
-		DirtPercentage -= 6.0f;
-		if (DirtPercentage > 100.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
-			DirtPercentage = 100.0f;
-		}
-		else if (DirtPercentage >= 80.0f) {
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
-		}
-		else if (DirtPercentage >= 60.0f) {
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
-		}
-		else if (DirtPercentage >= 40.0f) {
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
-		}
-		else if (DirtPercentage >= 20.0f) {
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
-		}
-		else {
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
-		}
-		if (DirtPercentage < 0.0f)
-		{
-			DirtPercentage = 0.0f;
-		}
-		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
-
-		UMaterialInterface* CurMaterial = NewMaterial;
-		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
-		if (DynamicMaterial)
-		{
-			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
-			this->GetMesh()->SetMaterial(0, DynamicMaterial);
-		}
-
-		int NumberOfSplatter = FMath::RandRange(3, 5);
-		for (int i = 0; i < NumberOfSplatter; i++)
-		{
-			Shake();
-		}
-	}
-	else return;
-
-
+	// 몸 털기 및 물방울 생성 함수 호출
+	ShakeOffAndSpawnSplatter();
 }
-void AGW_Player::OnMyActionSplashOngoing(const FInputActionValue& Value)
+
+
+// @Author : 신홍규
+void AGW_Player::OnMyActionShakeOngoing(const FInputActionValue& Value)
 {
-	if (SplashDelay < 0.5f)
+	// ShakeDelay가 0.5초 이하라면 아무것도 하지않음
+	if (ShakeDelay < 0.5f)
 	{
 		return;
 	}
 
-	check(Anim);
+	// 플래그 변경
 	bShaking = true;
 
+	// 몸 털기 및 물방울 생성 함수 호출
+	ShakeOffAndSpawnSplatter();
+
+	// 모든 Shake로직이 끝나면 ShakeDelay 초기화
+	ShakeDelay = 0.0f;
+}
+
+void AGW_Player::ShakeOffAndSpawnSplatter()
+{
+	// 머터리얼의 경로를 저장할 변수
 	FString MaterialPath;
+
+	// 머터리얼을 로드해서 저장할 변수
 	UMaterialInterface* NewMaterial;
 
+	// DirtPercentage 가 0이 아니라면
 	if (DirtPercentage != 0.0f)
 	{
-		DirtPercentage -= 6.0f;
-		if (DirtPercentage > 100.0f)
+		// 한 번의 호출 당 6.0씩 감소, 0 이하로 떨어지지 않도록 Clamp
+		DirtPercentage = FMath::Clamp(DirtPercentage - 6.0f, 0, 100);
+
+		// DirtPercentage 에 따른 플레이어 메시 머터리얼 변화
+		if (DirtPercentage == 100.0f)
 		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
-			DirtPercentage = 100.0f;
 		}
-		else if (DirtPercentage >= 80.0f) {
+		else if (DirtPercentage >= 80.0f)
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
 		}
-		else if (DirtPercentage >= 60.0f) {
+		else if (DirtPercentage >= 60.0f)
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
 		}
-		else if (DirtPercentage >= 40.0f) {
+		else if (DirtPercentage >= 40.0f)
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
 		}
-		else if (DirtPercentage >= 20.0f) {
+		else if (DirtPercentage >= 20.0f)
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
 		}
-		else {
+		else
+		{
 			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
 		}
-		if (DirtPercentage < 0.0f)
-		{
-			DirtPercentage = 0.0f;
-		}
 
+		// 지정된 경로명을 통해 머터리얼 로드
 		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
 
-		UMaterialInterface* CurMaterial = NewMaterial;
-		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurMaterial, this);
-		if (DynamicMaterial)
+		// 로드에 성공했다면
+		if (NewMaterial)
 		{
-			DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
-			this->GetMesh()->SetMaterial(0, DynamicMaterial);
+			// NewMaterial를 다이나믹 머터리얼로 만들고
+			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(NewMaterial, this);
+
+			// 다이나믹 머터리얼을 생성하는데 성공했다면
+			if (DynamicMaterial)
+			{
+				// ColorArray의 0번 인덱스를 RecentColor로 설정하고
+				RecentColor = ColorArray[0];
+
+				// 다이나믹 머터리얼의 Color 파라미터를 RecentColor로 설정
+				DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+
+				// DynamicMaterial을 플레이어 메시의 0번 머터리얼로 설정
+				GetMesh()->SetMaterial(0, DynamicMaterial);
+			}
 		}
 
 		int NumberOfSplatter = FMath::RandRange(3, 5);
+
+		// NumberOfSplatter번 반복
 		for (int i = 0; i < NumberOfSplatter; i++)
 		{
+			// 물방울 생성
 			Shake();
-			SplashDelay = 0.0f;
 		}
-	}
 
-	else return;
+	}
 }
 
 void AGW_Player::OnMyActionInteraction(const FInputActionValue& Value)
 {
 	if (LookAtActor != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *LookAtActor->GetClass()->GetName());
-
-		II_Interaction* Interact = Cast<II_Interaction>(LookAtActor);
-		if (Interact != nullptr)
+		II_Interaction* Interactable = Cast<II_Interaction>(LookAtActor);
+		if (Interactable != nullptr)
 		{
-			Interact->InteractionWith();
+			Interactable->InteractionWith();
 
 			if (AMasterItem* MasterItem = Cast<AMasterItem>(LookAtActor))
 			{
 				HandleMasterItemAttachment(MasterItem);
 			}
-			else if (AStaticObject* DynamicObject = Cast<AStaticObject>(LookAtActor))
+			else if (AStaticObject* StaticObject = Cast<AStaticObject>(LookAtActor))
 			{
-				HandleStaticObjectAttachment(DynamicObject);
+				HandleStaticObjectAttachment(StaticObject);
 				UGameplayStatics::PlaySound2D(GetWorld(), Bite);
 			}
 		}
-		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		LookAtActor = nullptr;
-		if (Interface) {
-			Interface->FadeAway();
-			LookAtActor = nullptr;
+
+		if (Interactable)
+		{
+			Interactable->FadeAway();
 		}
-
 	}
-
+	LookAtActor = nullptr;
 }
 
 void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
-
-
 	if (AttachedStaticObject != nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Dropping DynamicObject"));
@@ -538,7 +641,7 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 			Interact->ItemDrop();
 		}
 
-		dropObject(AttachedStaticObject);
+		DropObject(AttachedStaticObject);
 		return;  // Return early after dropping DynamicObject
 	}
 
@@ -552,12 +655,12 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 			Interact->ItemDrop();
 		}
 
-		dropObject(AttachedMasterItem);
+		DropObject(AttachedMasterItem);
 	}
 	UGameplayStatics::PlaySound2D(GetWorld(), Drop);
 }
 
-void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
+void AGW_Player::AttachStaticicObject(AActor* ObjectToAttach)
 {
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 
@@ -603,7 +706,7 @@ void AGW_Player::attachStaticicObject(AActor* ObjectToAttach)
 }
 
 
-void AGW_Player::dropObject(AActor* ObjectToDrop)
+void AGW_Player::DropObject(AActor* ObjectToDrop)
 {
 
 	if (ObjectToDrop)
@@ -634,12 +737,6 @@ void AGW_Player::dropObject(AActor* ObjectToDrop)
 
 void AGW_Player::HandleMasterItemAttachment(AActor* ObjectToAttach)
 {
-	// 	if (AttachedDynamicObject != nullptr)
-	// 	{
-	// 		// Drop DynamicObject first if both are attached
-	// 		dropDynamicObject(AttachedDynamicObject);
-	// 	}
-
 	if (AttachedMasterItem != nullptr)
 	{
 		II_Interaction* Interact = Cast<II_Interaction>(AttachedMasterItem);
@@ -647,10 +744,10 @@ void AGW_Player::HandleMasterItemAttachment(AActor* ObjectToAttach)
 		{
 			Interact->ItemDrop();
 		}
-		dropObject(AttachedMasterItem);
+		DropObject(AttachedMasterItem);
 	}
 	// Attach new MasterItem
-	attachStaticicObject(ObjectToAttach);
+	AttachStaticicObject(ObjectToAttach);
 
 	II_Interaction* NewInteract = Cast<II_Interaction>(ObjectToAttach);
 	if (NewInteract != nullptr)
@@ -664,11 +761,11 @@ void AGW_Player::HandleStaticObjectAttachment(AActor* ObjectToAttach)
 	// Drop existing DynamicObject if attached
 	if (AttachedStaticObject != nullptr)
 	{
-		dropObject(AttachedStaticObject);
+		DropObject(AttachedStaticObject);
 	}
 
 	// Attach new DynamicObject
-	attachStaticicObject(ObjectToAttach);
+	AttachStaticicObject(ObjectToAttach);
 
 }
 
@@ -693,8 +790,10 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 {
 	if (PlayerRoomState == Loc) return;
 
+	// EnterWidget에 방정보 위젯에 설정할 텍스트
 	FText TempText;
 
+	// 방 정보 Enum에 따라 텍스트 설정
 	switch (Loc)
 	{
 	case EPlayerRoomState::KITCHEN:   TempText = FText::FromString(TEXT("Kitchen"));   break;
@@ -702,23 +801,36 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 	case EPlayerRoomState::BASEMENTLIVINGROOM:   TempText = FText::FromString(TEXT("Basement Living Room"));      break;
 	case EPlayerRoomState::WINECELLAR: TempText = FText::FromString(TEXT("Wine Cellar"));      break;
 	case EPlayerRoomState::NURSERY:   TempText = FText::FromString(TEXT("Nursery"));      break;
-	default:
-		break;
+	default: break;
 	}
-	if (EnterWidget)
+
+	// 만약 EnterWidget이 nullptr이 아니라면
+	if (EnterInstructionUI)
 	{
-		if (EnterWidget->LifeTime > 0)
+		// EnterWidget의 생명주기가 0보다 크다면
+		if (EnterInstructionUI->LifeTime > 0)
 		{
-			EnterWidget->SetText(TempText);
-			EnterWidget->LifeTime = 2.0f;
-		}
-		else
-		{
-			EnterWidget = CreateWidget<UHG_EnterInstruction>(GetWorld(), WidgetFactory);
-			EnterWidget->SetText(TempText);
-			EnterWidget->AddToViewport();
+			// EnterWidget의 텍스트를 TempText로 설정하고
+			EnterInstructionUI->SetText(TempText);
+
+			// 생명 주기를 2초로 초기화한다.
+			EnterInstructionUI->LifeTime = 2.0f;
 		}
 	}
+	// nullptr이라면
+	else
+	{
+		// EnterWidget을 생성하고
+		EnterInstructionUI = CreateWidget<UHG_EnterInstruction>(GetWorld(), EnterInstructionUIClass);
+
+		// EnterWidget의 텍스트를 설정하고
+		EnterInstructionUI->SetText(TempText);
+
+		// 생명 주기를 2초로 설정한다.
+		EnterInstructionUI->AddToViewport();
+	}
+
+	// Loc을 현재 플레이어의 방 상태로 설정한다.
 	PlayerRoomState = Loc;
 }
 

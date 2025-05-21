@@ -46,6 +46,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+	FVector Direction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraComp", meta = (AllowPrivateAccess = "true"))
 	float TargetArmLength = 300.0f;
 
@@ -59,41 +61,50 @@ public:
 	float MaxArmLength = 1000.0f;
 
 	UPROPERTY(EditDefaultsOnly)
-	class USpringArmComponent* SpringArmComp;
+	TObjectPtr<class USpringArmComponent> SpringArmComp;
 
 	UPROPERTY(EditDefaultsOnly)
-	class UCameraComponent* CameraComp;
-
-
+	TObjectPtr<class UCameraComponent> CameraComp;
 
 	UPROPERTY(EditDefaultsOnly)
-	class UInputMappingContext* IMC_Player;
+	TObjectPtr<class UInputMappingContext> IMC_Player;
 
 	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Move;
+	TObjectPtr<class UInputAction> IA_Move;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UInputAction> IA_Look;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UInputAction> IA_Jump;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UInputAction> IA_Zoom;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UInputAction> IA_Dash;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UInputAction> IA_Interaction;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UInputAction> IA_Drop;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UInputAction> IA_Shake;
+
+
 	void OnMyActionMove(const FInputActionValue& Value);
-
-	FVector Direction;
-
-	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Look;
 
 	void OnMyActionLook(const FInputActionValue& Value);
 
-	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Jump;
-
 	void OnMyActionJump(const FInputActionValue& Value);
 
-	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Zoom;
 	void OnMyActionZoom(const FInputActionValue& Value);
 
-	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Dash;
 	void OnMyActionDashOngoing(const FInputActionValue& Value);
+
 	void OnMyActionDashCompleted(const FInputActionValue& Value);
-	void Shake();
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AHG_Splatter> SplatterFactory;
@@ -105,103 +116,122 @@ public:
 
 public:
 
-	AActor* LookAtActor = nullptr;
+	UPROPERTY()
+	TObjectPtr<AActor> LookAtActor;
+
 	TArray<FLinearColor> ColorArray;
 
 	int32 CurIdx = 0;
 	float IdxSetTime = 0.0f;
 	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Dirt;
+	TObjectPtr<class UInputAction> IA_Dirt;
 
 	void OnMyActionDirtStart(const FInputActionValue& Value);
+
 	void OnMyActionDirtOngoing(const FInputActionValue& Value);
 
 	void OnMyActionDirtEnd(const FInputActionValue& Value);
 
-	void OnMyActionSplashEnd(const FInputActionValue& Value);
+	void OnMyActionShakeEnd(const FInputActionValue& Value);
 
+	void OnMyActionShake(const FInputActionValue& Value);
 
-	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Splash;
+	// 몸 털기가 지속되고 있을 때 호출될 함수
+	void OnMyActionShakeOngoing(const FInputActionValue& Value);
 
-	void OnMyActionSplash(const FInputActionValue& Value);
+	// 몸 털기 및 물방울 생성 함수
+	void ShakeOffAndSpawnSplatter();
 
-	void OnMyActionSplashOngoing(const FInputActionValue& Value);
-
-	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Interaction;
-
-	UPROPERTY(EditDefaultsOnly)
-	class UInputAction* IA_Drop;
 
 	void OnMyActionInteraction(const FInputActionValue& Value);
 
 
 	void OnMyActionDrop(const FInputActionValue& Value);
 
-	void attachStaticicObject(AActor* ObjectToAttach);
+	void AttachStaticicObject(AActor* ObjectToAttach);
+
+private:
+	// 몸 흔들기
+	void Shake();
 
 	UPROPERTY()
-	class AActor* AttachedMasterItem;
+	TObjectPtr<AActor> AttachedMasterItem;
 
 	UPROPERTY()
-	class AActor* AttachedStaticObject;
+	TObjectPtr <AActor> AttachedStaticObject;
 
 	UPROPERTY()
-	class AActor* OverlappingObject;
+	TObjectPtr < AActor> OverlappingObject;
 
-	float SplashDelay = 0.0f;
+	// 계속 물방울을 스폰하지 않도록 지연을 주기위한 변수
+	float ShakeDelay = 0.0f;
 
 
-	void dropObject(AActor* ObjectToDrop);
+	void DropObject(AActor* ObjectToDrop);
+
 	void HandleMasterItemAttachment(AActor* ObjectToAttach);
+
 	void HandleStaticObjectAttachment(AActor* ObjectToAttach);
 
+	// 몸이 더럽혀진 정도를 나타내는 변수 0 ~ 100
 	float DirtPercentage;
 
+	// 충돌 함수
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	float MakeTime = 0.5;
-	float CurrentTime = 0;
-
-	//Animation
+	// AnimInstance
 	UPROPERTY()
-	class UPlayerAnimInstance* Anim;
+	TObjectPtr<UPlayerAnimInstance> Anim;
 
+public:
 	bool bIsRightMouseDown;
 
+	// 물건을 물 때의 효과음
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class USoundBase* Bite;
+	TObjectPtr<USoundBase> Bite;
 
+	// 물건을 내려놓을 때의 효과음
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class USoundBase* Drop;
+	TObjectPtr<USoundBase> Drop;
 
+	// 방에 들어갈 때 방의 이름과 찾은 스탬프 개수를 나타내는 UI 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UHG_EnterInstruction> WidgetFactory;
+	TObjectPtr<class UHG_EnterInstruction> EnterInstructionUI;
 
+	// 방에 들어갈 때 방의 이름과 찾은 스탬프 개수를 나타내는 UI를 생성하는 클래스 
 	UPROPERTY(EditAnywhere)
-	class UHG_EnterInstruction* EnterWidget = nullptr;
-	// 플레이어가 현재 위치한 방
+	TSubclassOf<class UHG_EnterInstruction> EnterInstructionUIClass;
+
+	// 플레이어가 현재 위치한 방 정보 열거형 변수
 	UPROPERTY(EditAnywhere)
 	EPlayerRoomState PlayerRoomState;
 
 	// 방이 바뀔 때 마다 LocState를 업데이트 하는 함수
 	void SetLocState(EPlayerRoomState Loc);
 
-
+	// 미니맵 UI를 생성하기 위한 서브 클래스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UUserWidget> MinimapUIClass;
 
-	UHJMiniMapWidget* MinimapUI;
+	// 미니맵 UI를 저장하기 위한 변수
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UHJMiniMapWidget> MinimapUI;
 
+	// Rub 중일 때 플레이어의 아래에 데칼이 있는지 체크하는 함수
 	FDecalInfo* IsDecalInRange(FVector Pos, float DetectRadius);
 
-	int32 count = 0;
+	// Rub 중에 데칼에 맞았는지 체크하기 위한 플래그 변수
+	uint8 bHitDecal : 1;
 
-	bool bHitDecal = false;
+	// 몇 번째 실행인지 체크하기 위한 변수
+	int32 Count = 0;
 
+	// 현재의 색을 나타내는 변수
 	FLinearColor RecentColor;
 
-	uint8 bRubbing: 1;
-	uint8 bShaking: 1;
+	// Rub 중인지 체크하기 위한 플래그 변수
+	uint8 bRubbing : 1;
+
+	// Shake 중인지 체크하기 위한 플래그 변수
+	uint8 bShaking : 1;
 };

@@ -13,8 +13,8 @@ UCLASS()
 class DORONKOWANKO_API AMasterInteraction : public AActor, public II_Interaction
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AMasterInteraction();
 
@@ -22,21 +22,29 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComp;
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;
 
+	// 충돌체
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UBoxComponent> BoxComp;
+
+	// 매시
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UStaticMeshComponent> MeshComp;
+
+	// 인터렉션 UI
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-    class UWidgetComponent* InteractionWidgetComp;
+	TObjectPtr<class UWidgetComponent> InteractionWidgetComp;
+
+	// 위젯 생성을 위한 클래스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UObjectWidget> ObjectWidgetClass;
 
+	// 생성한 위젯을 저장할 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	class UObjectWidget* Widget;
+	TObjectPtr<class UObjectWidget> Widget;
 
 	// Player 가 아이템을 바라보고 있을 때
 	virtual void LookAt();
@@ -46,7 +54,7 @@ public:
 	virtual void InteractionWith();
 	// Q 가 눌렸을 때 할 행동
 	virtual void ItemDrop();
-	
+
 	FText InteractionText;
 
 	bool bIsDropped = true;
