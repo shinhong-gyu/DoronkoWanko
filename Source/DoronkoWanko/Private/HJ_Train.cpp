@@ -130,38 +130,24 @@ void AHJ_Train::NotifyActorBeginOverlap(AActor* OtherActor)
 				AbleInteract = true;
 			}
 		}
-		UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
 	}
-	//바퀴가 함께 충돌할 때만 상호작용 가능 
-   /*UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));*/
-
-// 	if (OtherActor->IsA<AHJ_TrainWheel>())
-// 	{
-// 		AbleInteract = true;
-// 		// (방법 수정 필요) 부딪히고 E키 누를 때만 파괴 가능하게 
-// 		OtherActor->Destroy();
-// 	}
 }
-
-void AHJ_Train::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-}
-
 
 void AHJ_Train::InteractionWith()
 {
 	if (AbleInteract)
 	{
-	WheelCheck += 1;
-	// 열차 바퀴를 파괴하는 함수 필요 
-	auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-	if (Player) {
-		if (Player->AttachedStaticObject && Player->AttachedStaticObject->IsA<AHJ_TrainWheel>()) {
-			Player->AttachedStaticObject->Destroy();
-			AbleInteract = false;
+		WheelCheck += 1;
+		// 열차 바퀴를 파괴하는 함수 필요 
+		AGW_Player* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+		if (Player)
+		{
+			if (Player->AttachedStaticObject && Player->AttachedStaticObject->IsA<AHJ_TrainWheel>()) 
+			{
+				Player->AttachedStaticObject->Destroy();
+				AbleInteract = false;
+			}
 		}
-	}
-	UE_LOG(LogTemp, Warning, TEXT("CheckWhy"));
 	}
 }
 

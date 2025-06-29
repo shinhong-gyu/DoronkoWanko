@@ -36,7 +36,7 @@ public:
 
 	// 선풍기 충돌체 소환 
 	UPROPERTY(EditAnywhere)
-	class TSubclassOf<class AHJ_FanWingSplatter> WingSplatter;
+	TSubclassOf<class AHJ_FanWingSplatter> WingSplatter;
 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* WingArrow;

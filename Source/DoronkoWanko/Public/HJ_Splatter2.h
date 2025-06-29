@@ -10,8 +10,8 @@ UCLASS()
 class DORONKOWANKO_API AHJ_Splatter2 : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AHJ_Splatter2();
 
@@ -19,52 +19,47 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComp;
-	
+
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditAnywhere)
-    TSubclassOf<class AHG_DecalActor> DecalClass;
-
-	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* ProjectileMovementComponent;
-
-	void SpawnDecalAtLocation(const FVector& Location, const FRotator& Rotation);
-
-	FVector ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
 
 	FVector Velocity;
 
 	UPROPERTY(EditAnywhere)
-	class UMaterial* SelectedMaterial;
+	TObjectPtr <class UMaterial> SelectedDecalMaterial;
 
- 	UFUNCTION()
- 	void OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	FVector ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
 
 	void Initalize(FVector initVeloccity);
 
 	void UpdataRotation();
 
-	TArray<class AHG_MissonStamp*> IsStampInRange(FVector Pos ,float Param1,float Param2);
+	void SetMyColor(FLinearColor Value);
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class AHG_MissonStamp> StampFactory;
+	TArray<TObjectPtr<class AHG_MissonStamp>> IsStampInRange(FVector Pos, float Param1, float Param2);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AHG_MissonStamp> StampClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> NormalArrow;
 
 	FLinearColor MyColor;
 
-	void SetMyColor(FLinearColor Value);
-
 	UPROPERTY(EditAnywhere)
-	class USoundBase* StampSFX;
+	TObjectPtr<class USoundBase> StampSFX;
 
-	int32 SO = 0;
+	int32 SortOrder = 0;
 };

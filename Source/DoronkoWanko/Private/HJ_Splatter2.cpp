@@ -36,12 +36,12 @@ AHJ_Splatter2::AHJ_Splatter2()
 	int32 RandValue = FMath::RandRange(1, 5);
 	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/Splatoon/M_Paint%d.M_Paint%d"), RandValue, RandValue);
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Game/HongGyu/Splatoon/Water_Drop.Water_Drop"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/HongGyu/Splatoon/Water_Drop.Water_Drop'"));
 	if (TempMesh.Succeeded()) {
 		MeshComp->SetStaticMesh(TempMesh.Object);
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial11(TEXT("/Game/Material/BaseMaterials/M_Paint_Origin.M_Paint_Origin"));
+	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial11(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Paint_Origin.M_Paint_Origin'"));
 	if (TempMaterial11.Succeeded()) {
 		MeshComp->SetMaterial(0, TempMaterial11.Object);
 	}
@@ -51,7 +51,7 @@ AHJ_Splatter2::AHJ_Splatter2()
 
 	ConstructorHelpers::FObjectFinder<UMaterial> TempMaterial(*MatPath);
 	if (TempMaterial.Succeeded()) {
-		SelectedMaterial = TempMaterial.Object;
+		SelectedDecalMaterial= TempMaterial.Object;
 	}
 
 	this->SetLifeSpan(3.0f);
@@ -71,10 +71,12 @@ void AHJ_Splatter2::Tick(float DeltaTime)
 	UMaterialInterface* MaterialInterface = MeshComp->GetMaterial(0);
 	if (MaterialInterface) {
 		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(MaterialInterface);
-		if (!DynamicMaterial) {
+		if (!DynamicMaterial) 
+		{
 			DynamicMaterial = UMaterialInstanceDynamic::Create(MaterialInterface, this);
 		}
-		if (DynamicMaterial) {
+		if (DynamicMaterial) 
+		{
 			UE_LOG(LogTemp, Warning, TEXT("Splatter2 My Color : %s"), *(MyColor.ToString()));
 			DynamicMaterial->SetVectorParameterValue("Color", MyColor);
 			MeshComp->SetMaterial(0, DynamicMaterial);
@@ -89,69 +91,59 @@ void AHJ_Splatter2::Tick(float DeltaTime)
 	UpdataRotation();
 }
 
-void AHJ_Splatter2::SpawnDecalAtLocation(const FVector& Location, const FRotator& Rotation)
-{
-	if (DecalClass != nullptr)
-	{
-		AHG_DecalActor* Decal = GetWorld()->SpawnActor<AHG_DecalActor>(DecalClass, Location, Rotation);
-		auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
-		int32 RandNum = FMath::RandRange(1, 9);
-		GM->SetScore(RandNum);
-		GM->UpdataScoreBoard();
-		if (nullptr != Decal) 
-		{
-			UDecalComponent* DecalComp = Decal->GetDecal();
-			if (nullptr != DecalComp) 
-			{
-				DecalComp->SetWorldLocation(Location);
-				DecalComp->SetWorldRotation(Rotation);
-			}
-		}
-	}
-}
-
 void AHJ_Splatter2::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRoation;
+
 	float RandNum = FMath::FRandRange(100.0f, 150.0f);
 	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+
 	int32 RanInt = FMath::RandRange(1, 9);
 	GM->SetScore(RanInt);
 	GM->UpdataScoreBoard();
 	FVector end = SpawnLocation + Velocity.GetSafeNormal() * 10000;
-	FHitResult hitInfo;
+
+	FHitResult HitInfo;
 	FCollisionQueryParams params;
 	FCollisionObjectQueryParams QParams;
-
 	QParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 	QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
 	params.AddIgnoredActor(this);
 
-	bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, SpawnLocation, end, QParams, params);
+	bool bHit = GetWorld()->LineTraceSingleByObjectType(HitInfo, SpawnLocation, end, QParams, params);
 	if (bHit)
 	{
-		UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, hitInfo.ImpactPoint, hitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
-		if (Decal) {
+		UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedDecalMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, HitInfo.ImpactPoint, HitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
+		if (Decal) 
+		{
 			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Decal->GetDecalMaterial(), this);
-			if (DynamicMaterial) {
+
+			if (DynamicMaterial)
+			{
 				DynamicMaterial->SetVectorParameterValue("Color", MyColor);
 				Decal->SetDecalMaterial(DynamicMaterial);
-				Decal->SetSortOrder(SO);
-				SO++;
+				Decal->SetSortOrder(SortOrder);
+				SortOrder++;
 			}
 		}
 	}
-	TArray<AHG_MissonStamp*> StampArray = IsStampInRange(hitInfo.ImpactPoint, RandNum, RandNum);
-	if (StampArray.Num() != 0) {
-		for (auto s : StampArray) {
-			if (s->Decal->GetVisibleFlag() == false) {
-				s->Decal->SetVisibility(true);
+
+	TArray<TObjectPtr<AHG_MissonStamp>> StampArray = IsStampInRange(HitInfo.ImpactPoint, RandNum, RandNum);
+	if (StampArray.Num() != 0) 
+	{
+		for (auto Stamp : StampArray)
+		{
+			if (Stamp->Decal->GetVisibleFlag() == false) 
+			{
+				Stamp->Decal->SetVisibility(true);
 				GM->StampCount++;
 				auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-				if (Player) {
-					if (Player->MinimapUI) {
-						Player->MinimapUI->MiniMapUpdate(s->StampID);
+				if (Player) 
+				{
+					if (Player->MinimapUI) 
+					{
+						Player->MinimapUI->MiniMapUpdate(Stamp->StampID);
 						UGameplayStatics::PlaySound2D(GetWorld(), StampSFX);
 					}
 				}
@@ -179,21 +171,25 @@ void AHJ_Splatter2::Initalize(FVector initVeloccity)
 
 void AHJ_Splatter2::UpdataRotation()
 {
-	if (!Velocity.IsNearlyZero()) {
+	if (!Velocity.IsNearlyZero())
+	{
 		FRotator NewRotation = Velocity.Rotation();
 		SetActorRotation(NewRotation);
 	}
 }
 
-TArray<AHG_MissonStamp*> AHJ_Splatter2::IsStampInRange(FVector Pos, float Param1, float Param2)
+TArray<TObjectPtr<AHG_MissonStamp>> AHJ_Splatter2::IsStampInRange(FVector Pos, float Param1, float Param2)
 {
 	TArray<AActor*> StampArray;
-	TArray<AHG_MissonStamp*> Result;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StampFactory, StampArray);
-	for (auto a : StampArray)
+
+	TArray< TObjectPtr<AHG_MissonStamp>> Result;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StampClass, StampArray);
+	for (auto a : StampArray) 
 	{
 		FVector Dist = Pos - (a->GetActorLocation());
-		if ((Param1 / 2) * (Param1 / 2) + (Param2 / 2) * (Param2 / 2) > Dist.Size() * Dist.Size()) 
+
+		if (Param1* Param1 > Dist.Size() * Dist.Size()) 
 		{
 			Result.Add(Cast<AHG_MissonStamp>(a));
 		}

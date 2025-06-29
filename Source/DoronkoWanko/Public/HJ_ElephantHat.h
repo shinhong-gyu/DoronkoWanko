@@ -26,12 +26,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
-	class UArrowComponent* InkArrow;
+	class UArrowComponent* SplatterArrow;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AHG_Splatter> InkFactory;
+	TSubclassOf<class AHG_Splatter> SplatterFactory;
 
-	void SpawnInk();
+	void SpawnSplatter();
 
 	UPROPERTY(EditAnywhere)
 	float MakeTime = 0.1f;
@@ -45,6 +45,4 @@ public:
 	bool bTurnOn = false;
 
 	AGW_Player* GW_Player;
-
-	FLinearColor MyColor = FLinearColor(1.0f,0.5f,0.946f,1.0f);
 };

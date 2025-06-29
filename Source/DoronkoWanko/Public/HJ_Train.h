@@ -29,7 +29,6 @@ public:
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
 
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	bool AbleInteract = false;
 
 	UPROPERTY(EditAnywhere)
@@ -40,15 +39,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int WheelCheck = 0;
-
-	/*UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* Wheel3;
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* Wheel4;*/
-
-	/*UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComp;*/
 
 	// 소켓에 부착할 바퀴 클래스 선언 
 	UPROPERTY(EditAnywhere)

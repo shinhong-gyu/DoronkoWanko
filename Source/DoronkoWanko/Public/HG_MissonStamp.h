@@ -20,15 +20,15 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	// 데칼 컴포넌트
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UDecalComponent> Decal;
 
+	// 데칼 머터리얼
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterial> DecalMaterial;
 
+	// 스탬프를 구분하기 위한 아이디
 	UPROPERTY(EditAnywhere)
 	int32 StampID;
 };

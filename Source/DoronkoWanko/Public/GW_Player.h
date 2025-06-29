@@ -14,6 +14,7 @@
 #include "DecalInfoStruct.h"
 #include "GW_Player.generated.h"
 
+// 플레이어가 위치한 방 정보를 나타내는 열거형
 UENUM(BlueprintType)
 enum class EPlayerRoomState : uint8
 {
@@ -24,6 +25,7 @@ enum class EPlayerRoomState : uint8
 	NURSERY,
 };
 
+class UPlayerAnimInstance;
 
 UCLASS()
 class DORONKOWANKO_API AGW_Player : public ACharacter
@@ -92,8 +94,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<class UInputAction> IA_Shake;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class UInputAction> IA_Dirt;
 
 
+	// 캐릭터 움직임 함수
 	void OnMyActionMove(const FInputActionValue& Value);
 
 	void OnMyActionLook(const FInputActionValue& Value);
@@ -123,17 +129,22 @@ public:
 
 	int32 CurIdx = 0;
 	float IdxSetTime = 0.0f;
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<class UInputAction> IA_Dirt;
 
+	
+
+	// 몸을 더럽히는 액션이 시작될 때 호출될 함수
 	void OnMyActionDirtStart(const FInputActionValue& Value);
 
+	// 몸을 더럽히는 액션이 지속되고 있을 때 호출될 함수
 	void OnMyActionDirtOngoing(const FInputActionValue& Value);
 
+	// 몸을 더럽히는 액션이 끝났을 때 호출될 함수
 	void OnMyActionDirtEnd(const FInputActionValue& Value);
 
+	// 몸 털기가 끝났을 때 호출될 함수
 	void OnMyActionShakeEnd(const FInputActionValue& Value);
 
+	// 몸 털기가 시작될 때 호출될 함수
 	void OnMyActionShake(const FInputActionValue& Value);
 
 	// 몸 털기가 지속되고 있을 때 호출될 함수
@@ -142,18 +153,23 @@ public:
 	// 몸 털기 및 물방울 생성 함수
 	void ShakeOffAndSpawnSplatter();
 
-
+	// 플레이어가 바라보고 있는 오브젝트와 상호작용을 하는 함수
 	void OnMyActionInteraction(const FInputActionValue& Value);
 
-
+	// 오브젝트를 내려놓는 함수
 	void OnMyActionDrop(const FInputActionValue& Value);
 
+	// 정적 오브젝트를 소켓에 붙이는 함수
 	void AttachStaticicObject(AActor* ObjectToAttach);
 
 private:
 	// 몸 흔들기
 	void Shake();
 
+	// 계속 물방울을 스폰하지 않도록 지연을 주기위한 변수
+	float ShakeDelay = 0.0f;
+
+public:
 	UPROPERTY()
 	TObjectPtr<AActor> AttachedMasterItem;
 
@@ -161,12 +177,9 @@ private:
 	TObjectPtr <AActor> AttachedStaticObject;
 
 	UPROPERTY()
-	TObjectPtr < AActor> OverlappingObject;
+	TObjectPtr <AActor> OverlappingObject;
 
-	// 계속 물방울을 스폰하지 않도록 지연을 주기위한 변수
-	float ShakeDelay = 0.0f;
-
-
+	// 플레이어의 소켓에 장착한 오브젝트를 내려놓는 함수
 	void DropObject(AActor* ObjectToDrop);
 
 	void HandleMasterItemAttachment(AActor* ObjectToAttach);
@@ -227,7 +240,7 @@ public:
 	int32 Count = 0;
 
 	// 현재의 색을 나타내는 변수
-	FLinearColor RecentColor;
+	FLinearColor CurrentColor;
 
 	// Rub 중인지 체크하기 위한 플래그 변수
 	uint8 bRubbing : 1;

@@ -15,16 +15,18 @@ AHJ_ElephantHat::AHJ_ElephantHat()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// 스폰위치(Arrow) 생성 
-	InkArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
-	InkArrow->SetupAttachment(RootComponent);
-	InkArrow->SetRelativeLocation(FVector(90, 0, 0));
-	InkArrow->SetRelativeRotation(FRotator(0, 0, 0));
+	SplatterArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("InkArrow"));
+	SplatterArrow->SetupAttachment(RootComponent);
+	SplatterArrow->SetRelativeLocation(FVector(90, 0, 0));
+	SplatterArrow->SetRelativeRotation(FRotator(0, 0, 0));
 
 	// 충돌체 처리 
 	BoxComp->SetCollisionProfileName(TEXT("MapObject"));
 
 	// 위젯 생성 
 	InteractionText = FText::FromString(TEXT("Put On"));
+
+	MyColor = FLinearColor(1.0f, 0.5f, 0.946f, 1.0f);
 }
 
 // Called when the game starts or when spawned
@@ -50,22 +52,22 @@ void AHJ_ElephantHat::Tick(float DeltaTime)
 
 			if (CurrTime > MakeTime)
 			{
-				SpawnInk();
+				SpawnSplatter();
 				CurrTime = 0;
 			}
 		}
 	}
 }
 
-void AHJ_ElephantHat::SpawnInk()
+void AHJ_ElephantHat::SpawnSplatter()
 {
 	// 물감 스폰하기 (코 앞쪽으로 튀어나가게)
-	FTransform T = InkArrow->GetComponentTransform();
-	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, T);
-	if (nullptr != Ink)
+	FTransform T = SplatterArrow->GetComponentTransform();
+	auto* Splatter = GetWorld()->SpawnActor<AHG_Splatter>(SplatterFactory, T);
+	if (nullptr != Splatter)
 	{
-		Ink->Initalize(FVector(0, 0, 600) + GW_Player->GetActorForwardVector() * 600);
-		Ink->SetMyColor(MyColor);
+		Splatter->Initalize(FVector(0, 0, 600) + GW_Player->GetActorForwardVector() * 600);
+		Splatter->SetMyColor(MyColor);
 	}
 }
 

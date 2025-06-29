@@ -66,7 +66,7 @@ public:
 	FVector ProjectVectorOntoPlane(const FVector& Vector, const FVector& PlaneNormal);
 
 	// 물방울이 충돌했을 때 범위 안에 데칼이 있는지 확인하고 해당 데칼의 정보를 반환하는 함수.
-	FDecalInfo* IsDecalInRange(FVector Pos, float Param1, float Param2);
+	FDecalInfo* IsDecalInRange(FVector Pos, float InRange);
 
 private:
 	// 데칼 생성을 위한 TSubClassOf (팩토리 패턴)
@@ -86,15 +86,18 @@ public:
 	void UpdataRotation();
 
 private:
-	// 변위
+	// 속도
 	FVector Velocity;
 
 	// Stamp Section
 public:
 	// 물방울이 충돌한 위치에서 일정 범위 내에 스팸프가 있는지 확인하고 범위 내에 있는 스팸프들을 반환하는 함수.
-	TArray<class AHG_MissonStamp*> IsStampInRange(FVector Pos, float Param1, float Param2);
+	TArray<class AHG_MissonStamp*> IsStampInRange(FVector Pos, float InRange);
 
 	// 스팸프를 찾기 위한 스팸프 클래스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AHG_MissonStamp> StampClass;
+
+	// 찾은 스탬프들을 저장하기 위한 배열
+	TArray<AActor*> StampArray;
 };

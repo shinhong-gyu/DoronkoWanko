@@ -23,11 +23,11 @@ AHG_MissonStamp::AHG_MissonStamp()
 	// 난수에 따른 데칼 머터리얼 경로명
 	FString MaterialPath = FString::Printf(TEXT("/Game/HongGyu/M_MissonStamp%d.M_MissonStamp%d"), RandNum, RandNum);
 
-
 	// 데칼 머터리얼 애셋 로드
 	static ConstructorHelpers::FObjectFinder<UMaterial> FindMaterial(*MaterialPath);
 	if (FindMaterial.Succeeded())
 	{
+		// 찾은 머터리얼을 데칼 머터리얼로 설정
 		DecalMaterial = FindMaterial.Object;
 	}
 
@@ -49,11 +49,3 @@ void AHG_MissonStamp::BeginPlay()
 	// 시작했을 땐 보이지 않도록 설정
 	Decal->SetVisibility(false);
 }
-
-// Called every frame
-void AHG_MissonStamp::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

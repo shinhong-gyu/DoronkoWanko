@@ -63,7 +63,7 @@ void AHG_EnterTrigger::EnterTriggered()
 					Player->EnterInstructionUI->AddToViewport();
 
 					// EnterWidget의 방 이름 텍스트를 Trigger가 갖고있는 RoomName으로 설정
-					Player->EnterInstructionUI->SetText(RoomName);
+					Player->EnterInstructionUI->SetRoomName(RoomName);
 				}
 			}
 

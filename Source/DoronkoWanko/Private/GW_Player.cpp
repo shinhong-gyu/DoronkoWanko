@@ -106,10 +106,10 @@ void AGW_Player::BeginPlay()
 	if (DynamicMaterial)
 	{
 		// ColorArray에 있는 0번째 인덱스를 몸의 색으로 설정
-		RecentColor = ColorArray[0];
+		CurrentColor = ColorArray[0];
 
 		// DynamicMaterial의 Color 파라미터를 RecentColor로 설정
-		DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+		DynamicMaterial->SetVectorParameterValue("Color", CurrentColor);
 
 		// DynamicMaterial을 0번 머터리얼로 설정
 		GetMesh()->SetMaterial(0, DynamicMaterial);
@@ -211,6 +211,7 @@ void AGW_Player::Tick(float DeltaTime)
 			{
 				CurIdx = 1;
 			}
+
 			else if (CurIdx == 1)
 			{
 				CurIdx = 0;
@@ -315,8 +316,24 @@ void AGW_Player::Shake()
 	{
 		// 속도를 초기화하고
 		Splatter->Initalize(InitialVelocity);
+
 		// 색깔도 설정
-		Splatter->SetMyColor(ColorArray[CurIdx]);
+		// 만약 현재 인덱스가 유효하지 않은 색이 아니라면
+		if (ColorArray[CurIdx] != FLinearColor(0.0f, 0.0f, -0.000009f, 0.0f))
+		{
+			// 현재 인덱스로 물방울 색 설정
+			Splatter->SetMyColor(ColorArray[CurIdx]);
+		}
+		// 유효하지 않다면
+		else
+		{
+			// 만약 ColorArray에 2개의 색이 들어있는 상태라면
+			if (ColorArray.Num() == 2)
+			{
+				// 다른 인덱스의 물방울 색 설정
+				Splatter->SetMyColor(ColorArray[CurIdx == 0 ? 1 : 0]);
+			}
+		}
 	}
 }
 
@@ -369,7 +386,7 @@ void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 			bHitDecal = true;
 
 			// 라인트레이스에 맞은 데칼의 색을 현재의 색으로 설정
-			RecentColor = HittedDecalInfo->Color;
+			CurrentColor = HittedDecalInfo->Color;
 
 			// HittedDecalInfo 의 색이 현재 색과 다르면서 Count가 0이라면(첫 실행이라면)
 			if (HittedDecalInfo->Color != ColorArray[0] && Count == 0)
@@ -382,10 +399,10 @@ void AGW_Player::OnMyActionDirtStart(const FInputActionValue& Value)
 			if (ColorArray.Num() == 2)
 			{
 				// 첫 실행이라면
-// 				if (Count == 0)
-// 				{
-// 					ColorArray[1] = ColorArray[0];
-// 				}
+				if (Count == 0)
+				{
+					ColorArray[1] = ColorArray[0];
+				}
 
 				// Count가 짝수일 땐
 				if (Count % 2 == 0)
@@ -426,31 +443,11 @@ void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
 		// 1번의 호출 당 0.5%씩 증가 DirtPercentage 0~100 사이 값으로 조정
 		DirtPercentage = FMath::Clamp(DirtPercentage + 0.5f, 0.0f, 100.0f);
 
-		// DirtPercentage 별로 설정할 강아지 몸 머터리얼 경로 지정
-		if (DirtPercentage == 100.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
-		}
-		else if (DirtPercentage >= 80.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
-		}
-		else if (DirtPercentage >= 60.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
-		}
-		else if (DirtPercentage >= 40.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
-		}
-		else if (DirtPercentage >= 20.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
-		}
-		else
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
-		}
+		// DirtPercentage 에 따른 플레이어 메시 머터리얼 변화 (20%마다 변화)
+		int assetNum = DirtPercentage / 20;
+
+		// 경로 지정
+		MaterialPath = FString::Printf(TEXT("/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin"), assetNum, assetNum);
 
 		// 지정된 경로명을 통해 머터리얼 로드
 		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
@@ -465,10 +462,10 @@ void AGW_Player::OnMyActionDirtOngoing(const FInputActionValue& Value)
 			if (DynamicMaterial)
 			{
 				// ColorArray의 0번 인덱스를 RecentColor로 설정하고
-				RecentColor = ColorArray[0];
+				//CurrentColor = ColorArray[0];
 
 				// 다이나믹 머터리얼의 Color 파라미터를 RecentColor로 설정
-				DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+				DynamicMaterial->SetVectorParameterValue("Color", CurrentColor);
 
 				// DynamicMaterial을 플레이어 메시의 0번 머터리얼로 설정
 				GetMesh()->SetMaterial(0, DynamicMaterial);
@@ -542,30 +539,10 @@ void AGW_Player::ShakeOffAndSpawnSplatter()
 		DirtPercentage = FMath::Clamp(DirtPercentage - 6.0f, 0, 100);
 
 		// DirtPercentage 에 따른 플레이어 메시 머터리얼 변화
-		if (DirtPercentage == 100.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 5, 5);
-		}
-		else if (DirtPercentage >= 80.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 4, 4);
-		}
-		else if (DirtPercentage >= 60.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 3, 3);
-		}
-		else if (DirtPercentage >= 40.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 2, 2);
-		}
-		else if (DirtPercentage >= 20.0f)
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin'"), 1, 1);
-		}
-		else
-		{
-			MaterialPath = FString::Printf(TEXT("/Script/Engine.Material'/Game/Dog_Spitz/Spitz/Materials/M_Spitz_color_1.M_Spitz_color_1'"));
-		}
+		int assetNum = DirtPercentage / 20;
+
+		// 경로 지정
+		MaterialPath = FString::Printf(TEXT("/Game/Material/BaseMaterials/M_Spitz_%d_Origin.M_Spitz_%d_Origin"), assetNum, assetNum);
 
 		// 지정된 경로명을 통해 머터리얼 로드
 		NewMaterial = LoadObject<UMaterialInterface>(nullptr, *MaterialPath);
@@ -580,16 +557,17 @@ void AGW_Player::ShakeOffAndSpawnSplatter()
 			if (DynamicMaterial)
 			{
 				// ColorArray의 0번 인덱스를 RecentColor로 설정하고
-				RecentColor = ColorArray[0];
+				CurrentColor = ColorArray[0];
 
 				// 다이나믹 머터리얼의 Color 파라미터를 RecentColor로 설정
-				DynamicMaterial->SetVectorParameterValue("Color", RecentColor);
+				DynamicMaterial->SetVectorParameterValue("Color", CurrentColor);
 
 				// DynamicMaterial을 플레이어 메시의 0번 머터리얼로 설정
 				GetMesh()->SetMaterial(0, DynamicMaterial);
 			}
 		}
 
+		// 물방울을 몇 개 생성할지 랜덤으로 결정
 		int NumberOfSplatter = FMath::RandRange(3, 5);
 
 		// NumberOfSplatter번 반복
@@ -634,8 +612,8 @@ void AGW_Player::OnMyActionDrop(const FInputActionValue& Value)
 {
 	if (AttachedStaticObject != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Dropping DynamicObject"));
 		II_Interaction* Interact = Cast<II_Interaction>(AttachedStaticObject);
+
 		if (Interact != nullptr)
 		{
 			Interact->ItemDrop();
@@ -669,39 +647,28 @@ void AGW_Player::AttachStaticicObject(AActor* ObjectToAttach)
 	{
 		// Attach MasterItem to "HAT" socket
 		MasterItem->AttachToComponent(GetMesh(), AttachmentRules, FName("HAT"));
-		MasterItem->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-			1.0f / GetMesh()->GetComponentScale().Y,
-			1.0f / GetMesh()->GetComponentScale().Z));
+
+		MasterItem->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X, 1.0f / GetMesh()->GetComponentScale().Y, 1.0f / GetMesh()->GetComponentScale().Z));
+
 		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(MasterItem->GetRootComponent()))
 		{
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedMasterItem = MasterItem;
-		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		// 		LookAtActor = nullptr;
-		// 		if (Interface) {
-		// 			Interface->FadeAway();
-		// 			LookAtActor = nullptr;
-		// 		}
 	}
+
 	else if (AStaticObject* StaticicObject = Cast<AStaticObject>(ObjectToAttach))
 	{
 		// Attach DynamicObject to "HAND" socket
 		StaticicObject->AttachToComponent(GetMesh(), AttachmentRules, FName("attach"));
-		StaticicObject->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X,
-			1.0f / GetMesh()->GetComponentScale().Y,
-			1.0f / GetMesh()->GetComponentScale().Z));
+
+		StaticicObject->SetActorRelativeScale3D(FVector(1.0f / GetMesh()->GetComponentScale().X, 1.0f / GetMesh()->GetComponentScale().Y, 1.0f / GetMesh()->GetComponentScale().Z));
 		if (UPrimitiveComponent* DObComp = Cast<UPrimitiveComponent>(StaticicObject->GetRootComponent()))
 		{
 			DObComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		AttachedStaticObject = StaticicObject;
-		// 		II_Interaction* Interface = Cast<II_Interaction>(LookAtActor);
-		// 		LookAtActor = nullptr;
-		// 		if (Interface) {
-		// 			Interface->FadeAway();
-		// 			LookAtActor = nullptr;
-		// 		}
+
 	}
 }
 
@@ -717,11 +684,6 @@ void AGW_Player::DropObject(AActor* ObjectToDrop)
 		{
 			DObComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			DObComp->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel4);
-			// 물리 시뮬레이션을 활성화 (필요한 경우)
-// 			DObComp->SetSimulatePhysics(true);
-
-			// 디버그 로그 추가
-			UE_LOG(LogTemp, Warning, TEXT("Collision Enabled: %s"), *UEnum::GetValueAsString(DObComp->GetCollisionEnabled()));
 		}
 
 		if (ObjectToDrop == AttachedStaticObject)
@@ -810,8 +772,8 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 		// EnterWidget의 생명주기가 0보다 크다면
 		if (EnterInstructionUI->LifeTime > 0)
 		{
-			// EnterWidget의 텍스트를 TempText로 설정하고
-			EnterInstructionUI->SetText(TempText);
+			// EnterWidget의 방이름을 TempText로 설정하고
+			EnterInstructionUI->SetRoomName(TempText);
 
 			// 생명 주기를 2초로 초기화한다.
 			EnterInstructionUI->LifeTime = 2.0f;
@@ -823,8 +785,8 @@ void AGW_Player::SetLocState(EPlayerRoomState Loc)
 		// EnterWidget을 생성하고
 		EnterInstructionUI = CreateWidget<UHG_EnterInstruction>(GetWorld(), EnterInstructionUIClass);
 
-		// EnterWidget의 텍스트를 설정하고
-		EnterInstructionUI->SetText(TempText);
+		// EnterWidget의 방이름을 설정하고
+		EnterInstructionUI->SetRoomName(TempText);
 
 		// 생명 주기를 2초로 설정한다.
 		EnterInstructionUI->AddToViewport();

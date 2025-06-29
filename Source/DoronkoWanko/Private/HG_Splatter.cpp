@@ -53,13 +53,15 @@ AHG_Splatter::AHG_Splatter()
 
 	// 매시 에셋 로드
 	ConstructorHelpers::FObjectFinder<UStaticMesh> SplatterMesh(TEXT("/Script/Engine.StaticMesh'/Game/HongGyu/Splatoon/Water_Drop.Water_Drop'"));
-	if (SplatterMesh.Succeeded()) {
+	if (SplatterMesh.Succeeded())
+	{
 		MeshComp->SetStaticMesh(SplatterMesh.Object);
 	}
 
 	// 머터리얼 애셋 로드
 	ConstructorHelpers::FObjectFinder<UMaterial> SplatterMaterial(TEXT("/Script/Engine.Material'/Game/Material/BaseMaterials/M_Paint_Origin.M_Paint_Origin'"));
-	if (SplatterMesh.Succeeded()) {
+	if (SplatterMesh.Succeeded())
+	{
 		MeshComp->SetMaterial(0, SplatterMaterial.Object);
 	}
 
@@ -69,7 +71,8 @@ AHG_Splatter::AHG_Splatter()
 
 	// 데칼 모양 에셋 로드
 	ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterial(*MaterialPath);
-	if (DecalMaterial.Succeeded()) {
+	if (DecalMaterial.Succeeded())
+	{
 		SelectedDecalMaterial = DecalMaterial.Object;
 	}
 
@@ -84,7 +87,11 @@ void AHG_Splatter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 오버렙 이벤트 바인딩
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &AHG_Splatter::OnMyBeginOverlap);
+
+	// 레벨에 있는 모든 스탬프를 가져옴
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StampClass, StampArray);
 
 }
 
@@ -147,20 +154,17 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	// 물방울이 충돌을 일으켰을 때 충돌 근처에 있는 데칼의 정보를 저장하는 변수
 	FDecalInfo* HittedDecalInfo;
 
-	// 임의의 범위를 생성하기 위한 난수
-	float RandNum = FMath::FRandRange(100.0f, 150.0f);
-
 	// 점수를 조작하기 위해 GameMode를 가져와 저장.
-	TObjectPtr<ADoronkoGameMode> GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+	TObjectPtr<ADoronkoGameMode> MyGameMode = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
 
 	// 1~9점 사이의 랜덤 정수 생성 (점수)
 	int32 RandScore = FMath::RandRange(1, 9);
 
 	// 점수 업데이트
-	GM->SetScore(RandScore);
+	MyGameMode->SetScore(RandScore);
 
 	// UI 업데이트
-	GM->UpdataScoreBoard();
+	MyGameMode->UpdataScoreBoard();
 
 	// 물방울이 충돌했을 때 물방울의 머리 방향에 있는 물체에 데칼을 생성하기 위해 LineTrace를 사용
 	// LineTrace 파라미터
@@ -173,12 +177,15 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	QParams.AddObjectTypesToQuery(ECC_PhysicsBody);
 	Params.AddIgnoredActor(this);
 
+	// 임의의 범위를 생성하기 위한 난수
+	float RandRange = FMath::FRandRange(100.0f, 150.0f);
+
 	// LineTrace
 	bool bHit = GetWorld()->LineTraceSingleByObjectType(HitInfo, Start, End, QParams, Params);
 	if (bHit)
 	{
 		// 물방울 충돌 위치 내에 데칼이 있는지 확인
-		HittedDecalInfo = IsDecalInRange(HitInfo.ImpactPoint, RandNum, RandNum);
+		HittedDecalInfo = IsDecalInRange(HitInfo.ImpactPoint, RandRange);
 
 		// 만약 충돌한 물방울이 청소기에 의해 스폰된 것이 아니면서 충돌한 위치에 데칼이 존재하면서 해당 데칼의 색이 물방울의 색과 같다면
 		if (bSpawnedByRV == false && HittedDecalInfo != nullptr && MyColor == HittedDecalInfo->Color)
@@ -190,7 +197,8 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		else
 		{
 			// 데칼을 새로 생성
-			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedDecalMaterial, FVector(-5.0f, RandNum, RandNum), OtherComp, NAME_None, HitInfo.ImpactPoint, HitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
+			UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(SelectedDecalMaterial, FVector(-5.0f, RandRange, RandRange), OtherComp, NAME_None,
+				HitInfo.ImpactPoint, HitInfo.ImpactNormal.ToOrientationRotator(), EAttachLocation::KeepWorldPosition);
 
 			// 만약 데칼이 제대로 생성되었다면
 			if (Decal)
@@ -221,7 +229,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			SpawnDeaclInfo.Pos = HitInfo.ImpactPoint;
 
 			// GameMode가 관리하는 Decal 배열에 추가
-			GM->SpawnedDecalArr.Add(SpawnDeaclInfo);
+			MyGameMode->SpawnedDecalArr.Add(SpawnDeaclInfo);
 		}
 	}
 
@@ -229,13 +237,13 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	this->Destroy();
 
 	// 물방울이 충돌한 곳의 범위 안에 있는 스탬프 찾기
-	TArray<AHG_MissonStamp*> StampArray = IsStampInRange(HitInfo.ImpactPoint, RandNum, RandNum);
+	TArray<AHG_MissonStamp*> SearchedStamps = IsStampInRange(HitInfo.ImpactPoint, RandRange);
 
 	// 만약 찾은 스탬프의 개수가 0 이상이라면
-	if (StampArray.Num() > 0)
+	if (SearchedStamps.Num() > 0)
 	{
 		// StampArray를 순회하면서
-		for (auto Stamp : StampArray)
+		for (auto Stamp : SearchedStamps)
 		{
 
 			// 만약 Stamp가 nullptr이라면
@@ -251,7 +259,7 @@ void AHG_Splatter::OnMyBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 				Stamp->Decal->SetVisibility(true);
 
 				// 찾은 스탬프 개수를 증가시킨다.
-				GM->StampCount++;
+				MyGameMode->StampCount++;
 
 				// 플레이어를 가져와서
 				auto* Player = Cast<AGW_Player>(GetWorld()->GetFirstPlayerController()->GetCharacter());
@@ -282,7 +290,8 @@ void AHG_Splatter::Initalize(FVector initVeloccity)
 void AHG_Splatter::UpdataRotation()
 {
 	// 속도가 0에 가까우면 회전하지 않음
-	if (!Velocity.IsNearlyZero()) {
+	if (!Velocity.IsNearlyZero())
+	{
 		// 속도가 0에 가깝지 않다면
 
 		// 속도를 회전값으로 바꾸고
@@ -293,18 +302,10 @@ void AHG_Splatter::UpdataRotation()
 	}
 }
 
-TArray<AHG_MissonStamp*> AHG_Splatter::IsStampInRange(FVector Pos, float Param1, float Param2)
+TArray<AHG_MissonStamp*> AHG_Splatter::IsStampInRange(FVector Pos, float InRange)
 {
-	// 찾은 스탬프들을 저장하기 위한 배열
-	TArray<AActor*> StampArray;
-
 	// 반환할 스탬프 배열 
 	TArray<AHG_MissonStamp*> Result;
-
-	// 레벨에 있는 모든 스탬프를 가져옴
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StampClass, StampArray);
-
-	UE_LOG(LogTemp, Error, TEXT("%d"), StampArray.Num());
 
 	// 찾은 스탬프들을 순회하면서
 	for (auto Stamp : StampArray)
@@ -312,10 +313,9 @@ TArray<AHG_MissonStamp*> AHG_Splatter::IsStampInRange(FVector Pos, float Param1,
 		// 거리 계산
 		FVector Dist = Pos - (Stamp->GetActorLocation());
 
-		// 만약 스탬프의 위치와 물방울의 위치 사이의 거리가 Param1, Param2보다 작다면
-		if ((Param1 / 2) * (Param1 / 2) + (Param2 / 2) * (Param2 / 2) > Dist.Size() * Dist.Size())
+		// 만약 스탬프의 위치와 물방울의 위치 사이의 거리가 InRange보다 작ekaus
+		if (InRange * InRange > Dist.Size() * Dist.Size())
 		{
-			UE_LOG(LogTemp, Error, TEXT("%s"), *Stamp->GetName());
 			// 스탬프를 Result에 추가
 			Result.Emplace(Cast<AHG_MissonStamp>(Stamp));
 		}
@@ -331,7 +331,7 @@ void AHG_Splatter::SetMyColor(FLinearColor Value)
 	MyColor = Value;
 }
 
-FDecalInfo* AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2)
+FDecalInfo* AHG_Splatter::IsDecalInRange(FVector Pos, float InRange)
 {
 	// 거리 벡터
 	FVector Dist;
@@ -353,8 +353,8 @@ FDecalInfo* AHG_Splatter::IsDecalInRange(FVector Pos, float Param1, float Param2
 		{
 			// Pos에서 데칼으로의 벡터 계산
 			Dist = Pos - GM->SpawnedDecalArr[i].DecalComp->GetComponentLocation();
-			// 만약 계산한 Dist를 반지름으로 하는 원이 Param1, Param2을 두 반지름으로 하는 타원 안에 있다면
-			if ((Param1 / 2) * (Param1 / 2) + (Param2 / 2) * (Param2 / 2) > Dist.Size() * Dist.Size())
+			// 만약 계산한 Dist를 반지름으로 하는 원이 InRange를 반지름으로 하는 원 안에 있다면 (원하는 거리 안에 있다면)
+			if (InRange * InRange > Dist.Size() * Dist.Size())
 			{
 				// 만약 현재 저장되어있는 최소 거리보다 현재 계산한 거리가 더 작다면
 				if (Min.Size() >= Dist.Size())

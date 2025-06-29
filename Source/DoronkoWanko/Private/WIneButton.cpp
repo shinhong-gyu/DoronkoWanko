@@ -47,14 +47,14 @@ void AWIneButton::InteractionWith()
 	MeshComp->SetVisibility(false);
 
 	for (int i = 0; i < 600; i++) {
-		Shake();
+		Splash();
 	}
 
 	// 물감 터뜨리기 or 와인거치대 기울여서 떨어뜨리기 
 	// 기능 확정된 후 추가 함수 기재하기 
 }
 
-void AWIneButton::Shake()
+void AWIneButton::Splash()
 {
 	FVector InitialVelocity = FVector(FMath::RandRange(-800, 800), FMath::RandRange(-800, 800), FMath::RandRange(-600, 1500));
 

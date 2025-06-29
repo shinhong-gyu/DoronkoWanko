@@ -16,7 +16,7 @@ AHJ_Wine1::AHJ_Wine1()
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// 위젯 문구 생성 
-	InteractionText = FText::FromString(TEXT("INTERACTION"));
+	InteractionText = FText::FromString(TEXT("Interaction"));
 
 }
 
@@ -38,10 +38,12 @@ void AHJ_Wine1::Tick(float DeltaTime)
 
 void AHJ_Wine1::SpawnInk()
 {
+	check += 4;
 	// 한 번 와인 흘린 뒤, 또 쳐도 작동 안하도록 
+
 	if (check < 20)
 	{
-	auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, Vec, Rot);
+		auto* Ink = GetWorld()->SpawnActor<AHG_Splatter>(InkFactory, Vec, Rot);
 		if (Ink)
 		{
 			FVector InitialVelocity = FVector(FMath::RandRange(-10, 10), FMath::RandRange(-10, 10), FMath::RandRange(100, 150));
@@ -50,7 +52,6 @@ void AHJ_Wine1::SpawnInk()
 		}
 	}
 
-	check += 4;
 	if (check >= 20)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
@@ -68,7 +69,7 @@ void AHJ_Wine1::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimiti
 		UE_LOG(LogTemp, Warning, TEXT("WineCalled"));
 		if (!GetWorld()->GetTimerManager().IsTimerActive(TimerHandle))
 		{
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AHJ_Wine1::SpawnInk, 1.0f, true);
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AHJ_Wine1::SpawnInk, 0.5f, true);
 		}
 	}
 }

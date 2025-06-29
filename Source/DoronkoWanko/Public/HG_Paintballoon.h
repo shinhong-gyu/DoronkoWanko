@@ -21,8 +21,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	// InteractionWith 함수 오버라이드
 	UFUNCTION()

@@ -80,12 +80,6 @@ void AHG_Paintballoon::BeginPlay()
 	}
 }
 
-// Called every frame
-void AHG_Paintballoon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void AHG_Paintballoon::InteractionWith()
 {
 	// 물방울의 초기속도

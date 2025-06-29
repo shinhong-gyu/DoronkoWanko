@@ -15,59 +15,69 @@ void UHG_EnterInstruction::NativeTick(const FGeometry& MyGeometry, float InDelta
 	LifeTime -= InDeltaTime;
 
 	// 만약 생명주기가 0보다 작거나 같아지면
-	if (LifeTime <= 0) 
+	if (LifeTime <= 0)
 	{
 		// UI 제거
 		RemoveFromParent();
 	}
 
 	// 찾은 스탬프 개수에 따라 이미지 위젯들의 알파값 설정
-	SetImageAlpha();
+	UpdateStampProgress();
 }
 
-void UHG_EnterInstruction::SetText(FText Name)
+void UHG_EnterInstruction::SetRoomName(FText Name)
 {
 	// 방 이름 설정
-	RoomName->SetText(Name);
+	if (TB_RoomName)
+	{
+		TB_RoomName->SetText(Name);
+	}
 }
 
-void UHG_EnterInstruction::SetImageAlpha()
+void UHG_EnterInstruction::UpdateStampProgress()
 {
-	FSlateColor TempColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	// 이미지에 설정할 색상 값
+	FSlateColor ColorValue = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-	auto* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
+	// 현재 게임 모드 가져오기
+	ADoronkoGameMode* GM = Cast<ADoronkoGameMode>(GetWorld()->GetAuthGameMode());
 
-	if (nullptr != GM) 
+	// 게임모드가 유효하다면
+	if (nullptr != GM)
 	{
+		// 찾은 스탬프의 개수에 따라 이미지의 색 설정
 		switch (GM->StampCount)
 		{
 		case 1:
-			StampProgress1->SetBrushTintColor(TempColor);
+			StampProgress1->SetBrushTintColor(ColorValue);
 			break;
 
 		case 2:
-			StampProgress1->SetBrushTintColor(TempColor);
-			StampProgress2->SetBrushTintColor(TempColor);
+			StampProgress1->SetBrushTintColor(ColorValue);
+			StampProgress2->SetBrushTintColor(ColorValue);
 			break;
 		case 3:
-			StampProgress1->SetBrushTintColor(TempColor);
-			StampProgress2->SetBrushTintColor(TempColor);
-			StampProgress3->SetBrushTintColor(TempColor);
+			StampProgress1->SetBrushTintColor(ColorValue);
+			StampProgress2->SetBrushTintColor(ColorValue);
+			StampProgress3->SetBrushTintColor(ColorValue);
 			break;
-		case 4:	
-			StampProgress1->SetBrushTintColor(TempColor);
-			StampProgress2->SetBrushTintColor(TempColor);
-			StampProgress3->SetBrushTintColor(TempColor);
-			StampProgress4->SetBrushTintColor(TempColor);
+		case 4:
+			StampProgress2->SetBrushTintColor(ColorValue);
+			StampProgress3->SetBrushTintColor(ColorValue);
+			StampProgress1->SetBrushTintColor(ColorValue);
+			StampProgress4->SetBrushTintColor(ColorValue);
 			break;
 		case 5:
-			StampProgress1->SetBrushTintColor(TempColor);
-			StampProgress2->SetBrushTintColor(TempColor);
-			StampProgress3->SetBrushTintColor(TempColor);
-			StampProgress4->SetBrushTintColor(TempColor);
-			StampProgress5->SetBrushTintColor(TempColor);
+			StampProgress1->SetBrushTintColor(ColorValue);
+			StampProgress2->SetBrushTintColor(ColorValue);
+			StampProgress3->SetBrushTintColor(ColorValue);
+			StampProgress4->SetBrushTintColor(ColorValue);
+			StampProgress5->SetBrushTintColor(ColorValue);
 			break;
 		}
 	}
-	else return;
+	else
+	{
+		return;
+	}
 }

@@ -37,7 +37,7 @@ public:
 
 	// 페인트 스폰 
 
-	void Shake();
+	void Splash();
 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* InkArrow;
